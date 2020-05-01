@@ -706,6 +706,18 @@ inline b32 operator!=(v3f Left, v3f Right)
     return Result;
 }
 
+inline b32 operator<=(v3f Left, v3f Right)
+{
+    b32 Result = (Left.x <= Right.x) && (Left.y <= Right.y) && (Left.z <= Right.z);
+    return Result;
+}
+
+inline b32 operator>=(v3f Left, v3f Right)
+{
+    b32 Result = (Left.x >= Right.x) && (Left.y >= Right.y) && (Left.z >= Right.z);
+    return Result;
+}
+
 inline f32
 Dot(v3f Left, v3f Right)
 {
