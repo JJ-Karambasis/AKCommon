@@ -618,6 +618,16 @@ operator+(v3f Left, v3f Right)
     return Result;
 }
 
+inline v3f
+operator+(v3f Left, f32 Right)
+{
+    v3f Result;
+    Result.x = Left.x + Right;
+    Result.y = Left.y + Right;
+    Result.z = Left.z + Right;
+    return Result;
+}
+
 inline v3f&
 operator+=(v3f& Left, v3f Right)
 {
@@ -632,6 +642,16 @@ operator-(v3f Left, v3f Right)
     Result.x = Left.x - Right.x;
     Result.y = Left.y - Right.y;
     Result.z = Left.z - Right.z;
+    return Result;
+}
+
+inline v3f
+operator-(v3f Left, f32 Right)
+{
+    v3f Result;
+    Result.x = Left.x - Right;
+    Result.y = Left.y - Right;
+    Result.z = Left.z - Right;
     return Result;
 }
 
