@@ -91,7 +91,6 @@ struct buffer
 #define PushWriteArray_4( Data, Count, Type, Alignment) (Type*)_PushWrite_(__Global_Default_Arena__, sizeof(Type)*Count, Data, Alignment)
 #define PushWriteArray_5( Arena, Data, Count, Type, Alignment) (Type*)_PushWrite_(Arena, sizeof(Type)*Count, Data, Alignment)
 
-#define CopyArray(dst, src, count, type) CopyMemory(dst, src, sizeof(type)*count)
 #define ClearStruct(data, type) ClearMemory(data, sizeof(type))
 #define ClearArray(data, count, type) ClearMemory(data, sizeof(type)*count)
 

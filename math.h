@@ -595,6 +595,13 @@ V3(f32* V)
 }
 
 inline v3f
+V3(f64* V)
+{
+    v3f Result = V3((f32)V[0], (f32)V[1], (f32)V[2]);
+    return Result;
+}
+
+inline v3f
 InvalidV3()
 {
     v3f Result = {INFINITY, INFINITY, INFINITY};
@@ -1217,7 +1224,7 @@ PerspectiveM4(f32 FieldOfView, f32 AspectRatio, f32 Near, f32 Far)
         c/a,  0.0f,   0.0f,                       0.0f,
         0.0f, c,      0.0f,                       0.0f,
         0.0f, 0.0f, -(Far+Near)/(Far-Near),      -1.0f,
-        0.0f, 0.0f, -(2.0f*Far*Near)/(Far-Near),  0.0f
+        0.0f, 0.0f, -(2.0f*Far*Near)/(Far-Near),   0.0f
     };
     
     return Result;
@@ -1490,5 +1497,11 @@ struct vertex_p3_n3_weights
     u8 BoneIndex[4];
     f32 BoneWeights[3];
 };
+
+inline b32 operator!=(vertex_p3_n3 Left, vertex_p3_n3 Right)
+{
+    b32 Result = (Left.P != Right.P) || (Left.N != Right.N);
+    return Result;
+}
 
 #endif

@@ -356,11 +356,11 @@ inline b32 AreEqual(f32 A, f32 B, f32 Epsilon)
 }
 #include "memory.h"
 #include "list.h"
-#include "hash_table.h"
 #include "pool.h"
 #include "string.h"
 #include "error.h"
 #include "riff.h"
 #include "math.h"
+#include "hash_table.h"
 
 #endif

@@ -1,6 +1,54 @@
 #ifndef HASH_TABLE_H
 #define HASH_TABLE_H
 
+inline u64 Hash(f32 Value)
+{
+    union
+    {
+        f32 Float;
+        u32 Int;
+    } U;
+    
+    U.Float = Value;    
+    return (u64)U.Int;
+}
+
+inline u64 Hash(v2f V)
+{
+    u64 Result = ((Hash(V.x) ^ (Hash(V.y) << 1)) >> 1);
+    return Result;
+}
+
+inline u64 Hash(v3f V)
+{
+    u64 Result = Hash(V.xy) ^ (Hash(V.z) << 1);    
+    return Result;
+}
+
+inline u64 Hash(vertex_p3_n3 Vertex)
+{
+    u64 Result = ((Hash(Vertex.P) ^ (Hash(Vertex.N) << 1)) >> 1);
+    return Result;
+}
+
+inline u64 Hash(v2f V, u64 TableSize)
+{
+    u64 Result = Hash(V) % TableSize;
+    return Result;
+}
+
+inline u64 Hash(v3f V, u64 TableSize)
+{
+    u64 Result = Hash(V) % TableSize;    
+    return Result;
+}
+
+inline u64 Hash(vertex_p3_n3 Vertex, u64 TableSize)
+{
+    u64 Result = Hash(Vertex) % TableSize;    
+    return Result;
+}
+
 struct uint_pair
 {
     u32 Pair01;
