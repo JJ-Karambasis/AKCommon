@@ -1483,4 +1483,12 @@ struct vertex_p3_n3
     v3f N;
 };
 
+struct vertex_p3_n3_weights
+{
+    v3f P;
+    v3f N;
+    u8 BoneIndex[4];
+    f32 BoneWeights[3];
+};
+
 #endif

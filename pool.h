@@ -53,7 +53,7 @@ u64 AllocateFromPool(pool<type>* Pool)
     }
     else
     {
-        //CONFIRM(JJ): Should we handle a dynamically grow entity pool? Doubt it
+        //CONFIRM(JJ): Should we handle a dynamically grow pool? 
         ASSERT(Pool->MaxUsed < Pool->Capacity);
         Index = Pool->MaxUsed++;
     }
