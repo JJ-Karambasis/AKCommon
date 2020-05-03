@@ -85,7 +85,24 @@ type* GetByID(pool<type>* Pool, u64 ID)
 {
     ASSERT(IsAllocatedID(ID));
     i32 Index = GetPoolIndex(ID);    
-    type* Result = &Pool->Entries[Index].Entry;
+    pool_entry<type>* Entry = &Pool->Entries[Index];
+    ASSERT(Entry->ID == ID);    
+    type* Result = &Entry->Entry;
+    return Result;
+}
+
+template <typename type>
+type* TryAndGetByID(pool<type>* Pool, u64 ID)
+{
+    if(!IsAllocatedID(ID))
+        return NULL;
+    
+    i32 Index = GetPoolIndex(ID);
+    pool_entry<type>* Entry = &Pool->Entries[Index];
+    if(Entry->ID != ID)
+        return NULL;
+    
+    type* Result = &Entry->Entry;
     return Result;
 }
 
