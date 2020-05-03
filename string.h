@@ -53,6 +53,18 @@ inline b32 StringEquals(char* A, char* B)
     return Result;
 }
 
+inline b32 StringEquals(const char* A, const char* B)
+{
+    b32 Result = StringEquals((char*)A, LiteralStringLength(A), (char*)B, LiteralStringLength(B));
+    return Result;
+}
+
+inline b32 StringEquals(string A, char* B)
+{
+    b32 Result = StringEquals(A.Data, A.Length, B, LiteralStringLength(B));
+    return Result;
+}
+
 string LiteralString(char* Data, ptr StringLength);
 inline string operator+(string Left, int Right)
 {
@@ -149,6 +161,20 @@ inline string GetFilePath(string Path)
 {
     string Filename = GetFilename(Path);
     string Result = LiteralString(Path.Data, Filename-Path);
+    return Result;
+}
+
+inline string GetFileExtension(string Path)
+{
+    string Result = FindLastChar(Path, '.');
+    if(Result.Data == NULL)
+        return {};
+    return Result+1;
+}
+
+inline string GetFileExtension(char* String)
+{
+    string Result = GetFileExtension(LiteralString(String));
     return Result;
 }
 
@@ -287,7 +313,7 @@ char* FormatString(char* Format, va_list List)
 {
 #define FORMAT_STRING_PADDING 128
     char* Result = PushArray(LiteralStringLength(Format)+FORMAT_STRING_PADDING, char, Clear, 0);    
-    sprintf(Result, Format, List);        
+    vsprintf(Result, Format, List);        
     
     return Result;
 }

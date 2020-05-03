@@ -822,6 +822,13 @@ struct v4f
     };
 };
 
+inline v3f
+V3(v4f V)
+{
+    v3f Result = V.xyz;
+    return Result;
+}
+
 inline v4f 
 V4(f32 x, f32 y, f32 z, f32 w)
 {
@@ -921,8 +928,7 @@ struct m3
         {
             f32 m00, m01, m02;
             f32 m10, m11, m12;
-            f32 m20, m21, m22;
-            f32 m30, m31, m32;
+            f32 m20, m21, m22;            
         };
         
         struct
@@ -985,6 +991,40 @@ Transpose(m3 M)
 }
 
 inline m3
+InverseTransformM3(m3 M)
+{
+    f32 sx = 1.0f/SquareMagnitude(M.XAxis);
+    f32 sy = 1.0f/SquareMagnitude(M.YAxis);
+    f32 sz = 1.0f/SquareMagnitude(M.ZAxis);
+    
+    v3f x = sx*M.XAxis;
+    v3f y = sy*M.YAxis;
+    v3f z = sz*M.ZAxis;
+    
+    m3 Result = 
+    {
+        x.x, y.x, z.x,
+        x.y, y.y, z.y,
+        x.z, y.z, z.z,        
+    };
+    
+    return Result;
+}
+
+inline v3f
+operator*(v3f Left, m3 Right)
+{
+    Right = Transpose(Right);
+    
+    v3f Result;
+    Result.x = Dot(Left, Right.Rows[0]);
+    Result.y = Dot(Left, Right.Rows[1]);
+    Result.z = Dot(Left, Right.Rows[2]);
+    
+    return Result;
+}
+
+inline m3
 operator*(m3 Left, m3 Right)
 {
     Right = Transpose(Right);
@@ -1041,6 +1081,44 @@ struct m4
     };
 };
 
+inline m3
+M3(m4 M)
+{
+    m3 Result;
+    Result.XAxis = M.XAxis.xyz;
+    Result.YAxis = M.YAxis.xyz;
+    Result.ZAxis = M.ZAxis.xyz;
+    return Result;
+}
+
+inline m4
+M4(f32* Data)
+{
+    m4 Result = 
+    {
+        Data[0],  Data[1],  Data[2],  Data[3],
+        Data[4],  Data[5],  Data[6],  Data[7],
+        Data[8],  Data[9],  Data[10], Data[11],
+        Data[12], Data[13], Data[14], Data[15]
+    };    
+    
+    return Result;
+}
+
+inline m4
+M4(f64* Data)
+{
+    m4 Result = 
+    {
+        (f32)Data[0],  (f32)Data[1],  (f32)Data[2],  (f32)Data[3],
+        (f32)Data[4],  (f32)Data[5],  (f32)Data[6],  (f32)Data[7],
+        (f32)Data[8],  (f32)Data[9],  (f32)Data[10], (f32)Data[11],
+        (f32)Data[12], (f32)Data[13], (f32)Data[14], (f32)Data[15]
+    };    
+    
+    return Result;
+}
+
 inline m4
 M4(f32 Diagonal)
 {
@@ -1090,6 +1168,13 @@ TransformM4(v3f Position, v3f Scale)
     Result.YAxis = V4(0.0f,    Scale.y, 0.0f,    0.0f);
     Result.ZAxis = V4(0.0f,    0.0f,    Scale.z, 0.0f);
     Result.Translation = V4(Position, 1.0f);
+    return Result;
+}
+
+inline m4 
+TransformM4(v3f Position)
+{
+    m4 Result = TransformM4(Position, V3(1.0f, 1.0f, 1.0f));            
     return Result;
 }
 
@@ -1444,13 +1529,27 @@ ToMatrix3(quaternion Q)
 }
 
 inline m4
+TransformM4(v3f Position, quaternion Orientation, v3f Scale)
+{
+    m3 Matrix = ToMatrix3(Orientation);
+    Matrix.XAxis *= Scale.x;
+    Matrix.YAxis *= Scale.y;
+    Matrix.ZAxis *= Scale.z;
+    m4 Result = TransformM4(Position, Matrix);
+    return Result;
+}
+
+inline m4
+TransformM4(v3f Position, v3f Scale, v3f Euler)
+{
+    m4 Result = TransformM4(Position, EulerQuaternion(Euler), Scale);
+    return Result;
+}
+
+inline m4
 TransformM4(sqt SQT)
 {
-    m3 Orientation = ToMatrix3(SQT.Orientation);
-    Orientation.XAxis *= SQT.Scale.x;
-    Orientation.YAxis *= SQT.Scale.y;
-    Orientation.ZAxis *= SQT.Scale.z;
-    m4 Result = TransformM4(SQT.Position, Orientation);
+    m4 Result = TransformM4(SQT.Position, SQT.Orientation, SQT.Scale);
     return Result;
 }
 
@@ -1494,8 +1593,8 @@ struct vertex_p3_n3_weights
 {
     v3f P;
     v3f N;
-    u8 BoneIndex[4];
-    f32 BoneWeights[3];
+    u8 JointI[4];
+    f32 JointW[4];
 };
 
 inline b32 operator!=(vertex_p3_n3 Left, vertex_p3_n3 Right)
