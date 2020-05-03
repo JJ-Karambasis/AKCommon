@@ -1419,6 +1419,49 @@ EulerQuaternion(v3f Euler)
     return Result;
 }
 
+inline quaternion MatrixQuaternion(m3 Matrix)
+{
+    quaternion Result;
+    
+    f32 Trace = Matrix.m00 + Matrix.m11 + Matrix.m22;
+    if(Trace > 0)
+    {
+        f32 s = 0.5f / Sqrt(Trace + 1.0f);        
+        Result.w = 0.25f / s;
+        Result.x = (Matrix.m12 - Matrix.m21)*s;
+        Result.y = (Matrix.m20 - Matrix.m02)*s;
+        Result.z = (Matrix.m01 - Matrix.m10)*s;
+        return Result;
+    }    
+    
+    if((Matrix.m00 > Matrix.m11) && (Matrix.m00 > Matrix.m22))
+    {
+        f32 s = 2.0f * Sqrt(1.0f + Matrix.m00 - Matrix.m11 - Matrix.m22);
+        Result.w = (Matrix.m12 - Matrix.m21) / s;
+        Result.x = 0.25f * s;
+        Result.y = (Matrix.m10 + Matrix.m01) / s;
+        Result.z = (Matrix.m20 + Matrix.m02) / s;
+    }
+    else if(Matrix.m11 > Matrix.m22)
+    {
+        f32 s = 2.0f * Sqrt(1.0f + Matrix.m11 - Matrix.m00 - Matrix.m22);
+        Result.w = (Matrix.m20 - Matrix.m02) / s;
+        Result.x = (Matrix.m10 + Matrix.m01) / s;
+        Result.y = 0.25f * s;
+        Result.z = (Matrix.m21 + Matrix.m12) / s;
+    }
+    else
+    {
+        f32 s = 2.0f * Sqrt(1.0f + Matrix.m22 - Matrix.m00 - Matrix.m11);
+        Result.w = (Matrix.m01 - Matrix.m10) / s;
+        Result.x = (Matrix.m20 + Matrix.m02) / s;
+        Result.y = (Matrix.m21 + Matrix.m12) / s;
+        Result.z = 0.25f*s;
+    }
+    
+    return Result;
+}
+
 inline f32 
 SquareMagnitude(quaternion Q)
 {
@@ -1505,6 +1548,17 @@ CreateSQT(v3f Position, v3f Scale, v3f Euler)
     return Result;
 }
 
+inline sqt 
+CreateSQT(m4 M)
+{
+    sqt Result;
+    Result.Position = M.Translation.xyz;
+    Result.Scale = V3(Magnitude(M.XAxis.xyz), Magnitude(M.YAxis.xyz), Magnitude(M.ZAxis.xyz));    
+    m3 Rotation = M3(Normalize(M.XAxis.xyz), Normalize(M.YAxis.xyz), Normalize(M.ZAxis.xyz));
+    Result.Orientation = Normalize(MatrixQuaternion(Rotation));
+    return Result;
+}
+
 inline m3 
 ToMatrix3(quaternion Q)
 {
@@ -1525,6 +1579,13 @@ ToMatrix3(quaternion Q)
         2*(qxqy-qwqz),     1 - 2*(qxqx+qzqz), 2*(qyqz+qwqx),   
         2*(qxqz+qwqy),     2*(qyqz-qwqx),     1 - 2*(qxqx+qyqy)
     };
+    return Result;
+}
+
+inline m4
+TransformM4(v3f Position, quaternion Orientation)
+{
+    m4 Result = TransformM4(Position, ToMatrix3(Orientation));    
     return Result;
 }
 
