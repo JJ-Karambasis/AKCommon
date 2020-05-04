@@ -66,6 +66,12 @@ inline f32 RSqrt(f32 Value)
     return Result;
 }
 
+inline f32 Lerp(f32 A, f32 t, f32 B)
+{
+    f32 Result = (1-t)*A + t*B;
+    return Result;
+}
+
 struct v2i
 {
     union
@@ -785,6 +791,15 @@ Normalize(v3f V)
 {
     f32 InvMag = InverseMagnitude(V);
     v3f Result = InvMag*V;
+    return Result;
+}
+
+inline v3f
+Lerp(v3f A, f32 t, v3f B)
+{
+    v3f Result = V3(Lerp(A.x, t, B.x),
+                    Lerp(A.y, t, B.y),
+                    Lerp(A.z, t, B.z));
     return Result;
 }
 
@@ -1579,6 +1594,13 @@ ToMatrix3(quaternion Q)
         2*(qxqy-qwqz),     1 - 2*(qxqx+qzqz), 2*(qyqz+qwqx),   
         2*(qxqz+qwqy),     2*(qyqz-qwqx),     1 - 2*(qxqx+qyqy)
     };
+    return Result;
+}
+
+inline quaternion
+Lerp(quaternion A, f32 t, quaternion B)
+{
+    quaternion Result = Normalize(Quaternion(Lerp(A.v, t, B.v), Lerp(A.s, t, B.s)));
     return Result;
 }
 
