@@ -83,10 +83,11 @@ struct hash_table
     inline u64 GetHashIndex(type Key)
     {
         u64 HashIndex = Hash(Key, TableSize);
-        if(Table[HashIndex].Found && (Table[HashIndex].Key != Key))
+        while(Table[HashIndex].Found && (Table[HashIndex].Key != Key))
         {
             //NOTE(EVERYONE): We are linear probing to resolve has collisions for now. May be customizable at some point
-            HashIndex++;
+            HashIndex++;            
+            ASSERT(HashIndex < TableSize);
         }
         return HashIndex;
     }
