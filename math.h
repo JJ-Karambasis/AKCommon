@@ -726,6 +726,20 @@ operator/(v3f Left, v3f Right)
     return Result;
 }
 
+inline v3f
+operator/(v3f V, f32 Right)
+{
+    v3f Result = {V.x/Right, V.y/Right, V.z/Right};
+    return Result;
+}
+
+inline v3f
+operator/(f32 Left, v3f Right)
+{
+    v3f Result = {Left/Right.x, Left/Right.y, Left/Right.z};
+    return Result;
+}
+
 inline v3f 
 operator-(v3f V)
 {
@@ -791,6 +805,13 @@ Normalize(v3f V)
 {
     f32 InvMag = InverseMagnitude(V);
     v3f Result = InvMag*V;
+    return Result;
+}
+
+inline f32
+Determinant(v3f U, v3f V, v3f W)
+{
+    f32 Result = Dot(U, Cross(V, W));
     return Result;
 }
 
@@ -986,6 +1007,13 @@ inline m3
 IdentityM3()
 {
     m3 Result = M3(1.0f);
+    return Result;
+}
+
+inline f32
+Determinant(m3 M)
+{
+    f32 Result = Determinant(M.XAxis, M.YAxis, M.ZAxis);
     return Result;
 }
 
@@ -1683,6 +1711,38 @@ struct vertex_p3_n3_weights
 inline b32 operator!=(vertex_p3_n3 Left, vertex_p3_n3 Right)
 {
     b32 Result = (Left.P != Right.P) || (Left.N != Right.N);
+    return Result;
+}
+
+struct quadratic_equation_result
+{
+    u32 RootCount;
+    f32 Roots[2];
+};
+
+inline quadratic_equation_result 
+SolveQuadraticEquation(f32 a, f32 b, f32 c)
+{
+    ASSERT(a != 0);
+    quadratic_equation_result Result = {};
+    
+    f32 Determinant = b*b - 4*a*c;
+    if(Determinant < 0)
+        return Result;
+    
+    f32 a2 = 1.0f/(2*a);
+    if(Determinant == 0)
+    {
+        Result.RootCount = 1;
+        Result.Roots[0] = -b*a2;
+        return Result;
+    }
+    
+    Result.RootCount = 2;
+    
+    f32 Discriminant = Sqrt(Determinant);
+    Result.Roots[0] = (-b - Discriminant) * a2;
+    Result.Roots[1] = (-b + Discriminant) * a2;
     return Result;
 }
 

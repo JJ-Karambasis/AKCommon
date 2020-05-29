@@ -49,6 +49,7 @@
 #define EXPAND( x ) x
 
 #define CAT( A, B ) A ## B
+#define CAT2(A, B) CAT(A, B)
 #define SELECT( NAME, NUM ) CAT( NAME ## _, NUM )
 
 #define GET_COUNT( _1, _2, _3, _4, _5, _6, COUNT, ... ) COUNT
@@ -59,23 +60,25 @@
 
 #define OFFSET_OF(type, member) ((ptr)&(((type*)0)->member))
 
+#define XSTRINGIFY(macro) #macro
+#define STRINGIFY(macro) XSTRINGIFY(macro)
+
 #define internal static
 #define local static
 #define global static
 
-#define INVALID_CODE *(int*)0 = 0
+#ifdef OS_WINDOWS
+#define INVALID_CODE __debugbreak()
+#else
+#define INVALID_CODE 
+#endif
+
 #define INVALID_CASE(case_name) case case_name: { INVALID_CODE; } break
 #define INVALID_DEFAULT_CASE default: { INVALID_CODE; } break
 #define INVALID_ELSE else INVALID_CODE
 
-#ifdef OS_WINDOWS
-#define DEBUG_IF_AVAILABLE_OR_TERM __debugbreak()
-#else
-#define DEBUG_IF_AVAILABLE_OR_TERM INVALID_CODE
-#endif
-
 #if DEVELOPER_BUILD
-#define ASSERT(x) if(!(x)) DEBUG_IF_AVAILABLE_OR_TERM
+#define ASSERT(x) if(!(x)) INVALID_CODE
 #else
 #define ASSERT(x)
 #endif
@@ -362,5 +365,8 @@ inline b32 AreEqual(f32 A, f32 B, f32 Epsilon)
 #include "riff.h"
 #include "math.h"
 #include "hash_table.h"
+
+#define FOR_EACH(Value, Structure) auto CAT2(iter_, __LINE__) = BeginIter(Structure); \
+for(auto* Value = GetFirst(&CAT2(iter_, __LINE__)); Value; Value = GetNext(&CAT2(iter_, __LINE__)))
 
 #endif
