@@ -365,6 +365,7 @@ inline b32 AreEqual(f32 A, f32 B, f32 Epsilon)
 #include "riff.h"
 #include "math.h"
 #include "hash_table.h"
+#include "mesh_generation.h"
 
 #define FOR_EACH(Value, Structure) auto CAT2(iter_, __LINE__) = BeginIter(Structure); \
 for(auto* Value = GetFirst(&CAT2(iter_, __LINE__)); Value; Value = GetNext(&CAT2(iter_, __LINE__)))
