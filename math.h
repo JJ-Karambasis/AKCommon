@@ -1722,8 +1722,7 @@ struct quadratic_equation_result
 
 inline quadratic_equation_result 
 SolveQuadraticEquation(f32 a, f32 b, f32 c)
-{
-    ASSERT(a != 0);
+{    
     quadratic_equation_result Result = {};
     
     f32 Determinant = b*b - 4*a*c;
