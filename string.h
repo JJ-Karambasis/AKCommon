@@ -1,6 +1,58 @@
 #ifndef STRING_H
 #define STRING_H
 
+struct string
+{
+    char* Data;
+    ptr Length;
+    
+    inline char operator[](ptr Index)
+    {
+        return Data[Index];
+    }
+};
+
+struct string_storage
+{
+    ptr Capacity;
+    string String;    
+};
+
+struct string_stream
+{
+    arena Storage;
+    ptr Capacity;
+    ptr Size;
+    char* Data;       
+};
+
+string_storage AllocateStringStorage(arena* Arena, ptr Capacity)
+{
+    string_storage Result = {};
+    Result.String.Data = PushArray(Arena, Capacity, char, Clear, 0);
+    Result.Capacity = Capacity;
+    return Result;
+}
+
+void CopyToStorage(string_storage* Storage, string String)
+{
+    ASSERT(Storage->Capacity > String.Length);
+    CopyMemory(Storage->String.Data, String.Data, String.Length);
+    Storage->String.Length = String.Length;    
+}
+
+inline string InvalidString()
+{
+    string Result = {};
+    return Result;
+}
+
+inline b32 IsInvalidString(string String)
+{
+    b32 Result = !String.Data || !String.Length;
+    return Result;
+}
+
 ptr LiteralStringLength(char* Data)
 {
     ptr Result = 0;
@@ -14,25 +66,6 @@ ptr LiteralStringLength(const char* Data)
     ptr Result = LiteralStringLength((char*)Data);
     return Result;
 }
-
-struct string
-{
-    char* Data;
-    ptr Length;
-    
-    inline char operator[](ptr Index)
-    {
-        return Data[Index];
-    }
-};
-
-struct string_stream
-{
-    arena Storage;
-    ptr Capacity;
-    ptr Size;
-    char* Data;       
-};
 
 inline b32 StringEquals(char* A, ptr ALength, char* B, ptr BLength)
 {
@@ -188,6 +221,12 @@ inline string Concat(char* A, ptr ALength, char* B, ptr BLength, arena* Arena = 
     CopyMemory(Result.Data+ALength, B, BLength);    
     Result.Data[StringLength] = 0;                   
     Result.Length = StringLength;
+    return Result;
+}
+
+inline string Concat(char* A, char* B, arena* Arena = GetDefaultArena())
+{
+    string Result = Concat(A, LiteralStringLength(A), B, LiteralStringLength(B), Arena);
     return Result;
 }
 

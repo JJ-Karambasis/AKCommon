@@ -5,31 +5,6 @@
 #undef CopyMemory
 #endif
 
-inline void CopyMemory(void* Dest, void* Src, ptr Size)
-{
-    u8* DestAt = (u8*)Dest;
-    u8* SrcAt = (u8*)Src;
-    while(Size--)
-        *DestAt++ = *SrcAt++;
-}
-
-inline void ClearMemory(void* Dest, ptr Size)
-{
-    u8* DestAt = (u8*)Dest;
-    while(Size--)
-        *DestAt++ = 0;
-}
-
-inline void SetMemoryI64(void* Dest, i64 Value, ptr Size)
-{
-    ASSERT((Size % 8) == 0);
-    
-    i64* At = (i64*)Dest;    
-    ptr LoopCount = Size / 8;
-    while(LoopCount--)
-        *At++ = Value;
-}
-
 enum clear_flag
 {
     __ClearFlagClear__,
@@ -66,6 +41,31 @@ struct buffer
     u8* Data;
     ptr Size;
 };
+
+inline void CopyMemory(void* Dest, void* Src, ptr Size)
+{
+    u8* DestAt = (u8*)Dest;
+    u8* SrcAt = (u8*)Src;
+    while(Size--)
+        *DestAt++ = *SrcAt++;
+}
+
+inline void ClearMemory(void* Dest, ptr Size)
+{
+    u8* DestAt = (u8*)Dest;
+    while(Size--)
+        *DestAt++ = 0;
+}
+
+inline void SetMemoryI64(void* Dest, i64 Value, ptr Size)
+{
+    ASSERT((Size % 8) == 0);
+    
+    i64* At = (i64*)Dest;    
+    ptr LoopCount = Size / 8;
+    while(LoopCount--)
+        *At++ = Value;
+}
 
 #define PushSize( ... ) VA_SELECT( PushSize, __VA_ARGS__)
 #define PushSize_3( Size, Clear, Alignment ) _Push_(__Global_Default_Arena__, Size, __ClearFlag##Clear##__, Alignment)
@@ -248,6 +248,12 @@ inline void EndTemporaryMemory(temp_arena* TempArena)
 inline b32 CheckArena(arena* Arena)
 {
     return Arena->TemporaryArenas == 0;
+}
+
+inline b32 IsInvalidBuffer(buffer Buffer)
+{
+    b32 Result = !Buffer.Data || !Buffer.Size;
+    return Result;
 }
 
 #define CHECK_ARENA(Arena) ASSERT(CheckArena(Arena)) 
