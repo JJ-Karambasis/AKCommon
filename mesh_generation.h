@@ -1,3 +1,6 @@
+#ifndef MESH_GENERATION_H
+#define MESH_GENERATION_H
+
 struct mesh_generation_result
 {
     u32 VertexCount;
@@ -136,3 +139,5 @@ GenerateLineSphere(arena* Storage, f32 Radius, u16 CircleSampleCount, v3f Center
     
     return Result;
 }
+
+#endif

@@ -360,6 +360,7 @@ inline b32 AreEqual(f32 A, f32 B, f32 Epsilon)
 #include "memory.h"
 #include "list.h"
 #include "pool.h"
+#include "dynamic_array.h"
 #include "string.h"
 #include "error.h"
 #include "riff.h"

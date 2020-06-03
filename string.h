@@ -98,6 +98,33 @@ inline b32 StringEquals(string A, char* B)
     return Result;
 }
 
+inline b32 BeginsWith(char* String, ptr StringLength, char* BeginString)
+{
+    for(u32 StringIndex = 0; StringIndex < StringLength; StringIndex++)
+    {   
+        if(!BeginString[StringIndex])
+            break;
+        
+        if(String[StringIndex] != BeginString[StringIndex])
+        {
+            return false;
+        }
+    }    
+    return true;
+}
+
+inline b32 BeginsWith(char* String, char* BeginString)
+{
+    b32 Result = BeginsWith(String, LiteralStringLength(String), BeginString);
+    return Result;
+}
+
+inline b32 BeginsWith(char* String, const char* BeginString)
+{
+    b32 Result = BeginsWith(String, (char*)BeginString);
+    return Result;
+}
+
 string LiteralString(char* Data, ptr StringLength);
 inline string operator+(string Left, int Right)
 {
