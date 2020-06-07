@@ -22,7 +22,7 @@ struct dynamic_array
 };
 
 template <typename type>
-dynamic_array<type> CreateDynamicArray(u32 InitialCapacity)
+inline dynamic_array<type> CreateDynamicArray(u32 InitialCapacity)
 {
     dynamic_array<type> Result;
     Result.Capacity = InitialCapacity;
@@ -32,7 +32,14 @@ dynamic_array<type> CreateDynamicArray(u32 InitialCapacity)
 }
 
 template <typename type>
-void DeleteDynamicArray(dynamic_array<type>* Array)
+inline b32 IsInitialized(dynamic_array<type>* Array)
+{
+    b32 Result = Array->Capacity > 0;
+    return Result;
+}
+
+template <typename type>
+inline void DeleteDynamicArray(dynamic_array<type>* Array)
 {
     if(Array->Data)
         __Internal_Free__(Array->Data);    
@@ -41,9 +48,9 @@ void DeleteDynamicArray(dynamic_array<type>* Array)
 }
 
 template <typename type>
-void Append(dynamic_array<type>* Array, type& Value)
+inline void Append(dynamic_array<type>* Array, type Value)
 {
-    ASSERT(Array->Capacity > 0);
+    ASSERT(IsInitialized(Array));
     if(!Array->Data)        
         Array->Data = (type*)__Internal_Allocate__(sizeof(type)*Array->Capacity);            
     
@@ -51,7 +58,7 @@ void Append(dynamic_array<type>* Array, type& Value)
     {
         Array->Capacity *= 2;
         type* Temp = (type*)__Internal_Allocate__(sizeof(type)*Array->Capacity);
-        CopyMemory(Temp, Array->Data, Array->Size);
+        CopyMemory(Temp, Array->Data, Array->Size*sizeof(type));
         __Internal_Free__(Array->Data);
         Array->Data = Temp;
     }

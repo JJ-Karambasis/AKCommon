@@ -467,7 +467,7 @@ InverseMagnitude(v2f V)
 inline v2f
 Normalize(v2f V)
 {
-    f32 InvMag = InverseMagnitude(V);
+    f32 InvMag = 1.0f/Magnitude(V);
     v2f Result = InvMag*V;
     return Result;
 }
@@ -548,6 +548,10 @@ struct v3f
     };
 };
 
+const global v3f Global_WorldXAxis = {1.0f, 0.0f, 0.0f};
+const global v3f Global_WorldYAxis = {0.0f, 1.0f, 0.0f};
+const global v3f Global_WorldZAxis = {0.0f, 0.0f, 1.0f};
+
 inline v3f
 V3()
 {
@@ -602,6 +606,13 @@ V3(f32* V)
 
 inline v3f
 V3(f64* V)
+{
+    v3f Result = V3((f32)V[0], (f32)V[1], (f32)V[2]);
+    return Result;
+}
+
+inline v3f
+V3(const f64* V)
 {
     v3f Result = V3((f32)V[0], (f32)V[1], (f32)V[2]);
     return Result;
@@ -796,7 +807,8 @@ Magnitude(v3f V)
 inline f32
 InverseMagnitude(v3f V)
 {
-    f32 Result = RSqrt(SquareMagnitude(V));
+    //TODO(JJ): Can we turn this back into RSqrt?
+    f32 Result = 1.0f/Magnitude(V);
     return Result;
 }
 
@@ -1001,6 +1013,24 @@ M3(v3f XAxis, v3f YAxis, v3f ZAxis)
     Result.YAxis = YAxis;
     Result.ZAxis = ZAxis;    
     return Result;
+}
+
+void CreateBasis(v3f Z, v3f* X, v3f* Y)
+{
+    Z = Normalize(Z);
+    *X = -Cross(Z, Global_WorldYAxis);
+    if((Abs(X->x) < 1e-6f) && (Abs(X->y) < 1e-6f) && (Abs(X->z) < 1e-6f))    
+        *X = -Cross(Z, Global_WorldZAxis);   
+    
+    *X = Normalize(*X);
+    *Y = Cross(Z, *X);        
+}
+
+m3 CreateBasis(v3f Z)
+{
+    v3f X, Y;
+    CreateBasis(Z, &X, &Y);    
+    return M3(X, Y, Z);
 }
 
 inline m3
@@ -1640,13 +1670,28 @@ TransformM4(v3f Position, quaternion Orientation)
 }
 
 inline m4
+TransformM4(v3f Position, m3 Orientation, v3f Scale)
+{    
+    Orientation.XAxis *= Scale.x;
+    Orientation.YAxis *= Scale.y;
+    Orientation.ZAxis *= Scale.z;
+    m4 Result = TransformM4(Position, Orientation);
+    return Result;
+}
+
+inline m4 
+TransformM4(v3f Position, v3f XAxis, v3f YAxis, v3f ZAxis, v3f Scale)
+{
+    m3 OrientationMatrix = M3(XAxis, YAxis, ZAxis);
+    m4 Result = TransformM4(Position, OrientationMatrix, Scale);
+    return Result;
+}
+
+inline m4
 TransformM4(v3f Position, quaternion Orientation, v3f Scale)
 {
-    m3 Matrix = ToMatrix3(Orientation);
-    Matrix.XAxis *= Scale.x;
-    Matrix.YAxis *= Scale.y;
-    Matrix.ZAxis *= Scale.z;
-    m4 Result = TransformM4(Position, Matrix);
+    m3 OrientationMatrix = ToMatrix3(Orientation);
+    m4 Result = TransformM4(Position, OrientationMatrix, Scale);    
     return Result;
 }
 
@@ -1729,19 +1774,20 @@ SolveQuadraticEquation(f32 a, f32 b, f32 c)
     if(Determinant < 0)
         return Result;
     
-    f32 a2 = 1.0f/(2*a);
-    if(Determinant == 0)
-    {
-        Result.RootCount = 1;
-        Result.Roots[0] = -b*a2;
-        return Result;
-    }
-    
+    f32 Discriminant = Sqrt(Determinant);    
     Result.RootCount = 2;
     
-    f32 Discriminant = Sqrt(Determinant);
-    Result.Roots[0] = (-b - Discriminant) * a2;
-    Result.Roots[1] = (-b + Discriminant) * a2;
+    if(b < 0)
+    {
+        Result.Roots[0] = (-b + Discriminant) / (2*a);
+        Result.Roots[1] = (2*c) / (-b + Discriminant);
+    }
+    else
+    {
+        Result.Roots[0] = (2*c) / (-b - Discriminant);
+        Result.Roots[1] = (-b - Discriminant) / (2*a);
+    }
+    
     return Result;
 }
 

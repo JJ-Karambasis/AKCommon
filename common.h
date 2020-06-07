@@ -357,6 +357,32 @@ inline b32 AreEqual(f32 A, f32 B, f32 Epsilon)
     b32 Result = Abs(A-B) < Epsilon;
     return Result;
 }
+
+#if 1
+inline b32 AreNearlyEqual(f32 A, f32 B, f32 Epsilon)
+{
+    f32 AbsA = Abs(A);
+    f32 AbsB = Abs(B);
+    f32 Diff = Abs(A-B);
+    
+    b32 Result = false;
+    if (A == B)  // shortcut, handles infinities
+    {
+        Result = true;
+    }
+    else if (A == 0 || B == 0 || (AbsA + AbsB < FLT_MIN)) 
+    {
+        // a or b is zero or both are extremely close to it
+        // relative error is less meaningful here
+        Result = Diff < (Epsilon * FLT_MIN);
+    } 
+    else 
+    { // use relative error
+        Result = Diff / MinimumF32((AbsA + AbsB), FLT_MAX) < Epsilon;
+    }
+    return Result;
+}
+#endif
 #include "memory.h"
 #include "list.h"
 #include "pool.h"
