@@ -379,6 +379,13 @@ operator/(f32 Left, v2f Right)
     return Result;
 }
 
+inline v2f 
+operator/(v2f Left, v2f Right)
+{
+    v2f Result = {Left.x/Right.x, Left.y/Right.y};
+    return Result;
+}
+
 inline v2f
 Negate(v2f V)
 {
