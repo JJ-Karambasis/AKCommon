@@ -813,8 +813,7 @@ Magnitude(v3f V)
 
 inline f32
 InverseMagnitude(v3f V)
-{
-    //TODO(JJ): Can we turn this back into RSqrt?
+{    
     f32 Result = 1.0f/Magnitude(V);
     return Result;
 }
@@ -1559,7 +1558,7 @@ Magnitude(quaternion Q)
 inline f32
 InverseMagnitude(quaternion Q)
 {
-    f32 Result = RSqrt(SquareMagnitude(Q));
+    f32 Result = 1.0f/Magnitude(Q);
     return Result;
 }
 

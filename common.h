@@ -68,8 +68,10 @@
 #define global static
 
 #ifdef OS_WINDOWS
-#define INVALID_CODE __debugbreak()
+#define DEBUG_BREAK __debugbreak()
+#define INVALID_CODE DEBUG_BREAK
 #else
+#define DEBUB_BREAK
 #define INVALID_CODE 
 #endif
 
@@ -158,6 +160,12 @@ inline f32 MaximumF32(f32 A, f32 B)
 inline f32 MaximumF32(f32 A, f32 B, f32 C)
 {
     f32 Result = MaximumF32(MaximumF32(A, B), C);
+    return Result;
+}
+
+inline f32 MinimumF32(f32 A, f32 B, f32 C)
+{
+    f32 Result = MinimumF32(MinimumF32(A, B), C);
     return Result;
 }
 
@@ -391,7 +399,9 @@ inline b32 AreNearlyEqual(f32 A, f32 B, f32 Epsilon)
 #include "error.h"
 #include "riff.h"
 #include "math.h"
+#include "hash.h"
 #include "hash_table.h"
+#include "hash_map.h"
 #include "mesh_generation.h"
 
 #define FOR_EACH(Value, Structure) auto CAT2(iter_, __LINE__) = BeginIter(Structure); \

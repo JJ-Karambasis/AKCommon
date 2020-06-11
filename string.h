@@ -377,7 +377,7 @@ inline string PushString(string_stream* Stream, arena* Arena = GetDefaultArena()
 //TODO(JJ): Replace this with our own format string that will actually use a stringstream
 char* FormatString(char* Format, va_list List)
 {
-#define FORMAT_STRING_PADDING 128
+#define FORMAT_STRING_PADDING 128    
     char* Result = PushArray(LiteralStringLength(Format)+FORMAT_STRING_PADDING, char, Clear, 0);    
     vsprintf(Result, Format, List);        
     
