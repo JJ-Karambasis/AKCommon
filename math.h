@@ -3,6 +3,7 @@
 
 #define PI 3.14159265359f
 #define INV_PI 0.31830988618f
+#define SQRT2_2 0.70710678118f
 
 inline f32 Sin(f32 Rads)
 {
@@ -372,6 +373,13 @@ operator/(v2f V, f32 Right)
     return Result;
 }
 
+inline v2f&
+operator/=(v2f& V, f32 Right)
+{
+    V = V / Right;
+    return V;
+}
+
 inline v2f
 operator/(f32 Left, v2f Right)
 {
@@ -424,9 +432,21 @@ inline b32 operator<(v2f Left, v2f Right)
     return Result;
 }
 
+inline b32 operator<=(v2f Left, v2f Right)
+{
+    b32 Result = (Left.x <= Right.x) && (Left.y <= Right.y);
+    return Result;
+}
+
 inline b32 operator>=(v2f Left, f32 Right)
 {
     b32 Result = (Left.x >= Right) && (Left.y >= Right);
+    return Result;
+}
+
+inline b32 operator>=(v2f Left, v2f Right)
+{
+    b32 Result = (Left.x >= Right.x) && (Left.y >= Right.y);
     return Result;
 }
 
