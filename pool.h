@@ -31,6 +31,13 @@ pool<type> CreatePool(arena* Arena, u32 Capacity)
     return Result;
 }
 
+template <typename type>
+b32 IsInitialized(pool<type>* Pool)
+{
+    b32 Result = Pool->Entries != NULL;    
+    return Result;
+}
+
 inline u32 GetPoolIndex(u64 ID)
 {
     i32 Result = (u32)(ID & 0xFFFFFFFF);
@@ -81,6 +88,13 @@ void FreeFromPool(pool<type>* Pool, u64 ID)
 }
 
 template <typename type>
+void FreeFromPool(pool<type>* Pool, type* Entry)
+{
+    u64 ID = ((u64*)Entry)[-1];
+    FreeFromPool(Pool, ID);
+}
+
+template <typename type>
 type* GetByID(pool<type>* Pool, u64 ID)
 {
     ASSERT(IsAllocatedID(ID));
@@ -127,13 +141,17 @@ type* GetFirst(pool_iter<type>* Iter)
     ASSERT(Iter->CurrentID == 0);
     
     pool<type>* Pool = Iter->Pool;
-    for(u32 Index = 0; Index < Pool->Capacity; Index++)
+    
+    if(IsInitialized(Pool))
     {
-        pool_entry<type>* Entry = Pool->Entries + Index;
-        if(IsAllocatedID(Entry->ID))
+        for(u32 Index = 0; Index < Pool->Capacity; Index++)
         {
-            Iter->CurrentID = Entry->ID;
-            return &Entry->Entry;
+            pool_entry<type>* Entry = Pool->Entries + Index;
+            if(IsAllocatedID(Entry->ID))
+            {
+                Iter->CurrentID = Entry->ID;
+                return &Entry->Entry;
+            }
         }
     }
     
@@ -146,13 +164,16 @@ type* GetNext(pool_iter<type>* Iter)
     ASSERT(Iter->CurrentID != 0);    
     
     pool<type>* Pool = Iter->Pool;
-    for(u32 Index = GetPoolIndex(Iter->CurrentID)+1; Index < Pool->Capacity; Index++)
+    if(IsInitialized(Pool))
     {
-        pool_entry<type>* Entry = Pool->Entries + Index;
-        if(IsAllocatedID(Entry->ID))
+        for(u32 Index = GetPoolIndex(Iter->CurrentID)+1; Index < Pool->Capacity; Index++)
         {
-            Iter->CurrentID = Entry->ID;
-            return &Entry->Entry;
+            pool_entry<type>* Entry = Pool->Entries + Index;
+            if(IsAllocatedID(Entry->ID))
+            {
+                Iter->CurrentID = Entry->ID;
+                return &Entry->Entry;
+            }
         }
     }
     

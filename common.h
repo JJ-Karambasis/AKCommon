@@ -391,6 +391,7 @@ inline b32 AreNearlyEqual(f32 A, f32 B, f32 Epsilon)
     return Result;
 }
 #endif
+#include "atomic.h"
 #include "memory.h"
 #include "list.h"
 #include "pool.h"
