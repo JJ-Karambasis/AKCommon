@@ -877,6 +877,11 @@ struct v4f
             v3f xyz;
             f32 __unused_0__;
         };
+        struct
+        {
+            f32 __unused_1__;
+            v3f yzw;
+        };
         
         struct
         {
@@ -1398,6 +1403,18 @@ operator*(m4 Left, v4f Right)
 }
 
 inline m4
+operator*(f32 Left, m4 Right)
+{
+    Right = Transpose(Right);
+    m4 Result;
+    Result.Row0 = V4(Left * Right.Row0.x, Left * Right.Row0.y, Left * Right.Row0.x, Left * Right.Row0.w);
+    Result.Row1 = V4(Left * Right.Row1.x, Left * Right.Row1.y, Left * Right.Row1.x, Left * Right.Row1.w);
+    Result.Row2 = V4(Left * Right.Row2.x, Left * Right.Row2.y, Left * Right.Row2.x, Left * Right.Row2.w);
+    Result.Row3 = V4(Left * Right.Row3.x, Left * Right.Row3.y, Left * Right.Row3.x, Left * Right.Row3.w);
+    return Result;
+}
+
+inline m4
 PerspectiveM4(f32 FieldOfView, f32 AspectRatio, f32 Near, f32 Far)
 {
     f32 c = 1.0f/Tan(FieldOfView*0.5f);
@@ -1815,6 +1832,44 @@ SolveQuadraticEquation(f32 a, f32 b, f32 c)
     }
     
     return Result;
+}
+
+inline f32 Determinant(const m4& M)
+{
+    f32 Result = (M.m00 * Determinant(M.Rows[1].yzw, M.Rows[2].yzw, M.Rows[3].yzw) - 
+                  M.m10 * Determinant(M.Rows[0].yzw, M.Rows[2].yzw, M.Rows[3].yzw) + 
+                  M.m20 * Determinant(M.Rows[0].yzw, M.Rows[1].yzw, M.Rows[3].yzw) - 
+                  M.m30 * Determinant(M.Rows[0].yzw, M.Rows[1].yzw, M.Rows[2].yzw));    
+    return Result;
+}
+inline m4 Inverse(const m4 M)
+{
+    f32 Det = Determinant(M);
+    if(Det == 0)
+    {        
+        ASSERT(false);
+        return {};
+    }
+    m4 Adjoint = 
+    {
+        M.m11*M.m22*M.m33 + M.m12*M.m23*M.m31 + M.m13*M.m21*M.m32 - M.m13*M.m22*M.m31 - M.m12*M.m21*M.m33 - M.m11*M.m23*M.m32,
+        -M.m01*M.m22*M.m33 - M.m02*M.m23*M.m31 - M.m03*M.m21*M.m32 + M.m03*M.m22*M.m31 + M.m02*M.m21*M.m33 + M.m01*M.m23*M.m32,
+        M.m01*M.m12*M.m33 + M.m02*M.m13*M.m31 + M.m03*M.m11*M.m32 - M.m03*M.m12*M.m31 - M.m02*M.m11*M.m33 - M.m01*M.m13*M.m32,
+        -M.m01*M.m12*M.m23 - M.m02*M.m13*M.m21 - M.m03*M.m11*M.m22 + M.m03*M.m12*M.m21 + M.m02*M.m11*M.m23 + M.m01*M.m13*M.m22,
+        -M.m10*M.m22*M.m33 - M.m12*M.m23*M.m30 - M.m13*M.m20*M.m32 + M.m13*M.m22*M.m30 + M.m12*M.m20*M.m33 + M.m10*M.m23*M.m32,
+        M.m00*M.m22*M.m33 + M.m02*M.m23*M.m30 + M.m03*M.m20*M.m32 - M.m03*M.m22*M.m30 - M.m02*M.m20*M.m33 - M.m00*M.m23*M.m32,
+        -M.m00*M.m12*M.m33 - M.m02*M.m13*M.m30 - M.m03*M.m10*M.m32 + M.m03*M.m12*M.m30 + M.m02*M.m10*M.m33 + M.m00*M.m13*M.m32,
+        M.m00*M.m12*M.m23 + M.m02*M.m13*M.m20 + M.m03*M.m10*M.m22 - M.m03*M.m12*M.m20 - M.m02*M.m10*M.m23 - M.m00*M.m13*M.m22,
+        M.m10*M.m21*M.m33 + M.m11*M.m23*M.m30 + M.m13*M.m20*M.m31 - M.m13*M.m21*M.m30 - M.m11*M.m20*M.m33 - M.m10*M.m23*M.m31,
+        -M.m00*M.m21*M.m33 - M.m01*M.m23*M.m30 - M.m03*M.m20*M.m31 + M.m03*M.m21*M.m30 + M.m01*M.m20*M.m33 + M.m00*M.m23*M.m31,
+        M.m00*M.m11*M.m33 + M.m01*M.m13*M.m30 + M.m03*M.m10*M.m31 - M.m03*M.m11*M.m30 - M.m01*M.m10*M.m33 - M.m00*M.m13*M.m31,
+        -M.m00*M.m11*M.m23 - M.m01*M.m13*M.m20 - M.m03*M.m10*M.m21 + M.m03*M.m11*M.m20 + M.m01*M.m10*M.m23 + M.m00*M.m13*M.m21,
+        -M.m10*M.m21*M.m32 - M.m11*M.m22*M.m30 - M.m12*M.m20*M.m31 + M.m12*M.m21*M.m30 + M.m11*M.m20*M.m32 + M.m10*M.m22*M.m31,
+        M.m00*M.m21*M.m32 + M.m01*M.m22*M.m30 + M.m02*M.m20*M.m31 - M.m02*M.m21*M.m30 - M.m01*M.m20*M.m32 - M.m00*M.m22*M.m31,
+        -M.m00*M.m11*M.m32 - M.m01*M.m12*M.m30 - M.m02*M.m10*M.m31 + M.m02*M.m11*M.m30 + M.m01*M.m10*M.m32 + M.m00*M.m12*M.m31,
+        M.m00*M.m11*M.m22 + M.m01*M.m12*M.m20 + M.m02*M.m10*M.m21 - M.m02*M.m11*M.m20 - M.m01*M.m10*M.m22 - M.m00*M.m12*M.m21
+    };
+    return 1.0f/Det * Adjoint;
 }
 
 #endif
