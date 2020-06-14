@@ -1834,7 +1834,7 @@ SolveQuadraticEquation(f32 a, f32 b, f32 c)
     return Result;
 }
 
-inline f32 Determinant(const m4& M)
+inline f32 Determinant(m4 M)
 {
     f32 Result = (M.m00 * Determinant(M.Rows[1].yzw, M.Rows[2].yzw, M.Rows[3].yzw) - 
                   M.m10 * Determinant(M.Rows[0].yzw, M.Rows[2].yzw, M.Rows[3].yzw) + 
@@ -1842,7 +1842,7 @@ inline f32 Determinant(const m4& M)
                   M.m30 * Determinant(M.Rows[0].yzw, M.Rows[1].yzw, M.Rows[2].yzw));    
     return Result;
 }
-inline m4 Inverse(const m4 M)
+inline m4 Inverse(m4 M)
 {
     f32 Det = Determinant(M);
     if(Det == 0)
@@ -1850,6 +1850,7 @@ inline m4 Inverse(const m4 M)
         ASSERT(false);
         return {};
     }
+    
     m4 Adjoint = 
     {
         M.m11*M.m22*M.m33 + M.m12*M.m23*M.m31 + M.m13*M.m21*M.m32 - M.m13*M.m22*M.m31 - M.m12*M.m21*M.m33 - M.m11*M.m23*M.m32,
@@ -1869,6 +1870,7 @@ inline m4 Inverse(const m4 M)
         -M.m00*M.m11*M.m32 - M.m01*M.m12*M.m30 - M.m02*M.m10*M.m31 + M.m02*M.m11*M.m30 + M.m01*M.m10*M.m32 + M.m00*M.m12*M.m31,
         M.m00*M.m11*M.m22 + M.m01*M.m12*M.m20 + M.m02*M.m10*M.m21 - M.m02*M.m11*M.m20 - M.m01*M.m10*M.m22 - M.m00*M.m12*M.m21
     };
+    
     return 1.0f/Det * Adjoint;
 }
 
