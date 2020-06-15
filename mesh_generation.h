@@ -268,4 +268,125 @@ GenerateTriangleCone(arena* Storage, f32 Radius, f32 Height, u16 CircleSampleCou
     return Result;
 }
 
+inline u16 
+SubdivideEdge(u16 Index0, u16 Index1, v3f P0, v3f P1, mesh_generation_result* MeshOut, hash_map<uint_pair, u16>* DivisionsMap)
+{
+    uint_pair Edge = {Index0, Index1};
+    
+    u16 Result;
+    if(DivisionsMap->Find(Edge, &Result))
+        return Result;
+    
+    v3f P = Normalize((P0+P1)*0.5f);
+    Result = SafeU16(MeshOut->VertexCount++);
+    MeshOut->Vertices[Result] = {P};
+    DivisionsMap->Insert(Edge, Result);
+    return Result;
+}
+
+inline mesh_generation_result
+GenerateIcosahedronSphere(arena* Storage, u32 Subdivisons, f32 Radius=1.0f)
+{
+    f32 t = (1.0f + Sqrt(5.0f)) / 2.0f;
+    vertex_p3 Vertices[] = 
+    {
+        Normalize(V3(-1.0f,  t,     0.0f)),
+        Normalize(V3( 1.0f,  t,     0.0f)),
+        Normalize(V3(-1.0f, -t,     0.0f)),
+        Normalize(V3( 1.0f, -t,     0.0f)),        
+        Normalize(V3( 0.0f, -1.0f,  t)),
+        Normalize(V3( 0.0f,  1.0f,  t)),
+        Normalize(V3( 0.0f, -1.0f, -t)),
+        Normalize(V3( 0.0f,  1.0f, -t)),        
+        Normalize(V3( t,     0.0f, -1.0f)),
+        Normalize(V3( t,     0.0f,  1.0f)),
+        Normalize(V3(-t,     0.0f, -1.0f)),
+        Normalize(V3(-t,     0.0f,  1.0f))
+    };
+    
+    u16 Indices[] = 
+    {
+        0, 11, 5,
+        0, 5, 1,
+        0, 1, 7, 
+        0, 7, 10,
+        0, 10, 11,
+        1, 5, 9,
+        5, 11, 4,
+        11, 10, 2,
+        10, 7, 6,
+        7, 1, 8,
+        3, 9, 4,
+        3, 4, 2,
+        3, 2, 6,
+        3, 6, 8,
+        3, 8, 9,
+        4, 9, 5,
+        2, 4, 11,
+        6, 2, 10,
+        8, 6, 7,
+        9, 8, 1                
+    };        
+    
+    mesh_generation_result MeshIn = AllocateMeshGenerationResult(Storage, ARRAYCOUNT(Vertices), ARRAYCOUNT(Indices));
+    CopyMemory(MeshIn.Vertices, Vertices, sizeof(Vertices));
+    CopyMemory(MeshIn.Indices,  Indices, sizeof(Indices));
+    
+    for(u32 SubdivisionIndex = 0; SubdivisionIndex < Subdivisons; SubdivisionIndex++)
+    {           
+        ASSERT((MeshIn.IndexCount % 3) == 0);
+        u32 TriangleCount = MeshIn.IndexCount/3;
+        u32 NewVertexCount = MeshIn.VertexCount+(TriangleCount*3);
+        u32 NewIndexCount = (TriangleCount*3)*4;
+        
+        mesh_generation_result MeshOut = AllocateMeshGenerationResult(Storage, NewVertexCount, NewIndexCount);
+        MeshOut.VertexCount = MeshIn.VertexCount;
+        MeshOut.IndexCount = 0;
+        
+        CopyMemory(MeshOut.Vertices, MeshIn.Vertices, sizeof(vertex_p3)*MeshIn.VertexCount);
+        
+        hash_map<uint_pair, u16> DivisionsMap = CreateHashMap<uint_pair, u16>(8191);
+                
+        for(u32 TriangleIndex = 0; TriangleIndex < TriangleCount; TriangleIndex++)
+        {
+            u16 Index0 = MeshIn.Indices[TriangleIndex*3 + 0];
+            u16 Index1 = MeshIn.Indices[TriangleIndex*3 + 1];
+            u16 Index2 = MeshIn.Indices[TriangleIndex*3 + 2];
+            
+            v3f P0 = MeshIn.Vertices[Index0].P;
+            v3f P1 = MeshIn.Vertices[Index1].P;
+            v3f P2 = MeshIn.Vertices[Index2].P;
+            
+            u16 Index3 = SubdivideEdge(Index0, Index1, P0, P1, &MeshOut, &DivisionsMap);
+            u16 Index4 = SubdivideEdge(Index1, Index2, P1, P2, &MeshOut, &DivisionsMap);
+            u16 Index5 = SubdivideEdge(Index2, Index0, P2, P0, &MeshOut, &DivisionsMap);
+            
+            MeshOut.Indices[MeshOut.IndexCount++] = Index0;
+            MeshOut.Indices[MeshOut.IndexCount++] = Index3;
+            MeshOut.Indices[MeshOut.IndexCount++] = Index5;
+            
+            MeshOut.Indices[MeshOut.IndexCount++] = Index3;
+            MeshOut.Indices[MeshOut.IndexCount++] = Index1;
+            MeshOut.Indices[MeshOut.IndexCount++] = Index4;
+            
+            MeshOut.Indices[MeshOut.IndexCount++] = Index4;
+            MeshOut.Indices[MeshOut.IndexCount++] = Index2;
+            MeshOut.Indices[MeshOut.IndexCount++] = Index5;
+            
+            MeshOut.Indices[MeshOut.IndexCount++] = Index3;
+            MeshOut.Indices[MeshOut.IndexCount++] = Index4;
+            MeshOut.Indices[MeshOut.IndexCount++] = Index5;            
+        }    
+        
+        ASSERT(MeshOut.VertexCount <= NewVertexCount);
+        ASSERT(MeshOut.IndexCount == NewIndexCount);
+        
+        MeshIn = MeshOut;
+    }
+    
+    for(u32 VertexIndex = 0; VertexIndex < MeshIn.VertexCount; VertexIndex++) MeshIn.Vertices[VertexIndex].P *= Radius;
+    
+    return MeshIn;
+}
+
 #endif
