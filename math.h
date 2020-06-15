@@ -1283,13 +1283,20 @@ TransformM4(v3f Position)
 }
 
 inline m4
-TransformM4(v3f Position, m3 Orientation)
+TransformM4(v3f Position, v3f XAxis, v3f YAxis, v3f ZAxis)
 {
     m4 Result;
-    Result.XAxis       = V4(Orientation.XAxis, 0.0f);
-    Result.YAxis       = V4(Orientation.YAxis, 0.0f);
-    Result.ZAxis       = V4(Orientation.ZAxis, 0.0f);
+    Result.XAxis       = V4(XAxis, 0.0f);
+    Result.YAxis       = V4(YAxis, 0.0f);
+    Result.ZAxis       = V4(ZAxis, 0.0f);
     Result.Translation = V4(Position, 1.0f);
+    return Result;
+}
+
+inline m4
+TransformM4(v3f Position, m3 Orientation)
+{
+    m4 Result = TransformM4(Position, Orientation.XAxis, Orientation.YAxis, Orientation.ZAxis);    
     return Result;
 }
 
