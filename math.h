@@ -778,6 +778,20 @@ operator/(f32 Left, v3f Right)
     return Result;
 }
 
+inline v3f&
+operator/=(v3f& Left, f32 Right)
+{
+    Left = Left/Right;
+    return Left;
+}
+
+inline v3f&
+operator/=(v3f& Left, v3f Right)
+{
+    Left = Left/Right;
+    return Left;
+}
+
 inline v3f 
 operator-(v3f V)
 {
@@ -992,6 +1006,18 @@ inline v4f Yellow()
 inline v4f Black()
 {
     v4f Result = RGBA(0.0f, 0.0f, 0.0f, 1.0f);
+    return Result;
+}
+
+inline v4f Cyan()
+{
+    v4f Result = RGBA(0.0f, 1.0f, 1.0f, 1.0f);
+    return Result;
+}
+
+inline v4f Magenta()
+{
+    v4f Result = RGBA(1.0f, 0.0f, 1.0f, 1.0f);
     return Result;
 }
 
