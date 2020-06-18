@@ -375,26 +375,28 @@ inline string PushString(string_stream* Stream, arena* Arena = GetDefaultArena()
 }
 
 //TODO(JJ): Replace this with our own format string that will actually use a stringstream
-char* FormatString(char* Format, va_list List)
+string FormatString(char* Format, va_list List, arena* StringArena = GetDefaultArena())
 {
 #define FORMAT_STRING_PADDING 128    
-    char* Result = PushArray(LiteralStringLength(Format)+FORMAT_STRING_PADDING, char, Clear, 0);    
-    vsprintf(Result, Format, List);        
+    char* String = PushArray(StringArena, LiteralStringLength(Format)+FORMAT_STRING_PADDING, char, Clear, 0);    
+    ptr StringLength = vsprintf(String, Format, List);        
     
+    string Result = LiteralString(String, StringLength);    
     return Result;
 }
 
-char* FormatString(const char* Format, ...)
+string FormatString(const char* Format, ...)
 {    
     va_list List;
     va_start(List, Format);    
     
-    char* Result = FormatString((char*)Format, List);
+    string Result = FormatString((char*)Format, List);
     
     va_end(List);
     
     return Result;
 }
+
 
 
 
