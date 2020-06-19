@@ -86,6 +86,12 @@ inline b32 StringEquals(char* A, char* B)
     return Result;
 }
 
+inline b32 StringEquals(char* A, char* B, ptr BLength)
+{
+    b32 Result = StringEquals(A, LiteralStringLength(A), B, BLength);
+    return Result;
+}
+
 inline b32 StringEquals(const char* A, const char* B)
 {
     b32 Result = StringEquals((char*)A, LiteralStringLength(A), (char*)B, LiteralStringLength(B));

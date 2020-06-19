@@ -876,6 +876,65 @@ Lerp(v3f A, f32 t, v3f B)
     return Result;
 }
 
+#ifdef RGB
+#undef RGB
+#endif
+
+inline v3f
+RGB(f32 r, f32 g, f32 b)
+{
+    v3f Result = V3(r, g, b);
+    return Result;
+}
+
+inline v3f White3()
+{
+    v3f Result = RGB(1.0f, 1.0f, 1.0f);
+    return Result;
+}
+
+inline v3f Red3()
+{
+    return RGB(1.0f, 0.0f, 0.0f);
+}
+
+inline v3f Green3()
+{
+    v3f Result = RGB(0.0f, 1.0f, 0.0f);
+    return Result;
+}
+
+inline v3f Blue3()
+{    
+    return RGB(0.0f, 0.0f, 1.0f);
+}
+
+inline v3f Yellow3()
+{
+    v3f Result = RGB(1.0f, 1.0f, 0.0f);
+    return Result;
+}
+
+inline v3f Black3()
+{
+    v3f Result = RGB(0.0f, 0.0f, 0.0f);
+    return Result;
+}
+
+inline v3f Cyan3()
+{
+    v3f Result = RGB(0.0f, 1.0f, 1.0f);
+    return Result;
+}
+
+inline v3f Magenta3()
+{
+    v3f Result = RGB(1.0f, 0.0f, 1.0f);
+    return Result;
+}
+
+typedef v3f c3;
+
 struct v4f
 {
     union
@@ -959,10 +1018,46 @@ V4(v3f xyz, f32 w)
     return Result;
 }
 
+inline v4f 
+operator*(f32 Left, v4f Right)
+{
+    v4f Result = {Left*Right.x, Left*Right.y, Left*Right.z, Left*Right.w};
+    return Result;
+}
+
 inline f32
 Dot(v4f Left, v4f Right)
 {
     f32 Result = Left.x*Right.x + Left.y*Right.y + Left.z*Right.z + Left.w*Right.w;
+    return Result;
+}
+
+inline f32 
+SquareMagnitude(v4f V)
+{
+    f32 Result = Dot(V, V);
+    return Result;
+}
+
+inline f32
+Magnitude(v4f V)
+{
+    f32 Result = Sqrt(SquareMagnitude(V));
+    return Result;
+}
+
+inline f32
+InverseMagnitude(v4f V)
+{    
+    f32 Result = 1.0f/Magnitude(V);
+    return Result;
+}
+
+inline v4f
+Normalize(v4f V)
+{
+    f32 InvMag = InverseMagnitude(V);
+    v4f Result = InvMag*V;
     return Result;
 }
 
@@ -973,49 +1068,49 @@ RGBA(f32 r, f32 g, f32 b, f32 a)
     return Result;
 }
 
-inline v4f White()
+inline v4f White4()
 {
     v4f Result = RGBA(1.0f, 1.0f, 1.0f, 1.0f);
     return Result;
 }
 
 global v4f Global_Red = RGBA(1.0f, 0.0f, 0.0f, 1.0f);
-inline v4f Red()
+inline v4f Red4()
 {
     return Global_Red;
 }
 
-inline v4f Green()
+inline v4f Green4()
 {
     v4f Result = RGBA(0.0f, 1.0f, 0.0f, 1.0f);
     return Result;
 }
 
 global v4f Global_Blue = RGBA(0.0f, 0.0f, 1.0f, 0.0f);
-inline v4f Blue()
+inline v4f Blue4()
 {    
     return Global_Blue;
 }
 
-inline v4f Yellow()
+inline v4f Yellow4()
 {
     v4f Result = RGBA(1.0f, 1.0f, 0.0f, 1.0f);
     return Result;
 }
 
-inline v4f Black()
+inline v4f Black4()
 {
     v4f Result = RGBA(0.0f, 0.0f, 0.0f, 1.0f);
     return Result;
 }
 
-inline v4f Cyan()
+inline v4f Cyan4()
 {
     v4f Result = RGBA(0.0f, 1.0f, 1.0f, 1.0f);
     return Result;
 }
 
-inline v4f Magenta()
+inline v4f Magenta4()
 {
     v4f Result = RGBA(1.0f, 0.0f, 1.0f, 1.0f);
     return Result;
