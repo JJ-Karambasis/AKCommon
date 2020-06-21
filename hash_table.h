@@ -17,11 +17,23 @@ struct hash_table
     inline u64 GetHashIndex(type Key)
     {
         u64 HashIndex = Hash(Key, TableSize);
+        
+        //TODO(JJ): This is so bad :(
+        b32 Reverse = false;
         while(Table[HashIndex].Found && (Table[HashIndex].Key != Key))
         {
-            //NOTE(EVERYONE): We are linear probing to resolve has collisions for now. May be customizable at some point
-            HashIndex++;            
-            ASSERT(HashIndex < TableSize);
+            if((HashIndex+1) == TableSize)
+                Reverse = true;
+            
+            if(Reverse)
+            {
+                HashIndex--;
+                ASSERT(HashIndex > 0);
+            }
+            else
+            {                
+                HashIndex++;                                            
+            }
         }
         return HashIndex;
     }

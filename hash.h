@@ -37,6 +37,12 @@ inline u64 Hash(vertex_p3_n3 Vertex)
     return Result;
 }
 
+inline u64 Hash(vertex_p3_n3_uv Vertex)
+{
+    u64 Result = ((Hash(Vertex.P) ^ (Hash(Vertex.N) << 1)) >> 1) ^ (Hash(Vertex.UV) << 1);
+    return Result;
+}
+
 inline u64 Hash(v2f V, u64 TableSize)
 {
     u64 Result = Hash(V) % TableSize;
@@ -50,6 +56,12 @@ inline u64 Hash(v3f V, u64 TableSize)
 }
 
 inline u64 Hash(vertex_p3_n3 Vertex, u64 TableSize)
+{
+    u64 Result = Hash(Vertex) % TableSize;    
+    return Result;
+}
+
+inline u64 Hash(vertex_p3_n3_uv Vertex, u64 TableSize)
 {
     u64 Result = Hash(Vertex) % TableSize;    
     return Result;

@@ -262,6 +262,20 @@ V2(f32 x, f32 y)
 }
 
 inline v2f
+V2(f32* V)
+{
+    v2f Result = V2(V[0], V[1]);
+    return Result;
+}
+
+inline v2f
+V2(f64* V)
+{
+    v2f Result = V2((f32)V[0], (f32)V[1]);
+    return Result;
+}
+
+inline v2f
 operator+(v2f Left, f32 Right)
 {
     v2f Result = {Left.x+Right, Left.y+Right};
@@ -1916,6 +1930,13 @@ struct vertex_p3_n3
     v3f N;
 };
 
+struct vertex_p3_n3_uv
+{
+    v3f P;
+    v3f N;
+    v2f UV;
+};
+
 struct vertex_p3_n3_weights
 {
     v3f P;
@@ -1924,9 +1945,24 @@ struct vertex_p3_n3_weights
     f32 JointW[4];
 };
 
+struct vertex_p3_n3_uv_weights
+{
+    v3f P;
+    v3f N;
+    v2f UV;
+    u8 JointI[4];
+    f32 JointW[4];
+};
+
 inline b32 operator!=(vertex_p3_n3 Left, vertex_p3_n3 Right)
 {
     b32 Result = (Left.P != Right.P) || (Left.N != Right.N);
+    return Result;
+}
+
+inline b32 operator!=(vertex_p3_n3_uv Left, vertex_p3_n3_uv Right)
+{
+    b32 Result = (Left.P != Right.P) || (Left.N != Right.N) || (Left.UV != Right.UV);
     return Result;
 }
 

@@ -17,7 +17,7 @@ struct hash_map
     
     inline b32 Find(key Key, value* Value)
     {
-        u64 HashIndex = Hash(Key, TableSize);        
+        u64 HashIndex = Hash(Key, TableSize);                
         while(Table[HashIndex].Found && (Table[HashIndex].Key != Key))
         {
             HashIndex++;
