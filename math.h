@@ -1436,20 +1436,27 @@ TransformM4(v3f Position, m3 Orientation)
 }
 
 inline m4 
-InverseTransformM4(v3f Position, m3 Orientation)
+InverseTransformM4(v3f Position, v3f XAxis, v3f YAxis, v3f ZAxis)
 {
-    f32 tx = -Dot(Position, Orientation.XAxis);
-    f32 ty = -Dot(Position, Orientation.YAxis);
-    f32 tz = -Dot(Position, Orientation.ZAxis);
+    f32 tx = -Dot(Position, XAxis);
+    f32 ty = -Dot(Position, YAxis);
+    f32 tz = -Dot(Position, ZAxis);
     
     m4 Result = 
     {
-        Orientation.m00, Orientation.m10, Orientation.m20, 0.0f,
-        Orientation.m01, Orientation.m11, Orientation.m21, 0.0f,
-        Orientation.m02, Orientation.m12, Orientation.m22, 0.0f,
-        tx,              ty,              tz,              1.0f 
+        XAxis.x, YAxis.x, ZAxis.x, 0.0f,
+        XAxis.y, YAxis.y, ZAxis.y, 0.0f,
+        XAxis.z, YAxis.z, ZAxis.z, 0.0f,
+        tx,      ty,      tz,      1.0f 
     };
     
+    return Result;
+}
+
+inline m4 
+InverseTransformM4(v3f Position, m3 Orientation)
+{
+    m4 Result = InverseTransformM4(Position, Orientation.XAxis, Orientation.YAxis, Orientation.ZAxis);    
     return Result;
 }
 
@@ -2036,6 +2043,17 @@ inline m4 Inverse(m4 M)
     };
     
     return 1.0f/Det * Adjoint;
+}
+
+inline m4 LookAt(v3f Position, v3f Target, v3f WorldUp)
+{
+    v3f Z = Normalize(Position-Target);
+    
+    v3f X, Y;
+    CreateBasis(Z, &X, &Y);
+    
+    m4 Result = InverseTransformM4(Position, X, Y, Z);
+    return Result;
 }
 
 #endif
