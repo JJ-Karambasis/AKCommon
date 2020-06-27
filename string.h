@@ -403,7 +403,18 @@ string FormatString(const char* Format, ...)
     return Result;
 }
 
+char* EatWhitespace(char* String)
+{
+    char* Result = String;
+    while(IsWhitespace(*Result)) Result++;
+    return Result;
+}
 
-
+char* ProcessToken(char* String)
+{
+    char* Result = String;
+    while(!IsWhitespace(*Result)) Result++;
+    return Result;
+}
 
 #endif

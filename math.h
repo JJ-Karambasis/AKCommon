@@ -2045,7 +2045,7 @@ inline m4 Inverse(m4 M)
     return 1.0f/Det * Adjoint;
 }
 
-inline m4 LookAt(v3f Position, v3f Target, v3f WorldUp)
+inline m4 LookAt(v3f Position, v3f Target)
 {
     v3f Z = Normalize(Position-Target);
     
