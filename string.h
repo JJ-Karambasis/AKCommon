@@ -334,7 +334,7 @@ inline void CheckStringStreamSize(string_stream* Stream)
     }
 }
 
-inline void Write(string_stream* Stream, char* Format, va_list Args)
+inline void __Internal__Write__(string_stream* Stream, char* Format, va_list Args)
 {
     CheckStringStreamSize(Stream);
     Stream->Size += vsprintf(Stream->Data+Stream->Size, Format, Args);
@@ -344,7 +344,7 @@ inline void Write(string_stream* Stream, char* Format, ...)
 {
     va_list Args;
     va_start(Args, Format);
-    Write(Stream, Format, Args);
+    __Internal__Write__(Stream, Format, Args);
     va_end(Args);
 }
 
