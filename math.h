@@ -861,7 +861,7 @@ Magnitude(v3f V)
 
 inline f32
 InverseMagnitude(v3f V)
-{    
+{       
     f32 Result = 1.0f/Magnitude(V);
     return Result;
 }
@@ -952,7 +952,15 @@ typedef v3f c3;
 struct v4f
 {
     union
-    {
+    {        
+        struct
+        {
+            f32 x;
+            f32 y;
+            f32 z;
+            f32 w;
+        };        
+        
         struct
         {
             v2f xy;
@@ -968,14 +976,6 @@ struct v4f
         {
             f32 __unused_1__;
             v3f yzw;
-        };
-        
-        struct
-        {
-            f32 x;
-            f32 y;
-            f32 z;
-            f32 w;
         };
         
         struct
@@ -1263,6 +1263,13 @@ operator*(v3f Left, m3 Right)
     return Result;
 }
 
+inline v3f&
+operator*=(v3f& Left, m3 Right)
+{
+    Left = Left*Right;    
+    return Left;
+}
+
 inline m3
 operator*(m3 Left, m3 Right)
 {
@@ -1538,17 +1545,6 @@ operator*=(v4f& Left, m4 Right)
 {    
     Left = Left*Right;
     return Left;
-}
-
-inline v4f
-operator*(m4 Left, v4f Right)
-{              
-    v4f Result;
-    Result.x = Dot(Left.Rows[0], Right);
-    Result.y = Dot(Left.Rows[1], Right);
-    Result.z = Dot(Left.Rows[2], Right);
-    Result.w = Dot(Left.Rows[3], Right);
-    return Result;
 }
 
 inline m4
@@ -1937,13 +1933,6 @@ struct vertex_p3_n3
     v3f N;
 };
 
-struct vertex_p3_n3_uv
-{
-    v3f P;
-    v3f N;
-    v2f UV;
-};
-
 struct vertex_p3_n3_weights
 {
     v3f P;
@@ -1952,11 +1941,36 @@ struct vertex_p3_n3_weights
     f32 JointW[4];
 };
 
-struct vertex_p3_n3_uv_weights
+struct vertex_p3_n3_uv
 {
     v3f P;
     v3f N;
     v2f UV;
+};
+
+struct vertex_p3_n3_uv_weights
+{   
+    v3f P;
+    v3f N;
+    v2f UV;    
+    u8 JointI[4];
+    f32 JointW[4];
+};
+
+struct vertex_p3_n3_t4_uv
+{
+    v3f P;
+    v3f N;
+    v4f T;
+    v2f UV;    
+};
+
+struct vertex_p3_n3_t4_uv_weights
+{
+    v3f P;
+    v3f N;
+    v4f T;
+    v2f UV;    
     u8 JointI[4];
     f32 JointW[4];
 };
