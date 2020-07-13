@@ -5,6 +5,9 @@
 #define INV_PI 0.31830988618f
 #define SQRT2_2 0.70710678118f
 
+#define TO_DEGREE(rad) (rad * 180.0f * INV_PI)
+#define TO_RAD(degree) (degree * PI / 180.0f)
+
 inline f32 Sin(f32 Rads)
 {
     f32 Result = sinf(Rads);
@@ -1295,6 +1298,50 @@ operator*(m3 Left, m3 Right)
     return Result;
 }
 
+inline m3
+XRot(f32 Angle)
+{
+    m3 Result = IdentityM3();
+    f32 c = Cos(Angle);
+    f32 s = Sin(Angle);
+    
+    Result.m11 =  c;
+    Result.m12 =  s;
+    Result.m21 = -s;
+    Result.m22 =  c;
+    return Result;
+}
+
+inline m3 
+YRot(f32 Angle)
+{
+    m3 Result = IdentityM3();
+    
+    f32 c = Cos(Angle);
+    f32 s = Sin(Angle);
+    
+    Result.m00 =  c;
+    Result.m02 = -s;
+    Result.m20 =  s;
+    Result.m22 =  c;
+    return Result;
+}
+
+inline m3 
+ZRot(f32 Angle)
+{
+    m3 Result = IdentityM3();
+    
+    f32 c = Cos(Angle);
+    f32 s = Sin(Angle);
+    
+    Result.m00 =  c;
+    Result.m01 =  s;
+    Result.m10 = -s;
+    Result.m11 =  c;    
+    return Result;
+}
+
 inline m3& 
 operator*=(m3& Left, m3 Right)
 {
@@ -2075,6 +2122,42 @@ inline m4 LookAt(v3f Position, v3f Target)
     
     m4 Result = InverseTransformM4(Position, X, Y, Z);
     return Result;
+}
+
+struct rigid_transform
+{
+    v3f Position;
+    m3  Orientation;
+};
+
+struct spherical_coordinates
+{
+    f32 Radius;
+    f32 Azimuth;
+    f32 Inclination;
+};
+
+inline spherical_coordinates
+SphericalCoordinates(f32 Radius, f32 Azimuth, f32 Inclination)
+{
+    spherical_coordinates Result;
+    Result.Radius = Radius;
+    Result.Azimuth = Azimuth;
+    Result.Inclination = Inclination;
+    return Result;
+}
+
+inline v3f 
+ToCartesianCoordinates(spherical_coordinates Coordinates)
+{
+    v3f Result;    
+    f32 s = Coordinates.Radius*Sin(Coordinates.Inclination);
+    f32 c = Coordinates.Radius*Cos(Coordinates.Inclination);
+    
+    Result.x = s*Cos(Coordinates.Azimuth);
+    Result.y = s*Sin(Coordinates.Azimuth);
+    Result.z = c;
+    return Result;    
 }
 
 #endif
