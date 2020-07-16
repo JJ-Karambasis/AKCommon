@@ -1034,6 +1034,13 @@ V4(f32* xyz, f32 w)
 }
 
 inline v4f 
+V4(f64* xyz, f32 w)
+{
+    v4f Result = V4((f32)xyz[0], (f32)xyz[1], (f32)xyz[2], w);    
+    return Result;
+}
+
+inline v4f 
 V4(v3f xyz, f32 w)
 {
     v4f Result;
@@ -1849,15 +1856,15 @@ Rotate(v3f V, quaternion Q)
 struct sqt
 {
     quaternion Orientation;
-    v3f Position;
+    v3f Translation;
     v3f Scale;
 };
 
 inline sqt 
-CreateSQT(v3f Position, v3f Scale, v3f Euler)
+CreateSQT(v3f Translation, v3f Scale, v3f Euler)
 {
     sqt Result;
-    Result.Position = Position;
+    Result.Translation = Translation;
     Result.Scale = Scale;
     Result.Orientation = EulerQuaternion(Euler);
     return Result;
@@ -1867,7 +1874,7 @@ inline sqt
 CreateSQT(m4 M)
 {
     sqt Result;
-    Result.Position = M.Translation.xyz;
+    Result.Translation = M.Translation.xyz;
     Result.Scale = V3(Magnitude(M.XAxis.xyz), Magnitude(M.YAxis.xyz), Magnitude(M.ZAxis.xyz));    
     m3 Rotation = M3(Normalize(M.XAxis.xyz), Normalize(M.YAxis.xyz), Normalize(M.ZAxis.xyz));
     Result.Orientation = Normalize(MatrixQuaternion(Rotation));
@@ -1905,61 +1912,61 @@ Lerp(quaternion A, f32 t, quaternion B)
 }
 
 inline m4
-TransformM4(v3f Position, quaternion Orientation)
+TransformM4(v3f Translation, quaternion Orientation)
 {
-    m4 Result = TransformM4(Position, ToMatrix3(Orientation));    
+    m4 Result = TransformM4(Translation, ToMatrix3(Orientation));    
     return Result;
 }
 
 inline m4
-TransformM4(v3f Position, m3 Orientation, v3f Scale)
+TransformM4(v3f Translation, m3 Orientation, v3f Scale)
 {    
     Orientation.XAxis *= Scale.x;
     Orientation.YAxis *= Scale.y;
     Orientation.ZAxis *= Scale.z;
-    m4 Result = TransformM4(Position, Orientation);
+    m4 Result = TransformM4(Translation, Orientation);
     return Result;
 }
 
 inline m4 
-TransformM4(v3f Position, v3f XAxis, v3f YAxis, v3f ZAxis, v3f Scale)
+TransformM4(v3f Translation, v3f XAxis, v3f YAxis, v3f ZAxis, v3f Scale)
 {
     m3 OrientationMatrix = M3(XAxis, YAxis, ZAxis);
-    m4 Result = TransformM4(Position, OrientationMatrix, Scale);
+    m4 Result = TransformM4(Translation, OrientationMatrix, Scale);
     return Result;
 }
 
 inline m4
-TransformM4(v3f Position, quaternion Orientation, v3f Scale)
+TransformM4(v3f Translation, quaternion Orientation, v3f Scale)
 {
     m3 OrientationMatrix = ToMatrix3(Orientation);
-    m4 Result = TransformM4(Position, OrientationMatrix, Scale);    
+    m4 Result = TransformM4(Translation, OrientationMatrix, Scale);    
     return Result;
 }
 
 inline m4
-TransformM4(v3f Position, v3f Scale, v3f Euler)
+TransformM4(v3f Translation, v3f Scale, v3f Euler)
 {
-    m4 Result = TransformM4(Position, EulerQuaternion(Euler), Scale);
+    m4 Result = TransformM4(Translation, EulerQuaternion(Euler), Scale);
     return Result;
 }
 
 inline m4
 TransformM4(sqt SQT)
 {
-    m4 Result = TransformM4(SQT.Position, SQT.Orientation, SQT.Scale);
+    m4 Result = TransformM4(SQT.Translation, SQT.Orientation, SQT.Scale);
     return Result;
 }
 
 inline v3f TransformV3(v3f Point, sqt Transform)
 {
-    v3f Result = Rotate(Point*Transform.Scale, Transform.Orientation) + Transform.Position;
+    v3f Result = Rotate(Point*Transform.Scale, Transform.Orientation) + Transform.Translation;
     return Result;
 }
 
 inline v3f InverseTransformV3(v3f Point, sqt Transform)
 {
-    v3f Result = Rotate(Point-Transform.Position, Conjugate(Transform.Orientation)) / Transform.Scale;
+    v3f Result = Rotate(Point-Transform.Translation, Conjugate(Transform.Orientation)) / Transform.Scale;
     return Result;
 }
 
@@ -1967,6 +1974,15 @@ inline v3f TransformV3(v3f Point, m4 Transform)
 {
     v4f Result = V4(Point, 1.0f)*Transform;
     return Result.xyz;
+}
+
+inline sqt TransformSQT(sqt A, sqt B)
+{
+    sqt Result;
+    Result.Translation = A.Translation + B.Translation;
+    Result.Scale = A.Scale*B.Scale;
+    Result.Orientation = A.Orientation*B.Orientation;
+    return Result;
 }
 
 struct vertex_p2_uv_c
@@ -2126,7 +2142,44 @@ inline m4 LookAt(v3f Position, v3f Target)
 
 struct rigid_transform
 {
-    v3f Position;
+    v3f         Translation;
+    quaternion  Orientation;
+};
+
+inline rigid_transform
+CreateRigidTransform(v3f Translation, v3f Euler)
+{
+    rigid_transform Result;
+    Result.Translation = Translation;    
+    Result.Orientation = EulerQuaternion(Euler);
+    return Result;
+}
+
+inline v3f TransformV3(v3f Point, rigid_transform Transform)
+{
+    v3f Result = Rotate(Point, Transform.Orientation) + Transform.Translation;
+    return Result;
+}
+
+inline m4
+TransformM4(rigid_transform Transform)
+{
+    m4 Result = TransformM4(Transform.Translation, ToMatrix3(Transform.Orientation));
+    return Result;
+}
+
+inline rigid_transform 
+RigidTransform(rigid_transform A, rigid_transform B)
+{
+    rigid_transform Result;
+    Result.Translation = A.Translation + B.Translation;    
+    Result.Orientation = A.Orientation*B.Orientation;
+    return Result;
+}
+
+struct rigid_transform_matrix
+{
+    v3f Translation;
     m3  Orientation;
 };
 

@@ -348,6 +348,12 @@ inline u64 BijectiveMap(u32 A, u32 B)
     return Result;
 }
 
+inline i64 BijectiveMap(i32 A, i32 B)
+{
+    i64 Result = (A >= B) ? A*A + A + B : A + B*B;
+    return Result;
+}
+
 inline b32 IsInInterval(f32 Min, f32 Max, f32 V)
 {
     b32 Result = (V >= Min) && (V <= Max);
