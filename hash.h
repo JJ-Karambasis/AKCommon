@@ -85,4 +85,22 @@ inline b32 operator!=(uint_pair Left, uint_pair Right)
     return Result;
 }
 
+struct int_pair
+{
+    i32 Pair01;
+    i32 Pair02;
+};
+
+inline u64 Hash(int_pair Pair, u64 TableSize)
+{
+    u64 Result = BijectiveMap(Pair.Pair01, Pair.Pair02) % TableSize;
+    return Result;
+}
+
+inline b32 operator!=(int_pair Left, int_pair Right)
+{
+    b32 Result = (Left.Pair01 != Right.Pair01) || (Left.Pair02 != Right.Pair02);
+    return Result;
+}
+
 #endif

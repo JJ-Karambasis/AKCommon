@@ -163,6 +163,37 @@ GenerateLineSphere(arena* Storage, f32 Radius, u16 CircleSampleCount, v3f Center
 }
 
 inline mesh_generation_result
+GenerateLineHemisphere(arena* Storage, f32 Radius, u16 CircleSampleCount, v3f CenterP = V3())
+{
+    u16 HalfCircleSampleCountPlusOne = (CircleSampleCount/2)+1;    
+    
+    u32 VertexCount = CircleSampleCount+(HalfCircleSampleCountPlusOne*2);
+    mesh_generation_result Result = AllocateMeshGenerationResult(Storage, VertexCount, VertexCount*2);
+    
+    f32 CircleRadOffset = GetCircleRadOffset(CircleSampleCount);    
+    vertex_p3* VertexAt = Result.Vertices;
+    
+    f32 Radians = 0.0f;        
+    for(u32 SampleIndex = 0; SampleIndex < CircleSampleCount; SampleIndex++, Radians += CircleRadOffset)
+        *VertexAt++ = {V3(Cos(Radians), Sin(Radians), 0.0f)*Radius + CenterP};
+    
+    Radians = 0.0;
+    for(u32 SampleIndex = 0; SampleIndex < HalfCircleSampleCountPlusOne; SampleIndex++, Radians += CircleRadOffset)                
+        *VertexAt++ = {V3(0.0f, Cos(Radians), Sin(Radians))*Radius + CenterP};
+    
+    Radians = 0.0f;
+    for(u32 SampleIndex = 0; SampleIndex < HalfCircleSampleCountPlusOne; SampleIndex++, Radians += CircleRadOffset)
+        *VertexAt++ = {V3(Cos(Radians), 0.0f, Sin(Radians))*Radius + CenterP};            
+    
+    u16* IndicesAt = Result.Indices;
+    PopulateCircleIndices(&IndicesAt, 0, CircleSampleCount);
+    PopulateCircleIndices(&IndicesAt, CircleSampleCount, HalfCircleSampleCountPlusOne);
+    PopulateCircleIndices(&IndicesAt, CircleSampleCount+HalfCircleSampleCountPlusOne, HalfCircleSampleCountPlusOne);
+    
+    return Result;
+}
+
+inline mesh_generation_result
 GenerateTriangleCylinder(arena* Storage, f32 Radius, f32 Height, u16 CircleSampleCount, v3f CenterP = V3())
 {   
     mesh_generation_result Result = AllocateMeshGenerationResult(Storage, CircleSampleCount*2 + 2, 

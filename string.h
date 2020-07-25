@@ -131,6 +131,12 @@ inline b32 BeginsWith(char* String, const char* BeginString)
     return Result;
 }
 
+inline b32 BeginsWith(const char* String, const char* BeginString)
+{
+    b32 Result = BeginsWith((char*)String, (char*)BeginString);
+    return Result;
+}
+
 string LiteralString(char* Data, ptr StringLength);
 inline string operator+(string Left, int Right)
 {
