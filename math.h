@@ -2142,6 +2142,7 @@ inline m4 LookAt(v3f Position, v3f Target)
 
 struct rigid_transform
 {
+    
     v3f         Translation;
     quaternion  Orientation;
 };
@@ -2149,31 +2150,9 @@ struct rigid_transform
 inline rigid_transform
 CreateRigidTransform(v3f Translation, v3f Euler)
 {
-    rigid_transform Result;
+    rigid_transform Result;            
     Result.Translation = Translation;    
     Result.Orientation = EulerQuaternion(Euler);
-    return Result;
-}
-
-inline v3f TransformV3(v3f Point, rigid_transform Transform)
-{
-    v3f Result = Rotate(Point, Transform.Orientation) + Transform.Translation;
-    return Result;
-}
-
-inline m4
-TransformM4(rigid_transform Transform)
-{
-    m4 Result = TransformM4(Transform.Translation, ToMatrix3(Transform.Orientation));
-    return Result;
-}
-
-inline rigid_transform 
-RigidTransform(rigid_transform A, rigid_transform B)
-{
-    rigid_transform Result;
-    Result.Translation = A.Translation + B.Translation;    
-    Result.Orientation = A.Orientation*B.Orientation;
     return Result;
 }
 
@@ -2211,6 +2190,27 @@ ToCartesianCoordinates(spherical_coordinates Coordinates)
     Result.y = s*Sin(Coordinates.Azimuth);
     Result.z = c;
     return Result;    
+}
+
+inline v3f TransformV3(v3f Point, rigid_transform Transform)
+{
+    v3f Result = Rotate(Point, Transform.Orientation) + Transform.Translation;
+    return Result;
+}
+
+inline m4 TransformM4(rigid_transform Transform)
+{
+    m4 Result = TransformM4(Transform.Translation, Transform.Orientation);
+    return Result;
+}
+
+inline rigid_transform 
+operator*(rigid_transform TransformA, rigid_transform TransformB)
+{
+    rigid_transform Result;
+    Result.Orientation = TransformA.Orientation*TransformB.Orientation;
+    Result.Translation = TransformA.Translation+TransformB.Translation;
+    return Result;
 }
 
 #endif

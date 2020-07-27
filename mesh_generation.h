@@ -164,7 +164,7 @@ GenerateLineSphere(arena* Storage, f32 Radius, u16 CircleSampleCount, v3f Center
 
 inline mesh_generation_result
 GenerateLineHemisphere(arena* Storage, f32 Radius, u16 CircleSampleCount, v3f CenterP = V3())
-{
+{    
     u16 HalfCircleSampleCountPlusOne = (CircleSampleCount/2)+1;
     f32 CircleRadOffset = GetCircleRadOffset(CircleSampleCount);
     
@@ -188,7 +188,8 @@ GenerateLineHemisphere(arena* Storage, f32 Radius, u16 CircleSampleCount, v3f Ce
     u16* IndicesAt = Result.Indices;
     PopulateCircleIndices(&IndicesAt, 0, CircleSampleCount);
     PopulateCircleIndices(&IndicesAt, CircleSampleCount, HalfCircleSampleCountPlusOne);
-    PopulateCircleIndices(&IndicesAt, CircleSampleCount+HalfCircleSampleCountPlusOne, HalfCircleSampleCountPlusOne);    
+    PopulateCircleIndices(&IndicesAt, CircleSampleCount+HalfCircleSampleCountPlusOne, HalfCircleSampleCountPlusOne);
+    
     return Result;
 }
 
