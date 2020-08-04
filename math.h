@@ -865,14 +865,22 @@ SquareMagnitude(v3f V)
 inline f32
 Magnitude(v3f V)
 {
-    f32 Result = Sqrt(SquareMagnitude(V));
+    f32 SqrLength = SquareMagnitude(V);
+    if(SqrLength == 0)
+        return 0;
+    
+    f32 Result = Sqrt(SqrLength);
     return Result;
 }
 
 inline f32
 InverseMagnitude(v3f V)
-{       
-    f32 Result = 1.0f/Magnitude(V);
+{   
+    f32 Length = Magnitude(V);
+    if(Length == 0)
+        return 0;
+    
+    f32 Result = 1.0f/Length;
     return Result;
 }
 
@@ -897,6 +905,13 @@ Lerp(v3f A, f32 t, v3f B)
     v3f Result = V3(Lerp(A.x, t, B.x),
                     Lerp(A.y, t, B.y),
                     Lerp(A.z, t, B.z));
+    return Result;
+}
+
+inline b32
+AreEqual(v3f P0, v3f P1, f32 Epsilon)
+{
+    b32 Result = SquareMagnitude(P0-P1) < Epsilon;
     return Result;
 }
 
@@ -1860,13 +1875,27 @@ struct sqt
     v3f Scale;
 };
 
-inline sqt 
-CreateSQT(v3f Translation, v3f Scale, v3f Euler)
+inline sqt
+CreateSQT(v3f Translation, v3f Scale, quaternion Orientation)
 {
     sqt Result;
     Result.Translation = Translation;
     Result.Scale = Scale;
-    Result.Orientation = EulerQuaternion(Euler);
+    Result.Orientation = Orientation;
+    return Result;
+}
+
+inline sqt
+CreateSQT(v3f Translation, f32 Scale, quaternion Orientation)
+{
+    sqt Result = CreateSQT(Translation, V3(Scale, Scale, Scale), Orientation);    
+    return Result;
+}
+
+inline sqt 
+CreateSQT(v3f Translation, v3f Scale, v3f Euler)
+{
+    sqt Result = CreateSQT(Translation, Scale, EulerQuaternion(Euler));    
     return Result;
 }
 
@@ -2156,6 +2185,15 @@ CreateRigidTransform(v3f Translation, v3f Euler)
     return Result;
 }
 
+inline rigid_transform
+CreateRigidTransform(v3f Translation, quaternion Orientation)
+{
+    rigid_transform Result;
+    Result.Translation = Translation;
+    Result.Orientation = Orientation;
+    return Result;
+}
+
 struct rigid_transform_matrix
 {
     v3f Translation;
@@ -2198,6 +2236,12 @@ inline v3f TransformV3(v3f Point, rigid_transform Transform)
     return Result;
 }
 
+inline v3f InverseTransformV3(v3f Point, rigid_transform Transform)
+{
+    v3f Result = Rotate(Point-Transform.Translation, Conjugate(Transform.Orientation));    
+    return Result;
+}
+
 inline m4 TransformM4(rigid_transform Transform)
 {
     m4 Result = TransformM4(Transform.Translation, Transform.Orientation);
@@ -2211,6 +2255,45 @@ operator*(rigid_transform TransformA, rigid_transform TransformB)
     Result.Orientation = TransformA.Orientation*TransformB.Orientation;
     Result.Translation = TransformA.Translation+TransformB.Translation;
     return Result;
+}
+
+inline sqt 
+CreateSQT(rigid_transform Transform, v3f Scale)
+{    
+    sqt Result;    
+    Result.Translation = Transform.Translation;
+    Result.Scale = Scale;
+    Result.Orientation = Transform.Orientation;
+    return Result;
+}
+
+inline sqt 
+CreateSQT(rigid_transform Transform, f32 Scale)
+{    
+    sqt Result = CreateSQT(Transform, V3(Scale, Scale, Scale));        
+    return Result;
+}
+
+inline sqt 
+CreateSQT(rigid_transform Transform)
+{    
+    sqt Result = CreateSQT(Transform, 1.0f);
+    return Result;
+}
+
+struct rect3D
+{
+    v3f Min;
+    v3f Max;
+};
+
+inline rect3D
+CreateRect3D(v3f Min, v3f Max)
+{
+    rect3D Rect;
+    Rect.Min = Min;
+    Rect.Max = Max;
+    return Rect;
 }
 
 #endif
