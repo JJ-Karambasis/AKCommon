@@ -115,6 +115,12 @@ inline f32 Abs(f32 Value)
     return Result;
 }
 
+inline f64 Abs(f64 Value)
+{
+    f64 Result = (Value < 0) ? -Value : Value;
+    return Result;
+}
+
 inline u16 SafeU16(u32 Value)
 {
     ASSERT(Value <= 0xFFFF);
@@ -369,6 +375,18 @@ inline b32 IsRangeInInterval(f32 Min, f32 Max, f32 RangeMin, f32 RangeMax)
 inline b32 AreEqual(f32 A, f32 B, f32 Epsilon)
 {
     b32 Result = Abs(A-B) < Epsilon;
+    return Result;
+}
+
+inline b32 IsFuzzyZero(f32 Value)
+{
+    b32 Result = Abs(Value) < FLT_EPSILON;
+    return Result;
+}
+
+inline b32 IsFuzzyZero(f64 Value)
+{
+    b32 Result = Abs(Value) < DBL_EPSILON;
     return Result;
 }
 

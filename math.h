@@ -823,6 +823,12 @@ operator-(v3f V)
     return Result;
 }
 
+inline b32 operator==(v3f Left, v3f Right)
+{
+    b32 Result = (Left.x == Right.x) && (Left.y == Right.y) && (Left.z == Right.z);
+    return Result;
+}
+
 inline b32 operator!=(v3f Left, v3f Right)
 {
     b32 Result = (Left.x != Right.x) || (Left.y != Right.y) || (Left.z != Right.z);
@@ -1850,6 +1856,13 @@ operator*(quaternion Left, quaternion Right)
     return Result;
 }
 
+inline quaternion& 
+operator*=(quaternion& Left, quaternion Right)
+{
+    Left = Left*Right;
+    return Left;        
+}
+
 quaternion RotQuat(v3f Axis, f32 Angle)
 {
     quaternion Result;
@@ -2264,6 +2277,13 @@ CreateSQT(rigid_transform Transform, v3f Scale)
     Result.Translation = Transform.Translation;
     Result.Scale = Scale;
     Result.Orientation = Transform.Orientation;
+    return Result;
+}
+
+inline sqt
+CreateSQT(v3f Translation, quaternion Orientation)
+{
+    sqt Result = CreateSQT(Translation, 1.0f, Orientation);
     return Result;
 }
 
