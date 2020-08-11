@@ -2316,4 +2316,60 @@ CreateRect3D(v3f Min, v3f Max)
     return Rect;
 }
 
+struct frustum
+{
+    v3f Normals[6];
+    f32 Distances[6];
+};
+
+inline frustum CreateFrustum(m4 Matrix)
+{
+    frustum Result = {};
+    v3f Col1 = V3(Matrix.m00, Matrix.m10, Matrix.m20);
+    v3f Col2 = V3(Matrix.m01, Matrix.m11, Matrix.m21);
+    v3f Col3 = V3(Matrix.m02, Matrix.m12, Matrix.m22);
+    v3f Col4 = V3(Matrix.m03, Matrix.m13, Matrix.m23);
+    Result.Normals[0] = Col4 + Col1;
+    Result.Normals[1] = Col4 - Col1;
+    Result.Normals[2] = Col4 + Col2;
+    Result.Normals[3] = Col4 - Col2;
+    Result.Normals[4] = Col3;
+    Result.Normals[5] = Col4 - Col3;
+    Result.Distances[0] = Matrix.m33 + Matrix.m30;
+    Result.Distances[1] = Matrix.m33 - Matrix.m30;
+    Result.Distances[2] = Matrix.m33 + Matrix.m31;
+    Result.Distances[3] = Matrix.m33 - Matrix.m31;
+    Result.Distances[4] = Matrix.m32;
+    Result.Distances[5] = Matrix.m33 - Matrix.m32;
+    for(i32 PlaneIndex = 0; PlaneIndex < 6; PlaneIndex++)
+    {
+        f32 Mag = 1.0f/Magnitude(Result.Normals[PlaneIndex]);
+        Result.Normals[PlaneIndex] *= Mag;
+        Result.Distances[PlaneIndex] *= Mag;
+    }
+    return Result;
+}
+
+inline void GetFrustumCorners(v3f* Corners, m4 Perspective, f32 zNear, f32 zFar)
+{
+    m4 InversePerspective = InverseTransformM4(Perspective);
+
+    Corners[0] = (V4(-1, -1, zFar, 1) * InversePerspective).xyz;
+    Corners[1] = (V4( 1, -1, zFar, 1) * InversePerspective).xyz;
+    Corners[2] = (V4( 1,  1, zFar, 1) * InversePerspective).xyz;
+    Corners[3] = (V4(-1,  1, zFar, 1) * InversePerspective).xyz;
+    Corners[4] = (V4( 1, -1, zNear, 1) * InversePerspective).xyz;
+    Corners[5] = (V4(-1, -1, zNear, 1) * InversePerspective).xyz;
+    Corners[6] = (V4(-1,  1, zNear, 1) * InversePerspective).xyz;
+    Corners[7] = (V4( 1,  1, zNear, 1) * InversePerspective).xyz;
+}
+
+inline void TransformVectors(v3f* Vectors, i32 VectorSize, m4 Transformation)
+{
+    for(int i = 0; i < VectorSize; i++)
+    {
+        Vectors[i] = (V4(Vectors[i], 1) * Transformation).xyz;
+    }
+}
+
 #endif
