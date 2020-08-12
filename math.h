@@ -8,6 +8,28 @@
 #define TO_DEGREE(rad) (rad * 180.0f * INV_PI)
 #define TO_RAD(degree) (degree * PI / 180.0f)
 
+inline i32 Ceil(f32 number)
+{
+    i32 result = (i32)number;
+    if((f32)result >= number)
+    {
+        return result;
+    }
+
+    return result + 1;
+}
+
+inline i32 Floor(f32 number)
+{
+    i32 result = (i32)number;
+    if((f32)result <= number)
+    {
+        return result;
+    }
+
+    return result - 1;
+}
+
 inline f32 Sin(f32 Rads)
 {
     f32 Result = sinf(Rads);
