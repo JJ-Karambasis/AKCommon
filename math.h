@@ -1632,12 +1632,11 @@ operator*=(v4f& Left, m4 Right)
 inline m4
 operator*(f32 Left, m4 Right)
 {
-    Right = Transpose(Right);
     m4 Result;
-    Result.Row0 = V4(Left * Right.Row0.x, Left * Right.Row0.y, Left * Right.Row0.x, Left * Right.Row0.w);
-    Result.Row1 = V4(Left * Right.Row1.x, Left * Right.Row1.y, Left * Right.Row1.x, Left * Right.Row1.w);
-    Result.Row2 = V4(Left * Right.Row2.x, Left * Right.Row2.y, Left * Right.Row2.x, Left * Right.Row2.w);
-    Result.Row3 = V4(Left * Right.Row3.x, Left * Right.Row3.y, Left * Right.Row3.x, Left * Right.Row3.w);
+    Result.Row0 = V4(Left * Right.Row0.x, Left * Right.Row0.y, Left * Right.Row0.z, Left * Right.Row0.w);
+    Result.Row1 = V4(Left * Right.Row1.x, Left * Right.Row1.y, Left * Right.Row1.z, Left * Right.Row1.w);
+    Result.Row2 = V4(Left * Right.Row2.x, Left * Right.Row2.y, Left * Right.Row2.z, Left * Right.Row2.w);
+    Result.Row3 = V4(Left * Right.Row3.x, Left * Right.Row3.y, Left * Right.Row3.z, Left * Right.Row3.w);
     return Result;
 }
 
@@ -2167,7 +2166,7 @@ inline m4 Inverse(m4 M)
         -M.m00*M.m11*M.m32 - M.m01*M.m12*M.m30 - M.m02*M.m10*M.m31 + M.m02*M.m11*M.m30 + M.m01*M.m10*M.m32 + M.m00*M.m12*M.m31,
         M.m00*M.m11*M.m22 + M.m01*M.m12*M.m20 + M.m02*M.m10*M.m21 - M.m02*M.m11*M.m20 - M.m01*M.m10*M.m22 - M.m00*M.m12*M.m21
     };
-    
+
     return 1.0f/Det * Adjoint;
 }
 
@@ -2350,18 +2349,27 @@ inline frustum CreateFrustum(m4 Matrix)
     return Result;
 }
 
-inline void GetFrustumCorners(v3f* Corners, m4 Perspective, f32 zNear, f32 zFar)
+inline void GetFrustumCorners(v3f* Corners, m4 Perspective)
 {
-    m4 InversePerspective = InverseTransformM4(Perspective);
+    m4 InversePerspective = Inverse(Perspective);
+    v4f Intermediate[8];
+    Intermediate[0] = V4(-1, -1, -1, 1) * InversePerspective;
+    Intermediate[1] = V4( 1, -1, -1, 1) * InversePerspective;
+    Intermediate[2] = V4( 1,  1, -1, 1) * InversePerspective;
+    Intermediate[3] = V4(-1,  1, -1, 1) * InversePerspective;
+    Intermediate[4] = V4( 1, -1, 1, 1) * InversePerspective;
+    Intermediate[5] = V4(-1, -1,  1, 1) * InversePerspective;
+    Intermediate[6] = V4(-1,  1,  1, 1) * InversePerspective;
+    Intermediate[7] = V4( 1,  1,  1, 1) * InversePerspective;
 
-    Corners[0] = (V4(-1, -1, zFar, 1) * InversePerspective).xyz;
-    Corners[1] = (V4( 1, -1, zFar, 1) * InversePerspective).xyz;
-    Corners[2] = (V4( 1,  1, zFar, 1) * InversePerspective).xyz;
-    Corners[3] = (V4(-1,  1, zFar, 1) * InversePerspective).xyz;
-    Corners[4] = (V4( 1, -1, zNear, 1) * InversePerspective).xyz;
-    Corners[5] = (V4(-1, -1, zNear, 1) * InversePerspective).xyz;
-    Corners[6] = (V4(-1,  1, zNear, 1) * InversePerspective).xyz;
-    Corners[7] = (V4( 1,  1, zNear, 1) * InversePerspective).xyz;
+    Corners[0] = Intermediate[0].xyz / Intermediate[0].w;
+    Corners[1] = Intermediate[1].xyz / Intermediate[1].w;
+    Corners[2] = Intermediate[2].xyz / Intermediate[2].w;
+    Corners[3] = Intermediate[3].xyz / Intermediate[3].w;
+    Corners[4] = Intermediate[4].xyz / Intermediate[4].w;
+    Corners[5] = Intermediate[5].xyz / Intermediate[5].w;
+    Corners[6] = Intermediate[6].xyz / Intermediate[6].w;
+    Corners[7] = Intermediate[7].xyz / Intermediate[7].w;
 }
 
 inline void TransformVectors(v3f* Vectors, i32 VectorSize, m4 Transformation)
