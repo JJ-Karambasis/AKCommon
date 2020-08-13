@@ -50,6 +50,11 @@ inline void CopyMemory(void* Dest, void* Src, ptr Size)
         *DestAt++ = *SrcAt++;
 }
 
+inline void CopyMemory(void* Dest, const void* Src, ptr Size)
+{
+    CopyMemory(Dest, (void*)Src, Size);    
+}
+
 inline void ClearMemory(void* Dest, ptr Size)
 {
     u8* DestAt = (u8*)Dest;
@@ -94,6 +99,8 @@ inline void SetMemoryI64(void* Dest, i64 Value, ptr Size)
 #define ClearStruct(data, type) ClearMemory(data, sizeof(type))
 #define ClearArray(data, count, type) ClearMemory(data, sizeof(type)*count)
 
+#define ArrayCopy(dest, src, type, array_count) for(u32 array_index = 0; array_index < array_count; array_index++) ((type*)dest)[array_index] = ((type*)src)[array_index]
+
 #ifndef DEFAULT_BLOCK_ARENA_SIZE
 #define DEFAULT_BLOCK_ARENA_SIZE MEGABYTE(1)
 #endif
@@ -122,6 +129,18 @@ inline arena CreateArena(ptr BlockSize)
     arena Result = {};
     Result.BlockSize = BlockSize;    
     return Result;
+}
+
+inline void DeleteArena(arena* Arena)
+{
+    arena_block* Block = Arena->First;
+    while(Block)
+    {
+        arena_block* BlockToDelete = Block;
+        Block = Block->Next;        
+        __Internal_Free__(BlockToDelete);                
+    }    
+    *Arena = {};
 }
 
 arena_block* CreateBlock(ptr BlockSize)

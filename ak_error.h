@@ -28,18 +28,18 @@ inline error_stream CreateErrorStream()
 #define WRITE_ERROR(format, ...) \
 do \
 { \
-    Write(GetGlobalErrorStream(), "ERROR(file: %s, function: %s, line: %d): ", CURRENT_FILENAME, CURRENT_FUNCTION, CURRENT_LINE); \
-    Write(GetGlobalErrorStream(), format, __VA_ARGS__); \
-    EndLine(GetGlobalErrorStream()); \
+    GetGlobalErrorStream()->Write("ERROR(file: %s, function: %s, line: %d): ", CURRENT_FILENAME, CURRENT_FUNCTION, CURRENT_LINE); \
+    GetGlobalErrorStream()->Write(format, __VA_ARGS__); \
+    GetGlobalErrorStream()->NewLine(); \
     GetGlobalErrorStream()->HasErrorOccured = true; \
 } while(0)
 
 #define WRITE_AND_HANDLE_ERROR(format, ...) \
 do \
 { \
-    Write(GetGlobalErrorStream(), "ERROR(file: %s, function: %s, line: %d): ", CURRENT_FILENAME, CURRENT_FUNCTION, CURRENT_LINE); \
-    Write(GetGlobalErrorStream(), format, __VA_ARGS__); \
-    EndLine(GetGlobalErrorStream()); \
+    GetGlobalErrorStream()->Write("ERROR(file: %s, function: %s, line: %d): ", CURRENT_FILENAME, CURRENT_FUNCTION, CURRENT_LINE); \
+    GetGlobalErrorStream()->Write(format, __VA_ARGS__); \
+    GetGlobalErrorStream()->NewLine(); \
     GetGlobalErrorStream()->HasErrorOccured = true; \
     goto handle_error; \
 } while(0)

@@ -15,7 +15,7 @@ struct hash_map
     u32 TableSize;
     key_value<key, value>* Table;
     
-    inline b32 Find(key Key, value* Value)
+    inline b32 Find(key Key, value* Value = NULL)
     {
         u64 HashIndex = Hash(Key, TableSize);                
         while(Table[HashIndex].Found && (Table[HashIndex].Key != Key))
@@ -23,9 +23,12 @@ struct hash_map
             HashIndex++;
             ASSERT(HashIndex < TableSize);
         }
-        
-        if(Table[HashIndex].Found)
-            *Value = Table[HashIndex].Value;
+
+        if(Value)
+        {
+            if(Table[HashIndex].Found)
+                *Value = Table[HashIndex].Value;
+        }
         
         return Table[HashIndex].Found;        
     }
@@ -46,11 +49,11 @@ struct hash_map
 };
 
 template <typename key, typename value>
-inline hash_map<key, value> CreateHashMap(u32 TableSize)
+inline hash_map<key, value> CreateHashMap(u32 TableSize, arena* Arena = GetDefaultArena())
 {
     hash_map<key, value> Result;
     Result.TableSize = TableSize;
-    Result.Table = (key_value<key, value>*)PushSize(sizeof(key_value<key, value>)*TableSize, Clear, 0);
+    Result.Table = (key_value<key, value>*)PushSize(Arena, sizeof(key_value<key, value>)*TableSize, Clear, 0);
     
     return Result;
 }

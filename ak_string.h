@@ -9,21 +9,13 @@ struct string
     inline char operator[](ptr Index)
     {
         return Data[Index];
-    }
+    }        
 };
 
 struct string_storage
 {
     ptr Capacity;
     string String;    
-};
-
-struct string_stream
-{
-    arena Storage;
-    ptr Capacity;
-    ptr Size;
-    char* Data;       
 };
 
 string_storage AllocateStringStorage(arena* Arena, ptr Capacity)
@@ -86,6 +78,12 @@ inline b32 StringEquals(char* A, char* B)
     return Result;
 }
 
+inline b32 StringEquals(char* A, const char* B)
+{
+    b32 Result = StringEquals(A, LiteralStringLength(A), (char*)B, LiteralStringLength(B));
+    return Result;
+}
+
 inline b32 StringEquals(char* A, char* B, ptr BLength)
 {
     b32 Result = StringEquals(A, LiteralStringLength(A), B, BLength);
@@ -102,6 +100,33 @@ inline b32 StringEquals(string A, char* B)
 {
     b32 Result = StringEquals(A.Data, A.Length, B, LiteralStringLength(B));
     return Result;
+}
+
+inline b32 EndsWith(char* String, ptr StringLength, char* EndString)
+{
+    ptr EndStringLength = LiteralStringLength(EndString);
+    ptr Difference = StringLength-EndStringLength;
+        
+    for(ptr AIndex = Difference, BIndex = 0; AIndex < StringLength; AIndex++, BIndex++)
+    {
+        if(!EndString[BIndex])
+            break;
+        
+        if(String[AIndex] != EndString[BIndex])
+            return false;                
+    }
+    
+    return true;
+}
+
+inline b32 EndsWith(char* String, const char* EndString)
+{
+    return EndsWith(String, LiteralStringLength(String), (char*)EndString);
+}
+
+inline b32 EndsWith(const char* String, const char* EndString)
+{
+    return EndsWith((char*)String, LiteralStringLength(String), (char*)EndString);
 }
 
 inline b32 BeginsWith(char* String, ptr StringLength, char* BeginString)
@@ -150,6 +175,13 @@ inline ptr operator-(string Left, char* Right)
     return Result;
 }
 
+inline string operator-(string Left, i32 Right)
+{
+    string Result = Left;
+    Result.Length -= Right;
+    return Result;
+}
+
 inline ptr operator-(string Left, string Right)
 {
     ptr Result = Left.Data - Right.Data;
@@ -189,6 +221,12 @@ inline string PushLiteralString(char* String, ptr StringLength, arena* Arena = G
 inline string PushLiteralString(char* String, arena* Arena = GetDefaultArena())
 {
     string Result = PushLiteralString(String, LiteralStringLength(String), Arena);
+    return Result;
+}
+
+inline string PushLiteralString(const char* String, arena* Arena = GetDefaultArena())
+{
+    string Result = PushLiteralString((char*)String, LiteralStringLength(String), Arena);
     return Result;
 }
 
@@ -311,78 +349,21 @@ inline string Concat(char* A, char B, arena* Arena = GetDefaultArena())
     return Result;
 }
 
-inline void CreateStringStream(string_stream* Stream, ptr BlockSize)
-{    
-    Stream->Storage = CreateArena(BlockSize);    
-}
-
-inline string_stream CreateStringStream(ptr BlockSize)
+inline char* ToUpper(char* String, arena* Arena = GetDefaultArena())
 {
-    string_stream Result = {};
-    CreateStringStream(&Result, BlockSize);
+    ptr StringLength = LiteralStringLength(String);
+    char* Result = PushArray(Arena, StringLength+1, char, Clear, 0);
+    for(u32 StringIndex = 0; StringIndex < StringLength; StringIndex++)
+        Result[StringIndex] = ToUpper(String[StringIndex]);
+    Result[StringLength] = 0;
     return Result;
 }
 
-inline void CheckStringStreamSize(string_stream* Stream)
+inline string ToUpper(string String)
 {
-    b32 ShouldResize = !Stream->Capacity || (Stream->Size >= Stream->Capacity-1024);
-    
-    if(ShouldResize)
-    {
-        ptr NewCapacity = Stream->Capacity*2;
-        if(!NewCapacity) 
-            NewCapacity = 2048;
-        
-        char* Temp = PushArray(&Stream->Storage, NewCapacity, char, Clear, 0);
-        CopyMemory(Temp, Stream->Data, Stream->Capacity);
-        Stream->Data = Temp;
-        Stream->Capacity = NewCapacity;
-    }
-}
-
-inline void __Internal__Write__(string_stream* Stream, char* Format, va_list Args)
-{
-    CheckStringStreamSize(Stream);
-    Stream->Size += vsprintf(Stream->Data+Stream->Size, Format, Args);
-}
-
-inline void Write(string_stream* Stream, char* Format, ...)
-{
-    va_list Args;
-    va_start(Args, Format);
-    __Internal__Write__(Stream, Format, Args);
-    va_end(Args);
-}
-
-inline void WriteChar(string_stream* Stream, char Value)
-{
-    CheckStringStreamSize(Stream);
-    Stream->Data[Stream->Size++] = Value;
-}
-
-inline void EndLine(string_stream* Stream)
-{
-    WriteChar(Stream, '\n');
-}
-
-inline void WriteLine(string_stream* Stream, char* Format, ...)
-{
-    va_list Args;
-    va_start(Args, Format);
-    Write(Stream, Format, Args);
-    va_end(Args);
-    EndLine(Stream);
-}
-
-inline string GetString(string_stream* Stream)
-{
-    string Result = LiteralString(Stream->Data, Stream->Size);
-    return Result;
-}
-
-inline string PushString(string_stream* Stream, arena* Arena = GetDefaultArena())
-{
-    string Result = PushLiteralString(Stream->Data, Stream->Size, Arena);
+    string Result = AllocateLiteralString(String.Length);
+    for(u32 StringIndex = 0; StringIndex < String.Length; StringIndex++)
+        Result.Data[StringIndex] = ToUpper(String.Data[StringIndex]);
     return Result;
 }
 

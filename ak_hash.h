@@ -19,6 +19,24 @@ inline u64 Hash(f32 Value)
     return (u64)U.Int;
 }
 
+inline u64 Hash(char* Value)
+{
+    u64 Result = 0;
+    u64 Rand1 = 31414;
+    u64 Rand2 = 27183;
+    
+    char* At = Value;
+    while(*At)
+    {
+        Result *= Rand1;
+        Result += *At;
+        Rand1 *= Rand2;
+        At++;
+    }
+    
+    return Result;
+}
+
 inline u64 Hash(v2f V)
 {
     u64 Result = ((Hash(V.x) ^ (Hash(V.y) << 1)) >> 1);
@@ -100,6 +118,12 @@ inline u64 Hash(int_pair Pair, u64 TableSize)
 inline b32 operator!=(int_pair Left, int_pair Right)
 {
     b32 Result = (Left.Pair01 != Right.Pair01) || (Left.Pair02 != Right.Pair02);
+    return Result;
+}
+
+inline u64 Hash(char* String, u64 TableSize)
+{
+    u64 Result = Hash(String) % TableSize;
     return Result;
 }
 

@@ -329,6 +329,12 @@ inline char ToLower(char Value)
     return Result;
 }
 
+inline char ToUpper(char Value)
+{
+    char Result = (char)toupper(Value);
+    return Result;
+}
+
 inline f32 SafeRatio(i32 Numerator, i32 Denominator)
 {
     ASSERT(Denominator != 0);
@@ -390,46 +396,59 @@ inline b32 IsFuzzyZero(f64 Value)
     return Result;
 }
 
-#if 1
-inline b32 AreNearlyEqual(f32 A, f32 B, f32 Epsilon)
+inline b32 AreEqual32(f32 a, f32 b)
 {
-    f32 AbsA = Abs(A);
-    f32 AbsB = Abs(B);
-    f32 Diff = Abs(A-B);
+    f32 ab = Abs(a-b);
+    if(ab < FLT_EPSILON)
+        return true;
     
-    b32 Result = false;
-    if (A == B)  // shortcut, handles infinities
+    f32 aAbs = Abs(a);
+    f32 bAbs = Abs(b);
+    if(bAbs > aAbs)
     {
-        Result = true;
+        return ab < FLT_EPSILON*bAbs;
     }
-    else if (A == 0 || B == 0 || (AbsA + AbsB < FLT_MIN)) 
+    else
     {
-        // a or b is zero or both are extremely close to it
-        // relative error is less meaningful here
-        Result = Diff < (Epsilon * FLT_MIN);
-    } 
-    else 
-    { // use relative error
-        Result = Diff / MinimumF32((AbsA + AbsB), FLT_MAX) < Epsilon;
+        return ab < FLT_EPSILON*aAbs;
     }
-    return Result;
 }
-#endif
-#include "atomic.h"
-#include "memory.h"
-#include "list.h"
-#include "pool.h"
-#include "dynamic_array.h"
-#include "string.h"
-#include "error.h"
-#include "riff.h"
-#include "math.h"
-#include "hash.h"
-#include "hash_table.h"
-#include "hash_map.h"
-#include "mesh_generation.h"
+
+inline b32 AreEqual64(f64 a, f64 b)
+{
+    f64 ab = Abs(a-b);
+    if(ab < DBL_EPSILON)
+        return true;
+    
+    f64 aAbs = Abs(a);
+    f64 bAbs = Abs(b);
+    if(bAbs > aAbs)
+    {
+        return ab < DBL_EPSILON*bAbs;
+    }
+    else
+    {
+        return ab < DBL_EPSILON*aAbs;
+    }
+}
 
 #define FOR_EACH(Value, Structure) auto CAT2(iter_, __LINE__) = BeginIter(Structure); \
 for(auto* Value = GetFirst(&CAT2(iter_, __LINE__)); Value; Value = GetNext(&CAT2(iter_, __LINE__)))
+
+#include <ak_atomic.h>
+#include <ak_memory.h>
+#include <ak_riff.h>
+#include <ak_string.h>
+#include <ak_string_stream.h>
+#include <ak_error.h>
+#include <ak_math.h>
+#include <ak_hash.h>
+#include <ak_hash_map.h>
+#include <ak_hash_table.h>
+#include <ak_list.h>
+#include <ak_dynamic_array.h>
+#include <ak_pool.h>
+#include <ak_mesh_generation.h>
+#include <ak_platform.h>
 
 #endif

@@ -8,26 +8,16 @@
 #define TO_DEGREE(rad) (rad * 180.0f * INV_PI)
 #define TO_RAD(degree) (degree * PI / 180.0f)
 
-inline i32 Ceil(f32 number)
+inline i32 Ceil(f32 Value)
 {
-    i32 result = (i32)number;
-    if((f32)result >= number)
-    {
-        return result;
-    }
-
-    return result + 1;
+    i32 Result = (i32)ceilf(Value);
+    return Result;
 }
 
-inline i32 Floor(f32 number)
+inline i32 Floor(f32 Value)
 {
-    i32 result = (i32)number;
-    if((f32)result <= number)
-    {
-        return result;
-    }
-
-    return result - 1;
+    i32 Result = (i32)floorf(Value);
+    return Result;
 }
 
 inline f32 Sin(f32 Rads)
@@ -936,8 +926,14 @@ Lerp(v3f A, f32 t, v3f B)
     return Result;
 }
 
+inline b32 AreEqualV3(v3f A, v3f B)
+{
+    b32 Result = AreEqual32(A.x, B.x) && AreEqual32(A.y, B.y) && AreEqual32(A.z, B.z);
+    return Result;
+}
+
 inline b32
-AreEqual(v3f P0, v3f P1, f32 Epsilon)
+AreNearlyEqualV3(v3f P0, v3f P1, f32 Epsilon)
 {
     b32 Result = SquareMagnitude(P0-P1) < Epsilon;
     return Result;
@@ -1653,7 +1649,7 @@ operator*=(v4f& Left, m4 Right)
 
 inline m4
 operator*(f32 Left, m4 Right)
-{
+{    
     m4 Result;
     Result.Row0 = V4(Left * Right.Row0.x, Left * Right.Row0.y, Left * Right.Row0.z, Left * Right.Row0.w);
     Result.Row1 = V4(Left * Right.Row1.x, Left * Right.Row1.y, Left * Right.Row1.z, Left * Right.Row1.w);
@@ -2188,8 +2184,9 @@ inline m4 Inverse(m4 M)
         -M.m00*M.m11*M.m32 - M.m01*M.m12*M.m30 - M.m02*M.m10*M.m31 + M.m02*M.m11*M.m30 + M.m01*M.m10*M.m32 + M.m00*M.m12*M.m31,
         M.m00*M.m11*M.m22 + M.m01*M.m12*M.m20 + M.m02*M.m10*M.m21 - M.m02*M.m11*M.m20 - M.m01*M.m10*M.m22 - M.m00*M.m12*M.m21
     };
-
-    return 1.0f/Det * Adjoint;
+    
+    m4 Result = (1.0f/Det) * Adjoint;    
+    return Result;
 }
 
 inline m4 LookAt(v3f Position, v3f Target)
@@ -2322,6 +2319,13 @@ CreateSQT(rigid_transform Transform)
     return Result;
 }
 
+inline sqt
+CreateSQT(v3f Position)
+{
+    sqt Result = CreateSQT(Position, 1.0f, IdentityQuaternion());    
+    return Result;
+}
+
 struct rect3D
 {
     v3f Min;
@@ -2371,6 +2375,12 @@ inline frustum CreateFrustum(m4 Matrix)
     return Result;
 }
 
+inline void TransformPoints(v3f* Points, i32 PointCount, m4 Transformation)
+{
+    for(int PointIndex = 0; PointIndex < PointCount; PointIndex++)    
+        Points[PointIndex] = (V4(Points[PointIndex], 1) * Transformation).xyz;    
+}
+
 inline void GetFrustumCorners(v3f* Corners, m4 Perspective)
 {
     m4 InversePerspective = Inverse(Perspective);
@@ -2383,7 +2393,7 @@ inline void GetFrustumCorners(v3f* Corners, m4 Perspective)
     Intermediate[5] = V4(-1, -1,  1, 1) * InversePerspective;
     Intermediate[6] = V4(-1,  1,  1, 1) * InversePerspective;
     Intermediate[7] = V4( 1,  1,  1, 1) * InversePerspective;
-
+    
     Corners[0] = Intermediate[0].xyz / Intermediate[0].w;
     Corners[1] = Intermediate[1].xyz / Intermediate[1].w;
     Corners[2] = Intermediate[2].xyz / Intermediate[2].w;
@@ -2392,14 +2402,6 @@ inline void GetFrustumCorners(v3f* Corners, m4 Perspective)
     Corners[5] = Intermediate[5].xyz / Intermediate[5].w;
     Corners[6] = Intermediate[6].xyz / Intermediate[6].w;
     Corners[7] = Intermediate[7].xyz / Intermediate[7].w;
-}
-
-inline void TransformVectors(v3f* Vectors, i32 VectorSize, m4 Transformation)
-{
-    for(int i = 0; i < VectorSize; i++)
-    {
-        Vectors[i] = (V4(Vectors[i], 1) * Transformation).xyz;
-    }
 }
 
 #endif

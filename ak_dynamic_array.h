@@ -14,15 +14,20 @@ struct dynamic_array
         return Data[Index];
     } 
     
-    inline type* operator+(u32 Index)
+    inline type* Get(u32 Index)
     {
         ASSERT(Index < Size);
         return &Data[Index];
     }
+    
+    inline type* operator+(u32 Index)
+    {        
+        return Get(Index);
+    }
 };
 
 template <typename type>
-inline dynamic_array<type> CreateDynamicArray(u32 InitialCapacity)
+inline dynamic_array<type> CreateDynamicArray(u32 InitialCapacity=1)
 {
     dynamic_array<type> Result;
     Result.Capacity = InitialCapacity;
@@ -64,6 +69,41 @@ inline void Append(dynamic_array<type>* Array, type Value)
     }
     
     Array->Data[Array->Size++] = Value;
+}
+
+template <typename type>
+struct dynamic_array_iter
+{
+    dynamic_array<type>* Array;    
+    u32 Index;
+};
+
+template <typename type>
+dynamic_array_iter<type> BeginIter(dynamic_array<type>* Array)
+{
+    dynamic_array_iter<type> Result = {};
+    Result.Array = Array;
+    return Result;
+}
+
+template <typename type>
+type* GetFirst(dynamic_array_iter<type>* Iter)
+{
+    ASSERT(Iter->Index == 0);
+    if(Iter->Index >= Iter->Array->Size)
+        return NULL;
+    
+    Iter->Index++;
+    return Iter->Array->Get(0);
+}
+
+template <typename type>
+type* GetNext(dynamic_array_iter<type>* Iter)
+{
+    ASSERT(Iter->Index != 0);
+    if(Iter->Index >= Iter->Array->Size)
+        return NULL;    
+    return Iter->Array->Get(Iter->Index++);
 }
 
 #endif
