@@ -58,7 +58,7 @@ list_entry<type>* RemoveEndOfList(list<type>* List)
 {
     ASSERT(List->Last && (List->Count > 0)); 
     
-    result* Result = NULL;
+    list_entry<type>* Result = NULL;
     if(List->Count == 1)
     {
         Result = List->Last;
@@ -66,7 +66,7 @@ list_entry<type>* RemoveEndOfList(list<type>* List)
     }
     else
     {        
-        result* Prev = List->Last->Prev;
+        list_entry<type>* Prev = List->Last->Prev;
         Result = List->Last;
         ASSERT(!Result->Next);
         List->Last = Prev;
@@ -88,8 +88,8 @@ void RemoveFromList(list<type>* List, list_entry<type>* Entry)
     }
     else
     {
-        entry* Prev = Entry->Prev;
-        entry* Next = Entry->Next;
+        list_entry<type>* Prev = Entry->Prev;
+        list_entry<type>* Next = Entry->Next;
         
         if(!Prev)
         {
@@ -126,24 +126,31 @@ type* AllocateListEntry(list<type>* List, arena* Storage)
 template <typename type>
 type* AllocateListEntry(free_list<type>* FreeList, arena* Storage)
 {    
-    if(List->FreeList.Count > 0)
+    if(FreeList->FreeList.Count > 0)
     {
-        list_entry<type>* Entry = RemoveEndOfList(FreeList->FreeList);        
+        list_entry<type>* Entry = RemoveEndOfList(&FreeList->FreeList);        
         AddToList(&FreeList->List, Entry);    
         return &Entry->Entry;
     }
     else
     {
-        type* Result = AllocateListEntry(FreeList->List, Storage);
+        type* Result = AllocateListEntry(&FreeList->List, Storage);
         return Result;
     }        
 }
 
 template <typename type>
-type* FreeListEntry(free_list<type>* FreeList, list_entry<type>* Entry)
+void FreeListEntry(free_list<type>* FreeList, list_entry<type>* Entry)
 {    
     RemoveFromList(&FreeList->List, Entry);        
     AddToList(&FreeList->FreeList, Entry);
+}
+
+template <typename type>
+void FreeListEntry(free_list<type>* FreeList, type* Entry)
+{
+    list_entry<type>* ListEntry = (list_entry<type>*)Entry;
+    FreeListEntry(FreeList, ListEntry);    
 }
 
 template <typename type>

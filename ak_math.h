@@ -226,7 +226,15 @@ struct v2f
             f32 width;
             f32 height;
         };
+        
+        f32 Data[2];
     };
+    
+    inline f32& operator[](u32 Index)
+    {
+        ASSERT(Index < 2);
+        return Data[Index];
+    }
 };
 
 inline v2i Round2i(v2f V)
@@ -572,10 +580,19 @@ AreEqual(v2f P0, v2f P1, f32 Epsilon)
     return Result;
 }
 
+inline u32
+LargestComponent(v2f V)
+{
+    if(Abs(V.x) > Abs(V.y))
+        return 0;
+    else
+        return 1;
+}
+
 struct v3f
 {
     union
-    {        
+    {           
         struct 
         {
             f32 x;
@@ -608,7 +625,15 @@ struct v3f
             f32 __unused_1__;
             v2f yz;
         };        
+        
+        f32 Data[3];        
     };
+        
+    inline f32& operator[](u32 Index)
+    {
+        ASSERT(Index < 3);
+        return Data[Index];
+    }
 };
 
 const global v3f Global_WorldXAxis = {1.0f, 0.0f, 0.0f};
@@ -693,6 +718,33 @@ IsInvalidV3(v3f V)
 {
     b32 Result = ((V.x == INFINITY) || (V.y == INFINITY) || (V.z == INFINITY));
     return Result;
+}
+
+inline u32 
+LargestComponent(v3f V)
+{
+    if(Abs(V.x) > Abs(V.y))
+    {
+        if(Abs(V.x) > Abs(V.z))
+        {
+            return 0;
+        }
+        else
+        {
+            return 2;
+        }
+    }
+    else
+    {
+        if(Abs(V.y) > Abs(V.z))
+        {
+            return 1;
+        }
+        else
+        {
+            return 2;
+        }
+    }
 }
 
 inline v3f
@@ -2023,6 +2075,12 @@ inline v3f TransformV3(v3f Point, sqt Transform)
     return Result;
 }
 
+inline v3f NoScaleTransformV3(v3f Point, sqt Transform)
+{
+    v3f Result = Rotate(Point, Transform.Orientation) + Transform.Translation;
+    return Result;
+}
+
 inline v3f InverseTransformV3(v3f Point, sqt Transform)
 {
     v3f Result = Rotate(Point-Transform.Translation, Conjugate(Transform.Orientation)) / Transform.Scale;
@@ -2285,6 +2343,16 @@ operator*(rigid_transform TransformA, rigid_transform TransformB)
     rigid_transform Result;
     Result.Orientation = TransformA.Orientation*TransformB.Orientation;
     Result.Translation = TransformA.Translation+TransformB.Translation;
+    return Result;
+}
+
+inline sqt 
+operator*(sqt TransformA, sqt TransformB)
+{
+    sqt Result;
+    Result.Orientation = TransformA.Orientation*TransformB.Orientation;
+    Result.Translation = TransformA.Translation+TransformB.Translation;
+    Result.Scale = TransformA.Scale*TransformB.Scale;
     return Result;
 }
 
