@@ -432,23 +432,40 @@ inline b32 AreEqual64(f64 a, f64 b)
     }
 }
 
+inline u16 EndianSwap16(u16 Value)
+{
+    u16 Result = ((Value << 8) | (Value >> 8));
+    return Result;
+}
+
+inline u32 EndianSwap32(u32 Value)
+{
+    u32 Result = ((Value << 24) | 
+                  ((Value & 0xFF00) << 8) |
+                  ((Value >> 8) & 0xFF00) | 
+                  (Value >> 24));
+    return Result;
+}
+
 #define FOR_EACH(Value, Structure) auto CAT2(iter_, __LINE__) = BeginIter(Structure); \
 for(auto* Value = GetFirst(&CAT2(iter_, __LINE__)); Value; Value = GetNext(&CAT2(iter_, __LINE__)))
 
-#include <ak_atomic.h>
-#include <ak_memory.h>
-#include <ak_riff.h>
-#include <ak_string.h>
-#include <ak_string_stream.h>
-#include <ak_error.h>
-#include <ak_math.h>
-#include <ak_hash.h>
-#include <ak_hash_map.h>
-#include <ak_hash_table.h>
-#include <ak_list.h>
-#include <ak_dynamic_array.h>
-#include <ak_pool.h>
-#include <ak_mesh_generation.h>
-#include <ak_platform.h>
+#include "ak_atomic.h"
+#include "ak_memory.h"
+#include "ak_riff.h"
+#include "ak_string.h"
+#include "ak_string_stream.h"
+#include "ak_error.h"
+#include "ak_math.h"
+#include "ak_hash.h"
+#include "ak_hash_map.h"
+#include "ak_hash_table.h"
+#include "ak_list.h"
+#include "ak_dynamic_array.h"
+#include "ak_pool.h"
+#include "ak_mesh_generation.h"
+#include "ak_platform.h"
+#include "ak_zlib.h"
+#include "ak_png.h"
 
 #endif

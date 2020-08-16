@@ -288,6 +288,13 @@ inline string GetFileExtension(char* String)
     return Result;
 }
 
+inline string GetFilenameWithoutExtension(string Path)
+{
+    string Result = GetFilename(Path);
+    Result.Length -= (GetFileExtension(Path).Length+1);
+    return Result;
+}
+
 inline string Concat(char* A, ptr ALength, char* B, ptr BLength, arena* Arena = GetDefaultArena())
 {
     ptr StringLength = ALength + BLength;

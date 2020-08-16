@@ -76,7 +76,7 @@ IsValid(riff_iterator Iter)
     return Result;
 }
 
-inline void *
+inline void*
 GetChunkData(riff_iterator Iter)
 {
     void *Result = (Iter.At + sizeof(riff_chunk_header));    

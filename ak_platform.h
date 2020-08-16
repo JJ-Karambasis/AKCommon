@@ -78,4 +78,24 @@ FileRename(string OldName, string NewName)
     return Result;
 }
 
+inline buffer
+ReadEntireFile(char* Path, arena* Arena = GetDefaultArena())
+{
+    FILE* File = fopen(Path, "rb");
+    if(!File)
+        return {};
+    
+    fseek(File, 0, SEEK_END);
+    u32 FileSize = ftell(File);
+    fseek(File, 0, SEEK_SET);
+    
+    void* Data = PushSize(Arena, FileSize, NoClear, 0);
+    fread(Data, FileSize, 1, File);
+    
+    buffer Result;
+    Result.Data = (u8*)Data;
+    Result.Size = (ptr)FileSize;
+    return Result;    
+}
+
 #endif

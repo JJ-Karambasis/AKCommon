@@ -40,6 +40,12 @@ struct buffer
 {
     u8* Data;
     ptr Size;
+    
+    inline b32 IsValid()
+    {
+        b32 Result = (Data != NULL) && (Size > 0);
+        return Result;
+    }
 };
 
 inline void CopyMemory(void* Dest, void* Src, ptr Size)
@@ -119,6 +125,7 @@ arena CreateArena(ptr AllocationSize);
 
 inline void InitMemory(arena* DefaultArena, allocate_memory* Allocate = malloc, free_memory* Free = free)
 {
+    ASSERT(DefaultArena);
     __Internal_Allocate__ = Allocate;
     __Internal_Free__ = Free;    
     __Global_Default_Arena__ = DefaultArena;
@@ -191,7 +198,8 @@ void AddBlockToList(arena* Arena, arena_block* Block)
 }
 
 inline void* _Push_(arena* Arena, ptr Size, clear_flag Flags, i32 Alignment = 0)
-{   
+{
+    ASSERT(Arena);
     //IMPORTANT(EVERYONE): We currently do not support allocations larger than the initialize block size for now
     ASSERT(Size <= Arena->BlockSize);
     arena_block* Block = GetBlock(Arena, Size, Alignment); 
@@ -216,6 +224,7 @@ inline void* _Push_(arena* Arena, ptr Size, clear_flag Flags, i32 Alignment = 0)
 
 inline void* _PushWrite_(arena* Arena, ptr Size, void* Data, i32 Alignment = 0)
 {
+    ASSERT(Arena);
     void* Memory = _Push_(Arena, Size, __ClearFlagNoClear__, Alignment);
     CopyMemory(Memory, Data, Size);
     return Memory;
@@ -223,6 +232,7 @@ inline void* _PushWrite_(arena* Arena, ptr Size, void* Data, i32 Alignment = 0)
 
 inline void ResetArena(arena* Arena = __Global_Default_Arena__)
 {
+    ASSERT(Arena);
     for(arena_block* Block = Arena->First; Block; Block = Block->Next)    
         Block->Used = 0;        
     Arena->Current = Arena->First;
@@ -240,6 +250,8 @@ inline void SetDefaultArena(arena* Arena)
 
 inline temp_arena BeginTemporaryMemory(arena* Arena = __Global_Default_Arena__)
 {
+    ASSERT(Arena);
+    
     temp_arena Result;
     Result.Arena = Arena;
     if(!Arena->Current)
