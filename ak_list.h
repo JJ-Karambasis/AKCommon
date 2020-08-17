@@ -71,6 +71,7 @@ list_entry<type>* RemoveEndOfList(list<type>* List)
         ASSERT(!Result->Next);
         List->Last = Prev;
         Result->Prev = NULL;            
+        List->Last->Next = NULL;
     }
     
     List->Count--;
@@ -143,6 +144,7 @@ template <typename type>
 void FreeListEntry(free_list<type>* FreeList, list_entry<type>* Entry)
 {    
     RemoveFromList(&FreeList->List, Entry);        
+    ClearStruct(&Entry->Entry, type);
     AddToList(&FreeList->FreeList, Entry);
 }
 

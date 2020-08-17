@@ -2069,9 +2069,15 @@ TransformM4(sqt SQT)
     return Result;
 }
 
+inline v3f TransformV3(v3f Point, v3f Translation, quaternion Orientation, v3f Scale)
+{
+    v3f Result = Rotate(Point*Scale, Orientation) + Translation;
+    return Result;
+}
+
 inline v3f TransformV3(v3f Point, sqt Transform)
 {
-    v3f Result = Rotate(Point*Transform.Scale, Transform.Orientation) + Transform.Translation;
+    v3f Result = TransformV3(Point, Transform.Translation, Transform.Orientation, Transform.Scale);
     return Result;
 }
 
