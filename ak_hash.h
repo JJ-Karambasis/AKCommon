@@ -97,9 +97,9 @@ inline u64 Hash(uint_pair Pair, u64 TableSize)
     return Result;
 }
 
-inline b32 operator!=(uint_pair Left, uint_pair Right)
+inline b32 UIntPairCompare(uint_pair Left, uint_pair Right)
 {
-    b32 Result = (Left.Pair01 != Right.Pair01) || (Left.Pair02 != Right.Pair02);
+    b32 Result = (Left.Pair01 == Right.Pair01) && (Left.Pair02 == Right.Pair02);
     return Result;
 }
 
@@ -118,6 +118,12 @@ inline u64 Hash(int_pair Pair, u64 TableSize)
 inline b32 operator!=(int_pair Left, int_pair Right)
 {
     b32 Result = (Left.Pair01 != Right.Pair01) || (Left.Pair02 != Right.Pair02);
+    return Result;
+}
+
+inline b32 IntPairCompare(int_pair Left, int_pair Right)
+{
+    b32 Result = (Left.Pair01 == Right.Pair01) && (Left.Pair02 == Right.Pair02);
     return Result;
 }
 

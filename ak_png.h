@@ -77,7 +77,7 @@ struct png_context
     
     ptr CompressedStreamLength;
     u8* CompressedStream;
-        
+    
     u32 ComponentCount;
     u32 BytesPerComponent;
     u32 Width;
@@ -130,20 +130,20 @@ PNG_ValidateIHDR(ihdr* IHDR, u32* ComponentCount)
         else ValidIHDR = false;            
         
         if(!ValidIHDR)    
-            return PNG_Error("PNG file is not supported. Must have 1, 3, or 4 channels.");            
+            return PNG_Error("PNG file is not supported. Must have 1, 3, or 4 channels");            
         
         return true;
         
     }
     else
-        return PNG_Error("PNG file is not supported. Must have 8 or 16 bits per pixel.");                        
+        return PNG_Error("PNG file is not supported. Must have 8 or 16 bits per pixel");                        
 }        
 
 inline b32
 PNG_ReadFileChunks(png_context* Context, buffer* Buffer)
 {
     if(!PNG_ValidateSignature(Buffer))    
-        return PNG_Error("PNG signature is invalid. Is this a PNG file?");            
+        return PNG_Error("PNG signature is invalid");            
     
     *Context = {};
     Context->Stream = Buffer->Data;
@@ -191,7 +191,7 @@ PNG_ReadFileChunks(png_context* Context, buffer* Buffer)
             case PNG_CHUNK_TYPE_IEND:
             {                
                 if(!DataChunkList)                
-                    return PNG_Error("Invalid png file. Did not read any data chunks. Is the file corrupted?");                                                        
+                    return PNG_Error("Invalid png file. Did not read any data chunks. The file is corrupted");                                                        
                 
                 png_data_chunk* At = DataChunkList;
                 while(At)
@@ -225,7 +225,7 @@ PNG_ReadFileChunks(png_context* Context, buffer* Buffer)
         PNG_Read(Context, 4);
     }    
     
-    return PNG_Error("Could not find the last IEND chunk for the PNG file. Is the file corrupted?");    
+    return PNG_Error("Could not find the last IEND chunk for the PNG file. The file is corrupted");    
 }
 
 inline u8 
@@ -293,13 +293,11 @@ ReconstructPNG(void* DstTexels, void* SrcTexels, png_context* Context)
             case PNG_FILTER_NONE:
             {
                 for(u32 XIndex = 0; XIndex < Context->Width; XIndex++)
-                {
-                    u8* DstAt = Dst;
-                    u8* SrcAt = Src;
+                {                    
                     for(u32 ComponentIndex = 0; ComponentIndex < Context->ComponentCount; ComponentIndex++)       
                     {
                         for(u32 ByteIndex = 0; ByteIndex < Context->BytesPerComponent; ByteIndex++)
-                            *DstAt++ = *SrcAt++;                        
+                            *Dst++ = *Src++;                        
                     }                    
                 }
             } break;
@@ -326,7 +324,7 @@ ReconstructPNG(void* DstTexels, void* SrcTexels, png_context* Context)
             case PNG_FILTER_UP:
             {
                 if(!LastRow)                
-                    return PNG_Error("Failed to reconstruct the png file. Unfiltered data is corrupted. Skipping PNG");                                                        
+                    return PNG_Error("Failed to reconstruct the png file. Unfiltered data is corrupted");                                                        
                 
                 for(u32 XIndex = 0; XIndex < Context->Width; XIndex++)
                 {
@@ -342,7 +340,7 @@ ReconstructPNG(void* DstTexels, void* SrcTexels, png_context* Context)
             case PNG_FILTER_AVG:
             {
                 if(!LastRow)                
-                    return PNG_Error("Failed to reconstruct the png file. Unfiltered data is corrupted.");                                        
+                    return PNG_Error("Failed to reconstruct the png file. Unfiltered data is corrupted");                                        
                 
                 u8* PrevPixel = NULL;
                 for(u32 XIndex = 0; XIndex < Context->Width; XIndex++)
@@ -366,7 +364,7 @@ ReconstructPNG(void* DstTexels, void* SrcTexels, png_context* Context)
             case PNG_FILTER_PAETH:
             {
                 if(!LastRow)                
-                    return PNG_Error("Failed to reconstruct the png file. Unfiltered data is corrupted.");                                        
+                    return PNG_Error("Failed to reconstruct the png file. Unfiltered data is corrupted");                                        
                 
                 u8* LastRowPrevPixel = NULL;
                 u8* PrevPixel = NULL;
@@ -396,7 +394,7 @@ ReconstructPNG(void* DstTexels, void* SrcTexels, png_context* Context)
             
             default:
             {
-                return PNG_Error("Failed to reconstruct the png file. Unfiltered data is corrupted. Could not find a valid filter type.");                
+                return PNG_Error("Failed to reconstruct the png file. Unfiltered data is corrupted. Could not find a valid filter type");                
             } break;
         }
         
@@ -494,7 +492,7 @@ PNG_Load(string Path)
     }
     else
     {
-        PNG_Error("Failed to open the PNG file.");
+        PNG_Error("Failed to open the PNG file");
     }
     
     EndTemporaryMemory(&TempArena);    

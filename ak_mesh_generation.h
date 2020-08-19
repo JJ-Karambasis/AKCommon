@@ -376,7 +376,7 @@ GenerateIcosahedronSphere(arena* Storage, u32 Subdivisons, f32 Radius=1.0f)
         
         CopyMemory(MeshOut.Vertices, MeshIn.Vertices, sizeof(vertex_p3)*MeshIn.VertexCount);
         
-        hash_map<uint_pair, u16> DivisionsMap = CreateHashMap<uint_pair, u16>(8191);
+        hash_map<uint_pair, u16> DivisionsMap = CreateHashMap<uint_pair, u16>(8191, UIntPairCompare);
                 
         for(u32 TriangleIndex = 0; TriangleIndex < TriangleCount; TriangleIndex++)
         {

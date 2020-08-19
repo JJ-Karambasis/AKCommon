@@ -14,11 +14,13 @@ struct hash_map
 {
     u32 TableSize;
     key_value<key, value>* Table;
+    b32 (*Compare)(key A, key B);
     
     inline b32 Find(key Key, value* Value = NULL)
     {
-        u64 HashIndex = Hash(Key, TableSize);                
-        while(Table[HashIndex].Found && (Table[HashIndex].Key != Key))
+        u64 HashIndex = Hash(Key, TableSize);         
+        
+        while(Table[HashIndex].Found && !Compare(Table[HashIndex].Key, Key))
         {
             HashIndex++;
             ASSERT(HashIndex < TableSize);
@@ -36,7 +38,7 @@ struct hash_map
     inline void Insert(key Key, value Value)
     {
         u64 HashIndex = Hash(Key, TableSize);
-        while(Table[HashIndex].Found && (Table[HashIndex].Key != Key))
+        while(Table[HashIndex].Found && !Compare(Table[HashIndex].Key, Key))
         {
             HashIndex++;
             ASSERT(HashIndex < TableSize);
@@ -49,9 +51,10 @@ struct hash_map
 };
 
 template <typename key, typename value>
-inline hash_map<key, value> CreateHashMap(u32 TableSize, arena* Arena = GetDefaultArena())
+inline hash_map<key, value> CreateHashMap(u32 TableSize, b32 (*Compare)(key A, key B), arena* Arena = GetDefaultArena())
 {
     hash_map<key, value> Result;
+    Result.Compare = Compare;
     Result.TableSize = TableSize;
     Result.Table = (key_value<key, value>*)PushSize(Arena, sizeof(key_value<key, value>)*TableSize, Clear, 0);
     

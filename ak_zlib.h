@@ -256,8 +256,8 @@ ZLib_Inflate(zlib_stream* Stream)
                 u16 Len  = (Bytes[1] << 8) | Bytes[0];
                 u16 NLen = (Bytes[3] << 8) | Bytes[2];
                 
-                if(NLen != (Len ^ 0xFFFF)) return ZLib_Error("ZLib data uncompressed is corrupted. Len and NLen are undefined.");                
-                if(!Stream->IsValid()) return ZLib_Error("ZLib data uncompressed is corrupted. Read past the ZLib buffer.");
+                if(NLen != (Len ^ 0xFFFF)) return ZLib_Error("ZLib data uncompressed is corrupted. Len and NLen are undefined");                
+                if(!Stream->IsValid()) return ZLib_Error("ZLib data uncompressed is corrupted. Read past the ZLib buffer");
                 
                 CopyMemory(Stream->OutputStream+Stream->OutputAt, Stream->Stream+Stream->At, Len);
                 Stream->OutputAt += Len;
@@ -320,7 +320,7 @@ ZLib_Inflate(zlib_stream* Stream)
                                 RepeatValue = Stream->GetBits(7)+11;
                             }
                             else                            
-                                return ZLib_Error("ZLib data compressed is corrupted. The dynamic values are invalid.");                                                            
+                                return ZLib_Error("ZLib data compressed is corrupted. The dynamic values are invalid");                                                            
                             
                             while(RepeatValue--)
                                 LitLenDistCodeLen[Counter++] = CopyValue;
@@ -358,7 +358,7 @@ ZLib_Inflate(zlib_stream* Stream)
                             Distance += Stream->GetBits(Global_ZLibDistExtraBits[DecodedValue]);
                         
                         if(Distance > Stream->OutputAt)
-                            return ZLib_Error("ZLib data compressed is corrupted. The distance to read is larger than our current ZLib buffer.");
+                            return ZLib_Error("ZLib data compressed is corrupted. The distance to read is larger than our current ZLib buffer");
                         
                         u8* P = Stream->OutputStream + (Stream->OutputAt - Distance);
                         
@@ -372,7 +372,7 @@ ZLib_Inflate(zlib_stream* Stream)
                         
             default:
             {
-                ZLib_Error("ZLib data is corrupted. Could not find a valid compression type.");
+                ZLib_Error("ZLib data is corrupted. Could not find a valid compression type");
             } break;
         }
                                 
@@ -392,8 +392,8 @@ ZLib_Decompress(void* DecompressedData, void* CompressedData, ptr CompressedData
     u32 CM = (u8)Stream.GetBits(4);
     u32 CINFO = (u8)Stream.GetBits(4);
     
-    if(CM != 8) return ZLib_Error("ZLib compression method is not supported. Only supported method is deflate.");    
-    if(CINFO > 7) return ZLib_Error("ZLib compression info not supported.");
+    if(CM != 8) return ZLib_Error("ZLib compression method is not supported. Only supported method is deflate");    
+    if(CINFO > 7) return ZLib_Error("ZLib compression info not supported");
     
     u8 CMF = ((CINFO << 4) & 0xF0) | (CM & 0x0F);
     u8 FLAG = (u8)Stream.GetBits(8);
@@ -402,8 +402,8 @@ ZLib_Decompress(void* DecompressedData, void* CompressedData, ptr CompressedData
     u8 FDICT  = (FLAG & 0x20);
     u8 FLEVEL = (FLAG & 0xC0);
     
-    if((CMF*256 + FLAG) % 31 != 0) return ZLib_Error("ZLib header is corrupted.");    
-    if(FDICT) return ZLib_Error("ZLib preset dictionary is not supported.");
+    if((CMF*256 + FLAG) % 31 != 0) return ZLib_Error("ZLib header is corrupted");    
+    if(FDICT) return ZLib_Error("ZLib preset dictionary is not supported");
     
     b32 Result = ZLib_Inflate(&Stream);        
     return Result;

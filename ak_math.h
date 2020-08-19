@@ -1183,6 +1183,13 @@ Normalize(v4f V)
     return Result;
 }
 
+inline b32 
+operator!=(v4f& Left, v4f& Right)
+{
+    b32 Result = (Left.x != Right.x) || (Left.y != Right.y) || (Left.z != Right.z) || (Left.w != Right.w);
+    return Result;
+}
+
 inline v4f 
 RGBA(f32 r, f32 g, f32 b, f32 a)
 {
@@ -1761,6 +1768,13 @@ struct quaternion
     };
 };
 
+inline b32 
+operator!=(quaternion& Left, quaternion& Right)
+{
+    b32 Result = (Left.x != Right.x) || (Left.y != Right.y) || (Left.z != Right.z) || (Left.w != Right.w);
+    return Result;
+}
+
 quaternion Quaternion(f32 x, f32 y, f32 z, f32 w)
 {
     quaternion Result;
@@ -1957,6 +1971,13 @@ struct sqt
     v3f Scale;
 };
 
+inline b32 
+operator!=(sqt& Left, sqt& Right)
+{
+    b32 Result = (Left.Orientation != Right.Orientation) || (Left.Translation != Right.Translation) || (Left.Scale != Right.Scale);
+    return Result;
+}
+
 inline sqt
 CreateSQT(v3f Translation, v3f Scale, quaternion Orientation)
 {
@@ -2150,24 +2171,6 @@ struct vertex_p3_n3_uv_weights
     f32 JointW[4];
 };
 
-struct vertex_p3_n3_t4_uv
-{
-    v3f P;
-    v3f N;
-    v4f T;
-    v2f UV;    
-};
-
-struct vertex_p3_n3_t4_uv_weights
-{
-    v3f P;
-    v3f N;
-    v4f T;
-    v2f UV;    
-    u8 JointI[4];
-    f32 JointW[4];
-};
-
 inline b32 operator!=(vertex_p3_n3 Left, vertex_p3_n3 Right)
 {
     b32 Result = (Left.P != Right.P) || (Left.N != Right.N);
@@ -2177,6 +2180,22 @@ inline b32 operator!=(vertex_p3_n3 Left, vertex_p3_n3 Right)
 inline b32 operator!=(vertex_p3_n3_uv Left, vertex_p3_n3_uv Right)
 {
     b32 Result = (Left.P != Right.P) || (Left.N != Right.N) || (Left.UV != Right.UV);
+    return Result;
+}
+
+inline b32 operator==(vertex_p3_n3_uv& Left, vertex_p3_n3_uv& Right)
+{
+    b32 Result = (Left.P == Right.P) && (Left.N == Right.N) && (Left.UV == Right.UV);
+    return Result;
+}
+
+inline b32 operator!=(vertex_p3_n3_uv_weights& Left, vertex_p3_n3_uv_weights& Right)
+{
+    b32 Result = ((Left.P != Right.P) || (Left.N != Right.N) || (Left.UV != Right.UV) || 
+                  (Left.JointI[0] != Right.JointI[0]) || (Left.JointI[1] != Right.JointI[1]) ||
+                  (Left.JointI[2] != Right.JointI[2]) || (Left.JointI[3] != Right.JointI[3]) ||
+                  (Left.JointW[0] != Right.JointW[0]) || (Left.JointW[1] != Right.JointW[1]) ||
+                  (Left.JointW[2] != Right.JointW[2]) || (Left.JointW[3] != Right.JointW[3]));
     return Result;
 }
 
