@@ -609,9 +609,9 @@ struct v3f
         
         struct
         {
+            f32 roll;
             f32 pitch;
             f32 yaw;
-            f32 roll;
         };
         
         struct
@@ -1807,24 +1807,6 @@ IdentityQuaternion()
     return Result;
 }
 
-inline quaternion 
-EulerQuaternion(f32 Pitch, f32 Yaw, f32 Roll)
-{
-    f32 cp = Cos(Yaw*0.5f);
-    f32 sp = Sin(Yaw*0.5f);
-    f32 cy = Cos(Roll*0.5f);
-    f32 sy = Sin(Roll*0.5f);  
-    f32 cr = Cos(Pitch*0.5f);
-    f32 sr = Sin(Pitch*0.5f);
-    
-    quaternion Result;
-    Result.x = (cy*cp*sr) - (sy*sp*cr);
-    Result.y = (sy*cp*sr) + (cy*sp*cr);
-    Result.z = (sy*cp*cr) - (cy*sp*sr);
-    Result.w = (cy*cp*cr) + (sy*sp*sr);
-    return Result;
-}
-
 inline quaternion
 RollQuaternion(quaternion Q)
 {
@@ -1838,10 +1820,30 @@ RollQuaternion(quaternion Q)
     return Result;
 }
 
-inline quaternion 
-EulerQuaternion(v3f Euler)
+/// Converts the Quaternion to its corresponding Euler angles.
+inline v3f
+QuaternionEuler(quaternion Quaternion)
 {
-    quaternion Result = EulerQuaternion(Euler.pitch, Euler.yaw, Euler.roll);
+    v3f Result;
+
+    f32 sinr_cosp = 2 * (Quaternion.w * Quaternion.x + Quaternion.y * Quaternion.z);
+    f32 cosr_cosp = 1 - 2 * (Quaternion.x * Quaternion.x + Quaternion.y + Quaternion.y);
+    Result.roll = atan2f(sinr_cosp, cosr_cosp);
+
+    f32 sinp = 2 * (Quaternion.w * Quaternion.y - Quaternion.z * Quaternion.x);
+    if (Abs(sinp) >= 1)
+    {
+        Result.pitch = copysignf(PI/2, sinp);
+    }
+    else
+    {
+        Result.pitch = asinf(sinp);
+    }
+
+    f32 siny_cosp = 2 * (Quaternion.w * Quaternion.z + Quaternion.x * Quaternion.y);
+    f32 cosy_cosp = 1 - 2 * (Quaternion.y * Quaternion.y + Quaternion.z * Quaternion.z);
+    Result.yaw = atan2f(siny_cosp, cosy_cosp);
+    
     return Result;
 }
 
@@ -1932,6 +1934,35 @@ Normalize(quaternion Q)
 }
 
 inline quaternion 
+EulerQuaternion(f32 Roll, f32 Pitch, f32 Yaw)
+{
+    f32 cy = Cos(Yaw*0.5f);
+    f32 sy = Sin(Yaw*0.5f);
+    f32 cr = Cos(Roll*0.5f);
+    f32 sr = Sin(Roll*0.5f);  
+    f32 cp = Cos(Pitch*0.5f);
+    f32 sp = Sin(Pitch*0.5f);
+
+    quaternion Result;
+    //q.x = sr * cp * cy - cr * sp * sy;
+    Result.x = (cy*cp*sr) - (sy*sp*cr);
+    //q.y = cr * sp * cy + sr * cp * sy;
+    Result.y = (sy*cp*sr) + (cy*sp*cr);
+    //q.z = cr * cp * sy - sr * sp * cy;
+    Result.z = (sy*cp*cr) - (cy*sp*sr);
+    //q.w = cr * cp * cy + sr * sp * sy;
+    Result.w = (cy*cp*cr) + (sy*sp*sr);
+    return Normalize(Result);
+}
+
+inline quaternion 
+EulerQuaternion(v3f Euler)
+{
+    quaternion Result = EulerQuaternion(Euler.roll, Euler.pitch, Euler.yaw);
+    return Result;
+}
+
+inline quaternion 
 operator*(quaternion Left, quaternion Right)
 {
     quaternion Result = Quaternion(Cross(Left.v, Right.v) + Right.s*Left.v + Right.v*Left.s, 
@@ -1946,6 +1977,7 @@ operator*=(quaternion& Left, quaternion Right)
     return Left;        
 }
 
+//Returns a quaternion representing the rotaion about the Axis angle by Angle in radians.
 quaternion RotQuat(v3f Axis, f32 Angle)
 {
     quaternion Result;
