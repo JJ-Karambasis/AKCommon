@@ -2394,22 +2394,12 @@ inline m4 TransformM4(rigid_transform Transform)
     return Result;
 }
 
-inline rigid_transform 
-operator*(rigid_transform TransformA, rigid_transform TransformB)
-{
-    rigid_transform Result;
-    Result.Orientation = TransformA.Orientation*TransformB.Orientation;
-    Result.Translation = TransformA.Translation+TransformB.Translation;
-    return Result;
-}
-
-inline sqt 
-operator*(sqt TransformA, sqt TransformB)
+inline sqt ToParentCoordinates(sqt Child, sqt Parent)
 {
     sqt Result;
-    Result.Orientation = TransformA.Orientation*TransformB.Orientation;
-    Result.Translation = TransformA.Translation+TransformB.Translation;
-    Result.Scale = TransformA.Scale*TransformB.Scale;
+    Result.Orientation = Child.Orientation*Parent.Orientation;
+    Result.Scale = Child.Scale*Parent.Scale;
+    Result.Translation = Rotate(Child.Translation*Result.Scale, Result.Orientation) + Parent.Translation;
     return Result;
 }
 
