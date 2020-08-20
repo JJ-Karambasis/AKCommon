@@ -374,6 +374,24 @@ inline string ToUpper(string String)
     return Result;
 }
 
+inline char* ToLower(char* String, arena* Arena = GetDefaultArena())
+{
+    ptr StringLength = LiteralStringLength(String);
+    char* Result = PushArray(Arena, StringLength+1, char, Clear, 0);
+    for(u32 StringIndex = 0; StringIndex < StringLength; StringIndex++)
+        Result[StringIndex] = ToLower(String[StringIndex]);
+    Result[StringLength] = 0;
+    return Result;
+}
+
+inline string ToLower(string String)
+{
+    string Result = AllocateLiteralString(String.Length);
+    for(u32 StringIndex = 0; StringIndex < String.Length; StringIndex++)
+        Result.Data[StringIndex] = ToLower(String.Data[StringIndex]);
+    return Result;
+}
+
 //TODO(JJ): Replace this with our own format string that will actually use a stringstream
 string FormatString(char* Format, va_list List, arena* StringArena = GetDefaultArena())
 {
