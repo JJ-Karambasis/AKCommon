@@ -616,6 +616,13 @@ struct v3f
         
         struct
         {
+            f32 Radius;
+            f32 Azimuth;
+            f32 Inclination;
+        };
+        
+        struct
+        {
             v2f xy;
             f32 __unused_0__;
         };
@@ -1827,7 +1834,7 @@ QuaternionEuler(quaternion Quaternion)
     v3f Result;
 
     f32 sinr_cosp = 2 * (Quaternion.w * Quaternion.x + Quaternion.y * Quaternion.z);
-    f32 cosr_cosp = 1 - 2 * (Quaternion.x * Quaternion.x + Quaternion.y + Quaternion.y);
+    f32 cosr_cosp = 1 - 2 * (Quaternion.x * Quaternion.x + Quaternion.y * Quaternion.y);
     Result.roll = atan2f(sinr_cosp, cosr_cosp);
 
     f32 sinp = 2 * (Quaternion.w * Quaternion.y - Quaternion.z * Quaternion.x);
@@ -2346,12 +2353,7 @@ struct rigid_transform_matrix
     m3  Orientation;
 };
 
-struct spherical_coordinates
-{
-    f32 Radius;
-    f32 Azimuth;
-    f32 Inclination;
-};
+typedef v3f spherical_coordinates;
 
 inline spherical_coordinates
 SphericalCoordinates(f32 Radius, f32 Azimuth, f32 Inclination)
