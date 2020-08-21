@@ -2519,4 +2519,13 @@ inline void GetFrustumCorners(v3f* Corners, m4 Perspective)
     Corners[7] = Intermediate[7].xyz / Intermediate[7].w;
 }
 
+sqt Lerp(sqt OldState, f32 t, sqt NewState)
+{
+    sqt Result;
+    Result.Translation = Lerp(OldState.Translation, t, NewState.Translation);
+    Result.Orientation = Lerp(OldState.Orientation, t, NewState.Orientation);
+    Result.Scale       = Lerp(OldState.Scale,       t, NewState.Scale);    
+    return Result;    
+}
+
 #endif
