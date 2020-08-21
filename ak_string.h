@@ -129,6 +129,20 @@ inline b32 EndsWith(const char* String, const char* EndString)
     return EndsWith((char*)String, LiteralStringLength(String), (char*)EndString);
 }
 
+inline b32 
+EndsWith(char* String, ptr StringLength, char Character)
+{
+    b32 Result = String[StringLength-1] == Character;
+    return Result;
+}
+
+inline b32
+EndsWith(string String, char Character)
+{
+    b32 Result = EndsWith(String.Data, String.Length, Character);
+    return Result;
+}
+
 inline b32 BeginsWith(char* String, ptr StringLength, char* BeginString)
 {
     for(u32 StringIndex = 0; StringIndex < StringLength; StringIndex++)

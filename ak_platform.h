@@ -1,6 +1,8 @@
 #ifndef AK_PLATFORM_H
 #define AK_PLATFORM_H
 
+typedef list<string> directory_result;
+
 enum platform_file_attributes
 {
     PLATFORM_FILE_ATTRIBUTES_READ,
@@ -130,7 +132,7 @@ FileGetSize(platform_file_handle* Handle)
 }
 
 inline b32
-FileRead(platform_file_handle* Handle, void* Data, u32 ReadSize, u64 Offset)
+FileRead(platform_file_handle* Handle, void* Data, u32 ReadSize, u64 Offset = NO_OFFSET)
 {
     ASSERT(Handle->IsValid() && (Handle->Attributes == PLATFORM_FILE_ATTRIBUTES_READ));
     
@@ -152,7 +154,7 @@ FileRead(platform_file_handle* Handle, void* Data, u32 ReadSize, u64 Offset)
 }
 
 inline b32
-FileWrite(platform_file_handle* Handle, void* Data, u32 WriteSize, u64 Offset)
+FileWrite(platform_file_handle* Handle, void* Data, u32 WriteSize, u64 Offset = NO_OFFSET)
 {
     ASSERT(Handle->IsValid() && (Handle->Attributes == PLATFORM_FILE_ATTRIBUTES_WRITE));
     
@@ -173,6 +175,15 @@ FileWrite(platform_file_handle* Handle, void* Data, u32 WriteSize, u64 Offset)
     return false;
 }
 
+inline u64
+FileGetPointer(platform_file_handle* Handle)
+{
+    LONG High = 0;
+    DWORD Low = SetFilePointer(Handle->Handle, 0, &High, FILE_CURRENT);
+    u64 Result = ((u64)High << 32) | Low;
+    return Result;
+}
+
 global b32 _Internal_Global_InitFrequency_;
 global LARGE_INTEGER _Internal_Global_Frequency_;
 
@@ -187,6 +198,32 @@ inline f64 GetElapsedTime(platform_time End, platform_time Start)
 {
     if(!_Internal_Global_InitFrequency_) { QueryPerformanceFrequency(&_Internal_Global_Frequency_); _Internal_Global_InitFrequency_ = true; }    
     f64 Result = ((f64)(End-Start))/((f64)_Internal_Global_Frequency_.QuadPart);
+    return Result;
+}
+
+inline directory_result 
+GetAllFilesInDirectory(string Directory, arena* Arena = GetDefaultArena())
+{
+    directory_result Result = {};
+    
+    if(!EndsWith(Directory, '\\') && !EndsWith(Directory, '/'))        
+        Directory = Concat(Directory, "\\");
+    
+    string Wildcard = Concat(Directory, "*");
+    
+    WIN32_FIND_DATAA FindData;
+    HANDLE Handle = FindFirstFile(Wildcard.Data, &FindData);
+    if(Handle != INVALID_HANDLE_VALUE)
+    {
+        b32 Loop = true;
+        while(Loop)
+        {        
+            string* File = AllocateListEntry(&Result, Arena);
+            *File = Concat(Directory, FindData.cFileName);            
+            Loop = FindNextFile(Handle, &FindData);
+        }        
+    }
+    
     return Result;
 }
 
