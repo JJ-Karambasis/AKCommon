@@ -450,6 +450,10 @@ inline u32 EndianSwap32(u32 Value)
 #define FOR_EACH(Value, Structure) auto CAT2(iter_, __LINE__) = BeginIter(Structure); \
 for(auto* Value = GetFirst(&CAT2(iter_, __LINE__)); Value; Value = GetNext(&CAT2(iter_, __LINE__)))
 
+
+void* AllocateMemory(ptr Size);
+void  FreeMemory(void* Memory);
+
 #include "ak_atomic.h"
 #include "ak_memory.h"
 #include "ak_riff.h"

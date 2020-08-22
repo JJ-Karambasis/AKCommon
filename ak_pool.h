@@ -17,7 +17,81 @@ struct pool
     u32 MaxUsed;
     u64 NextKey;
     u32 FreeHead;
-    u32 Capacity;
+    u32 Capacity;        
+    
+    inline b32 IsInitialized()
+    {
+        b32 Result = Entries != NULL;    
+        return Result;
+    }
+        
+    inline u32 GetIndex(u64 ID)
+    {
+        i32 Result = (u32)(ID & 0xFFFFFFFF);
+        return Result;
+    }
+        
+    inline b32 IsAllocatedID(u64 ID)
+    {
+        b32 Result = (ID & 0xFFFFFFFF00000000) != 0;
+        return Result;
+    }    
+    
+    inline u64 Allocate()
+    {
+        u32 Index;
+        if(FreeHead != INVALID_FREE_HEAD)
+        {
+            Index = FreeHead;
+        }
+        else
+        {
+            //CONFIRM(JJ): Should we handle a dynamically grow pool? 
+            ASSERT(MaxUsed < Capacity);
+            Index = MaxUsed++;
+        }
+        
+        pool_entry<type>* Entry = Entries + Index;    
+        if(FreeHead != -1)    
+            FreeHead = Entry->ID & 0xFFFFFFFF;
+        
+        Entry->ID = (NextKey++ << 32) | Index;
+        return Entry->ID;
+    }
+        
+    inline void Free(u64 ID)
+    {
+        ASSERT(IsAllocatedID(ID));
+        u32 Index = GetIndex(ID);
+        
+        pool_entry<type>* Entry = &Entries[Index];
+        ClearStruct(&Entry->Entry, type);
+        
+        Entry->ID = (0 | FreeHead);    
+        ASSERT(!IsAllocatedID(Entry->ID));
+        FreeHead = Index;
+    }
+    
+    inline void Free(type* Entry)
+    {
+        u64 ID = ((u64*)Entry)[-1];
+        Free(ID);
+    }
+    
+    inline type* Get(u64 ID)
+    {
+        if(!IsAllocatedID(ID))
+            return NULL;
+        
+        i32 Index = GetIndex(ID);
+        pool_entry<type>* Entry = &Entries[Index];
+        if(Entry->ID != ID)
+            return NULL;
+        
+        type* Result = &Entry->Entry;
+        return Result;
+    }
+    
 };
 
 template <typename type>
@@ -28,95 +102,6 @@ pool<type> CreatePool(arena* Arena, u32 Capacity)
     Result.FreeHead = INVALID_FREE_HEAD;
     Result.Capacity = Capacity;
     Result.Entries = PushArray(Arena, Capacity, pool_entry<type>, Clear, 0);
-    return Result;
-}
-
-template <typename type>
-b32 IsInitialized(pool<type>* Pool)
-{
-    b32 Result = Pool->Entries != NULL;    
-    return Result;
-}
-
-inline u32 GetPoolIndex(u64 ID)
-{
-    i32 Result = (u32)(ID & 0xFFFFFFFF);
-    return Result;
-}
-
-inline b32 IsAllocatedID(u64 ID)
-{
-    b32 Result = (ID & 0xFFFFFFFF00000000) != 0;
-    return Result;
-}
-
-template <typename type>
-u64 AllocateFromPool(pool<type>* Pool)
-{
-    u32 Index;
-    if(Pool->FreeHead != INVALID_FREE_HEAD)
-    {
-        Index = Pool->FreeHead;
-    }
-    else
-    {
-        //CONFIRM(JJ): Should we handle a dynamically grow pool? 
-        ASSERT(Pool->MaxUsed < Pool->Capacity);
-        Index = Pool->MaxUsed++;
-    }
-    
-    pool_entry<type>* Entry = Pool->Entries + Index;    
-    if(Pool->FreeHead != -1)    
-        Pool->FreeHead = Entry->ID & 0xFFFFFFFF;
-    
-    Entry->ID = (Pool->NextKey++ << 32) | Index;
-    return Entry->ID;
-}
-
-template <typename type>
-void FreeFromPool(pool<type>* Pool, u64 ID)
-{
-    ASSERT(IsAllocatedID(ID));
-    u32 Index = GetPoolIndex(ID);
-    
-    pool_entry<type>* Entry = &Pool->Entries[Index];
-    ClearStruct(&Entry->Entry, type);
-    
-    Entry->ID = (0 | Pool->FreeHead);    
-    ASSERT(!IsAllocatedID(Entry->ID));
-    Pool->FreeHead = Index;
-}
-
-template <typename type>
-void FreeFromPool(pool<type>* Pool, type* Entry)
-{
-    u64 ID = ((u64*)Entry)[-1];
-    FreeFromPool(Pool, ID);
-}
-
-template <typename type>
-type* GetByID(pool<type>* Pool, u64 ID)
-{
-    ASSERT(IsAllocatedID(ID));
-    i32 Index = GetPoolIndex(ID);    
-    pool_entry<type>* Entry = &Pool->Entries[Index];
-    ASSERT(Entry->ID == ID);    
-    type* Result = &Entry->Entry;
-    return Result;
-}
-
-template <typename type>
-type* TryAndGetByID(pool<type>* Pool, u64 ID)
-{
-    if(!IsAllocatedID(ID))
-        return NULL;
-    
-    i32 Index = GetPoolIndex(ID);
-    pool_entry<type>* Entry = &Pool->Entries[Index];
-    if(Entry->ID != ID)
-        return NULL;
-    
-    type* Result = &Entry->Entry;
     return Result;
 }
 
@@ -142,12 +127,12 @@ type* GetFirst(pool_iter<type>* Iter)
     
     pool<type>* Pool = Iter->Pool;
     
-    if(IsInitialized(Pool))
+    if(Pool->IsInitialized())
     {
         for(u32 Index = 0; Index < Pool->Capacity; Index++)
         {
             pool_entry<type>* Entry = Pool->Entries + Index;
-            if(IsAllocatedID(Entry->ID))
+            if(Pool->IsAllocatedID(Entry->ID))
             {
                 Iter->CurrentID = Entry->ID;
                 return &Entry->Entry;
@@ -164,12 +149,12 @@ type* GetNext(pool_iter<type>* Iter)
     ASSERT(Iter->CurrentID != 0);    
     
     pool<type>* Pool = Iter->Pool;
-    if(IsInitialized(Pool))
+    if(Pool->IsInitialized())
     {
-        for(u32 Index = GetPoolIndex(Iter->CurrentID)+1; Index < Pool->Capacity; Index++)
+        for(u32 Index = Pool->GetIndex(Iter->CurrentID)+1; Index < Pool->Capacity; Index++)
         {
             pool_entry<type>* Entry = Pool->Entries + Index;
-            if(IsAllocatedID(Entry->ID))
+            if(Pool->IsAllocatedID(Entry->ID))
             {
                 Iter->CurrentID = Entry->ID;
                 return &Entry->Entry;

@@ -218,7 +218,7 @@ GetAllFilesInDirectory(string Directory, arena* Arena = GetDefaultArena())
         b32 Loop = true;
         while(Loop)
         {        
-            string* File = AllocateListEntry(&Result, Arena);
+            string* File = Result.Allocate(Arena);
             *File = Concat(Directory, FindData.cFileName);            
             Loop = FindNextFile(Handle, &FindData);
         }        

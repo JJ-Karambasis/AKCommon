@@ -117,19 +117,9 @@ inline void SetMemoryI64(void* Dest, i64 Value, ptr Size)
 typedef ALLOCATE_MEMORY(allocate_memory);
 typedef FREE_MEMORY(free_memory);
 
-global allocate_memory* __Internal_Allocate__;
-global free_memory* __Internal_Free__;
 global struct arena* __Global_Default_Arena__; 
 
 arena CreateArena(ptr AllocationSize);
-
-inline void InitMemory(arena* DefaultArena, allocate_memory* Allocate = malloc, free_memory* Free = free)
-{
-    ASSERT(DefaultArena);
-    __Internal_Allocate__ = Allocate;
-    __Internal_Free__ = Free;    
-    __Global_Default_Arena__ = DefaultArena;
-}
 
 inline arena CreateArena(ptr BlockSize)
 {
@@ -145,14 +135,14 @@ inline void DeleteArena(arena* Arena)
     {
         arena_block* BlockToDelete = Block;
         Block = Block->Next;        
-        __Internal_Free__(BlockToDelete);                
+        FreeMemory(BlockToDelete);                
     }    
     *Arena = {};
 }
 
 arena_block* CreateBlock(ptr BlockSize)
 {
-    arena_block* Block = (arena_block*)__Internal_Allocate__(BlockSize+sizeof(arena_block));
+    arena_block* Block = (arena_block*)AllocateMemory(BlockSize+sizeof(arena_block));
     Block->Memory = (u8*)(Block+1);    
     Block->Prev = Block->Next = 0;
     Block->Used = 0;

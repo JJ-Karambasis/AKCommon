@@ -24,6 +24,31 @@ struct dynamic_array
     {        
         return Get(Index);
     }
+    
+    inline b32 IsInitialized()
+    {
+        b32 Result = Capacity > 0;
+        return Result;
+    }
+    
+    
+    inline void Add(type Value)
+    {
+        ASSERT(IsInitialized());
+        if(!Data)        
+            Data = (type*)AllocateMemory(sizeof(type)*Capacity);            
+        
+        if(Size == Capacity)
+        {
+            Capacity *= 2;
+            type* Temp = (type*)AllocateMemory(sizeof(type)*Capacity);
+            CopyMemory(Temp, Data, Size*sizeof(type));
+            FreeMemory(Data);
+            Data = Temp;
+        }
+        
+        Data[Size++] = Value;
+    }
 };
 
 template <typename type>
@@ -37,38 +62,12 @@ inline dynamic_array<type> CreateDynamicArray(u32 InitialCapacity=1)
 }
 
 template <typename type>
-inline b32 IsInitialized(dynamic_array<type>* Array)
-{
-    b32 Result = Array->Capacity > 0;
-    return Result;
-}
-
-template <typename type>
 inline void DeleteDynamicArray(dynamic_array<type>* Array)
 {
     if(Array->Data)
-        __Internal_Free__(Array->Data);    
+        FreeMemory(Array->Data);    
     Array->Data = NULL;
     Array->Capacity = Array->Size = 0;
-}
-
-template <typename type>
-inline void Append(dynamic_array<type>* Array, type Value)
-{
-    ASSERT(IsInitialized(Array));
-    if(!Array->Data)        
-        Array->Data = (type*)__Internal_Allocate__(sizeof(type)*Array->Capacity);            
-    
-    if(Array->Size == Array->Capacity)
-    {
-        Array->Capacity *= 2;
-        type* Temp = (type*)__Internal_Allocate__(sizeof(type)*Array->Capacity);
-        CopyMemory(Temp, Array->Data, Array->Size*sizeof(type));
-        __Internal_Free__(Array->Data);
-        Array->Data = Temp;
-    }
-    
-    Array->Data[Array->Size++] = Value;
 }
 
 template <typename type>
