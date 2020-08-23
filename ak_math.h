@@ -103,7 +103,7 @@ struct v2i
             i32 width;
             i32 height;
         };
-    };
+    };            
 };
 
 inline v2i V2i(i32 x, i32 y)
@@ -234,6 +234,14 @@ struct v2f
     {
         ASSERT(Index < 2);
         return Data[Index];
+    }
+        
+    inline u32 LargestComponent()
+    {
+        if(Abs(x) > Abs(y))
+            return 0;
+        else
+            return 1;
     }
 };
 
@@ -580,15 +588,6 @@ AreEqual(v2f P0, v2f P1, f32 Epsilon)
     return Result;
 }
 
-inline u32
-LargestComponent(v2f V)
-{
-    if(Abs(V.x) > Abs(V.y))
-        return 0;
-    else
-        return 1;
-}
-
 struct v3f
 {
     union
@@ -641,6 +640,15 @@ struct v3f
         ASSERT(Index < 3);
         return Data[Index];
     }
+    
+    
+    inline u32 LargestComponent()
+    {
+        u32 Result = xy.LargestComponent();
+        if(Abs(z) > Data[Result])
+            return 2;
+        return Result;        
+    }    
 };
 
 const global v3f Global_WorldXAxis = {1.0f, 0.0f, 0.0f};
@@ -725,33 +733,6 @@ IsInvalidV3(v3f V)
 {
     b32 Result = ((V.x == INFINITY) || (V.y == INFINITY) || (V.z == INFINITY));
     return Result;
-}
-
-inline u32 
-LargestComponent(v3f V)
-{
-    if(Abs(V.x) > Abs(V.y))
-    {
-        if(Abs(V.x) > Abs(V.z))
-        {
-            return 0;
-        }
-        else
-        {
-            return 2;
-        }
-    }
-    else
-    {
-        if(Abs(V.y) > Abs(V.z))
-        {
-            return 1;
-        }
-        else
-        {
-            return 2;
-        }
-    }
 }
 
 inline v3f

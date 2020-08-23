@@ -92,6 +92,11 @@ struct pool
         return Result;
     }
     
+    inline type* GetByIndex(u32 Index)
+    {
+        type* Result = &Entries[Index].Entry;
+        return Result;
+    }    
 };
 
 template <typename type>
