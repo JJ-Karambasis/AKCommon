@@ -97,6 +97,16 @@ struct pool
         type* Result = &Entries[Index].Entry;
         return Result;
     }    
+    
+    inline void FreeAll()
+    {
+        for(u32 Index = 0; Index < Capacity; Index++)
+        {
+            pool_entry<type>* Entry = &Entries[Index];
+            if(IsAllocatedID(Entry->ID))
+                Free(Entry->ID);
+        }        
+    }
 };
 
 template <typename type>
