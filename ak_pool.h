@@ -24,13 +24,25 @@ struct pool
         b32 Result = Entries != NULL;    
         return Result;
     }
-        
+    
+    inline u64 GetID(type* Entry)
+    {
+        u64 ID = ((u64*)Entry)[-1];
+        return ID;
+    }
+    
     inline u32 GetIndex(u64 ID)
     {
         i32 Result = (u32)(ID & 0xFFFFFFFF);
         return Result;
     }
-        
+    
+    inline u32 GetIndex(type* Entry)
+    {
+        u64 ID = GetID(Entry);
+        return GetIndex(ID);
+    }
+    
     inline b32 IsAllocatedID(u64 ID)
     {
         b32 Result = (ID & 0xFFFFFFFF00000000) != 0;
@@ -58,7 +70,7 @@ struct pool
         Entry->ID = (NextKey++ << 32) | Index;
         return Entry->ID;
     }
-        
+    
     inline void Free(u64 ID)
     {
         ASSERT(IsAllocatedID(ID));
@@ -74,7 +86,7 @@ struct pool
     
     inline void Free(type* Entry)
     {
-        u64 ID = ((u64*)Entry)[-1];
+        u64 ID = GetID(Entry);
         Free(ID);
     }
     
