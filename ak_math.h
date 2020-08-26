@@ -1950,6 +1950,15 @@ EulerQuaternion(v3f Euler)
     return Result;
 }
 
+inline quaternion
+operator+(quaternion Left, quaternion Right)
+{
+    quaternion Result;
+    Result.v = Left.v+Right.v;
+    Result.w = Left.w+Right.w;
+    return Result;
+}
+
 inline quaternion 
 operator*(quaternion Left, quaternion Right)
 {

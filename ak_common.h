@@ -348,9 +348,27 @@ inline b32 SameSign(f32 a, f32 b)
     return Result;
 }
 
-f32 SafeInverse(f32 A, f32 Epsilon = 0.0f)
+inline b32 IsCloseToZero(f32 Value, f32 Epsilon)
 {
-    ASSERT(Abs(A) > Epsilon);
+    b32 Result = Abs(Value) < Epsilon;
+    return Result;
+}
+
+inline b32 IsFuzzyZero(f32 Value)
+{
+    b32 Result = IsCloseToZero(Value, FLT_EPSILON);
+    return Result;
+}
+
+inline b32 IsFuzzyZero(f64 Value)
+{
+    b32 Result = Abs(Value) < DBL_EPSILON;
+    return Result;
+}
+
+f32 SafeInverse(f32 A)
+{    
+    ASSERT(!IsFuzzyZero(A));
     return 1.0f/A;
 }               
 
@@ -381,18 +399,6 @@ inline b32 IsRangeInInterval(f32 Min, f32 Max, f32 RangeMin, f32 RangeMax)
 inline b32 AreEqual(f32 A, f32 B, f32 Epsilon)
 {
     b32 Result = Abs(A-B) < Epsilon;
-    return Result;
-}
-
-inline b32 IsFuzzyZero(f32 Value)
-{
-    b32 Result = Abs(Value) < FLT_EPSILON;
-    return Result;
-}
-
-inline b32 IsFuzzyZero(f64 Value)
-{
-    b32 Result = Abs(Value) < DBL_EPSILON;
     return Result;
 }
 
