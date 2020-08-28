@@ -227,6 +227,86 @@ GetAllFilesInDirectory(string Directory, arena* Arena = GetDefaultArena())
     return Result;
 }
 
+inline wchar_t* 
+Win32_ConvertToWide(char* String)
+{
+    int StringSize = (int)LiteralStringLength(String)+1;
+    wchar_t* Result = PushArray(StringSize, wchar_t, Clear, 0);
+    MultiByteToWideChar(CP_ACP, 0, String, -1, Result, StringSize);
+    return Result;
+}
+
+inline char* 
+Win32_ConvertToStandard(wchar_t* String)
+{
+    //CONFIRM(JJ): Do we want to actually support wide strings in string.h? If so can we remove these wide string functions 
+    //from the c runtime libary?
+    int StringSize = (int)wcslen(String)+1;
+    char* Result = PushArray(StringSize, char, Clear, 0);
+    WideCharToMultiByte(CP_ACP, 0, String, -1, Result, StringSize, NULL, NULL);
+    return Result;
+}
+
+#include <shobjidl_core.h>
+inline string 
+Platform_OpenFileDialog(char* Extension)
+{
+    string Result = InvalidString();
+    
+    IFileOpenDialog* FileDialog = NULL;
+    if(SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog, (void**)&FileDialog)))
+    {
+        DWORD FileFlags;
+        if(SUCCEEDED(FileDialog->GetOptions(&FileFlags)))
+        {
+            if(SUCCEEDED(FileDialog->SetOptions(FileFlags | FOS_FORCEFILESYSTEM)))
+            {
+                string StringExtension = Concat("*.", Extension); 
+                COMDLG_FILTERSPEC Filter = {L"File", Win32_ConvertToWide(StringExtension.Data)};
+                if(SUCCEEDED(FileDialog->SetFileTypes(1, &Filter)))
+                {
+                    if(SUCCEEDED(FileDialog->SetFileTypeIndex(0)))
+                    {
+                        if(SUCCEEDED(FileDialog->SetDefaultExtension(Win32_ConvertToWide(Extension))))
+                        {
+                            if(SUCCEEDED(FileDialog->Show(NULL)))
+                            {
+                                IShellItem* Item;
+                                if(SUCCEEDED(FileDialog->GetResult(&Item)))
+                                {
+                                    PWSTR FilePath = NULL;
+                                    if(SUCCEEDED(Item->GetDisplayName(SIGDN_FILESYSPATH, &FilePath)))
+                                    {
+                                        Result = PushLiteralString(Win32_ConvertToStandard(FilePath));
+                                        CoTaskMemFree(FilePath);
+                                    }       
+                                    Item->Release();                                    
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        FileDialog->Release();      
+    }
+    
+    return Result;        
+}
+
+inline void ConsoleLog(char* Format, ...)
+{
+    char String[1024];
+    
+    va_list Args;
+    va_start(Args, Format);
+    vsprintf(String, Format, Args);
+    va_end(Args);
+    
+    OutputDebugStringA(String);    
+}
+
 #endif
 
 inline string 

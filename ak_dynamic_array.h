@@ -49,6 +49,11 @@ struct dynamic_array
         
         Data[Size++] = Value;
     }
+    
+    inline void Reset()
+    {
+        Size = 0;
+    }
 };
 
 template <typename type>

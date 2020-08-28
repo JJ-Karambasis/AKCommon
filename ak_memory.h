@@ -121,6 +121,12 @@ global struct arena* __Global_Default_Arena__;
 
 arena CreateArena(ptr AllocationSize);
 
+inline b32 IsInitialized(arena* Arena)
+{
+    b32 Result = Arena->BlockSize > 0;
+    return Result;
+}
+
 inline arena CreateArena(ptr BlockSize)
 {
     arena Result = {};

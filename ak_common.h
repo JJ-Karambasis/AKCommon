@@ -151,6 +151,18 @@ inline i32 MaximumI32(i32 A, i32 B)
     return Result;
 }
 
+inline u32 MinimumU32(u32 A, u32 B)
+{
+    u32 Result = (A <= B) ? A : B;
+    return Result;
+}
+
+inline u32 MaximumU32(u32 A, u32 B)
+{
+    u32 Result = (A >= B) ? A : B;
+    return Result;
+}
+
 inline f32 MinimumF32(f32 A, f32 B)
 {
     f32 Result = (A <= B) ? A : B;
@@ -190,6 +202,12 @@ inline f32 ClampF32(f32 Value, f32 Min, f32 Max)
 inline i32 ClampI32(i32 Value, i32 Min, i32 Max)
 {
     i32 Result = MinimumI32(MaximumI32(Value, Min), Max);
+    return Result;
+}
+
+inline u32 ClampU32(u32 Value, u32 Min, u32 Max)
+{
+    u32 Result = MinimumU32(MaximumU32(Value, Min), Max);
     return Result;
 }
 
