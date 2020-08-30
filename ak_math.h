@@ -755,6 +755,16 @@ operator+(v3f Left, f32 Right)
     return Result;
 }
 
+inline v3f
+operator+(f32 Left, v3f Right)
+{
+    v3f Result;
+    Result.x = Left + Right.x;
+    Result.y = Left + Right.y;
+    Result.z = Left + Right.z;
+    return Result;
+}
+
 inline v3f&
 operator+=(v3f& Left, v3f Right)
 {
