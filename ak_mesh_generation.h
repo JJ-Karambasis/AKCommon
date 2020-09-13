@@ -163,6 +163,24 @@ GenerateLineSphere(arena* Storage, f32 Radius, u16 CircleSampleCount, v3f Center
 }
 
 inline mesh_generation_result
+GenerateLineCircle(arena* Storage, f32 Radius, u16 CircleSampleCount, v3f CenterP = V3())
+{
+    mesh_generation_result Result = AllocateMeshGenerationResult(Storage, CircleSampleCount, CircleSampleCount*2);
+    
+    f32 CircleRadOffset = GetCircleRadOffset(CircleSampleCount);    
+    vertex_p3* VertexAt = Result.Vertices;
+    
+    f32 Radians = 0.0f;        
+    for(u32 SampleIndex = 0; SampleIndex < CircleSampleCount; SampleIndex++, Radians += CircleRadOffset)
+        *VertexAt++ = {V3(Cos(Radians), Sin(Radians), 0.0f)*Radius + CenterP};         
+    
+    u16* IndicesAt = Result.Indices;
+    PopulateCircleIndices(&IndicesAt, 0, CircleSampleCount);
+    
+    return Result;
+}
+
+inline mesh_generation_result
 GenerateLineHemisphere(arena* Storage, f32 Radius, u16 CircleSampleCount, v3f CenterP = V3())
 {    
     u16 HalfCircleSampleCountPlusOne = (CircleSampleCount/2)+1;
@@ -255,6 +273,50 @@ GenerateTriangleCylinder(arena* Storage, f32 Radius, f32 Height, u16 CircleSampl
         *IndicesAt++ = BottomSampleIndexPlusOne;
         *IndicesAt++ = TopSampleIndexPlusOne;
     }
+    
+    return Result;
+}
+
+//Basically a Cylinder without the top and bottom
+inline mesh_generation_result
+GenerateTriangleCircle(arena* Storage, f32 Radius, f32 Height, u16 CircleSampleCount, v3f CenterP = V3())
+{   
+    mesh_generation_result Result = AllocateMeshGenerationResult(Storage, CircleSampleCount*2, 
+                                                                 CircleSampleCount*3*2);    
+    f32 CircleRadOffset = GetCircleRadOffset(CircleSampleCount);
+    u16 CenterVertexOffset = CircleSampleCount*2;
+    
+    vertex_p3* VertexAt = Result.Vertices; 
+    
+    f32 Radians = 0.0f;    
+    for(u32 SampleIndex = 0; SampleIndex < CircleSampleCount; SampleIndex++, Radians += CircleRadOffset)    
+        *VertexAt++ = {V3(Cos(Radians)*Radius, Sin(Radians)*Radius, 0.0f) + CenterP};            
+    
+    Radians = 0.0f;
+    for(u32 SampleIndex = 0; SampleIndex < CircleSampleCount; SampleIndex++, Radians += CircleRadOffset)
+        *VertexAt++ = {V3(Cos(Radians)*Radius, Sin(Radians)*Radius, Height) + CenterP};
+    
+    // *VertexAt++ = {V3(0.0f, 0.0f, 0.0f) + CenterP};
+    // *VertexAt++ = {V3(0.0f, 0.0f, Height) + CenterP};
+    
+    u16* IndicesAt = Result.Indices;
+    for(u16 SampleIndex = 0; SampleIndex < CircleSampleCount; SampleIndex++)
+    {
+        u16 SampleIndexPlusOne = (SampleIndex+1) % CircleSampleCount;
+        
+        *IndicesAt++ = SampleIndex;
+        *IndicesAt++ = SampleIndexPlusOne;
+        *IndicesAt++ = SampleIndex + CircleSampleCount;
+        if(SampleIndex != 0)
+        {
+            *IndicesAt++ = SampleIndex;
+            *IndicesAt++ = SampleIndex + CircleSampleCount;
+            *IndicesAt++ = SampleIndex + CircleSampleCount - 1;
+        }
+        
+        
+    }    
+    
     
     return Result;
 }
