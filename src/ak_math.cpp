@@ -1324,7 +1324,7 @@ ak_quat<type> AK_EulerToQuat(type Roll, type Pitch, type Yaw)
 template <typename type> 
 ak_quat<type> AK_EulerToQuat(ak_v3<type> Euler)
 {
-    return AK_EulerToQuat(Euler.r, Euler.p, Euler.y);
+    return AK_EulerToQuat(Euler.roll, Euler.pitch, Euler.yaw);
 }
 
 template <typename type> 
@@ -1378,21 +1378,21 @@ ak_v3<type> AK_QuatToEuler(ak_quat<type> Quat)
     
     type sinr_cosp = 2 * (Quat.w * Quat.x + Quat.y * Quat.z);
     type cosr_cosp = 1 - 2 * (Quat.x * Quat.x + Quat.y * Quat.y);
-    Result.r = AK_ATan2(sinr_cosp, cosr_cosp);
+    Result.roll = AK_ATan2(sinr_cosp, cosr_cosp);
     
     type sinp = 2 * (Quat.w * Quat.y - Quat.z * Quat.x);
     if (AK_Abs(sinp) >= 1)
     {
-        Result.p = copysignf(AK_PI/2, sinp);
+        Result.pitch = copysignf(AK_PI/2, sinp);
     }
     else
     {
-        Result.p = AK_ASin(sinp);
+        Result.pitch = AK_ASin(sinp);
     }
     
     type siny_cosp = 2 * (Quat.w * Quat.z + Quat.x * Quat.y);
     type cosy_cosp = 1 - 2 * (Quat.y * Quat.y + Quat.z * Quat.z);
-    Result.y = AK_ATan2(siny_cosp, cosy_cosp);
+    Result.yaw = AK_ATan2(siny_cosp, cosy_cosp);
     
     return Result;
 }

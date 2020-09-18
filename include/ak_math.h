@@ -58,9 +58,9 @@ struct ak_v3
         
         struct
         {
-            type r;
-            type p;
-            type y;
+            type roll;
+            type pitch;
+            type yaw;
         };
         
         struct
