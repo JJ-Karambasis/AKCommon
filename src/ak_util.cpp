@@ -55,3 +55,40 @@ ak_bool AK_EqualSign(ak_f32 a, ak_f32 b)
     ak_bool Result = (a >= 0) ^ (b < 0);
     return Result;
 }
+
+global ak_u64 AK_Internal__Seed64 = (ak_u64)-1;
+global ak_u32 AK_Internal__Seed32 = (ak_u32)-1;
+
+void AK_SetRandomSeed64(ak_u64 Seed)
+{
+    AK_Internal__Seed64 = Seed;
+}
+
+void AK_SetRandomSeed32(ak_u32 Seed)
+{
+    AK_Internal__Seed32 = Seed;
+}
+
+//NOTE(EVERYONE): Random number generator based on Xorshift
+//https://en.wikipedia.org/wiki/Xorshift
+ak_u64 AK_Random64()
+{
+    AK_Assert(AK_Internal__Seed64 != (ak_u64)-1, "Please set a seed using AK_SetRandomSeed64() before using the random number generator");    
+    ak_u64 Result = AK_Internal__Seed64;
+    Result ^= Result << 13;
+    Result ^= Result >> 7;
+    Result ^= Result << 17;
+    AK_Internal__Seed64 = Result;
+    return Result;
+}
+
+ak_u32 AK_Random32()
+{
+    AK_Assert(AK_Internal__Seed32 != (ak_u32)-1, "Please set a seed using AK_SetRandomSeed32() before using the random number generator");
+    ak_u32 Result = AK_Internal__Seed32;
+    Result ^= Result << 13;
+    Result ^= Result >> 17;
+    Result ^= Result << 5;
+    AK_Internal__Seed32 = Result;
+    return Result;
+}
