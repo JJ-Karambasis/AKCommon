@@ -11,6 +11,7 @@ typedef ak_string_builder ak_logger;
 
 #define AK_InvalidCode() AK_Assert(false, "Invalid code path");
 #define AK_NotImplemented() AK_Assert(false, "Code path not implemented");
+#define AK_InvalidCase(x) case x: { AK_InvalidCode(); } break
 #define AK_INVALID_ELSE else AK_InvalidCode()
 #define AK_INVALID_DEFAULT_CASE default:  { AK_InvalidCode(); } break
 

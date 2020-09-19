@@ -118,3 +118,17 @@ type* ak_array_iter<type>::Next()
     if(Index < Array->Size) return Array->Get(Index++);        
     return NULL;
 }
+
+template <typename type>
+ak_fixed_array<type> AK_CreateArray(type* Data, ak_u32 Size)
+{
+    ak_fixed_array<type> Result = {Data, Size};
+    return Result;
+}
+
+template <typename type>
+type& ak_fixed_array<type>::operator[](ak_u32 Index)
+{
+    AK_Assert(Index < Size, "Index out of bounds");
+    return Data[Index];
+}
