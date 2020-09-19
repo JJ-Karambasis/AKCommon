@@ -1727,7 +1727,8 @@ ak_m3<type>& operator*=(ak_m3<type>& Left, type Right)
     return Left;
 }
 
-template <typename type> ak_m3<type> operator*(ak_m3<type> Left, ak_m3<type> Right)
+template <typename type> 
+ak_m3<type> operator*(ak_m3<type> Left, ak_m3<type> Right)
 {
     Right = AK_Transpose(Right);
     ak_m3<type> Result;
@@ -1768,6 +1769,19 @@ ak_v3<type>& operator*=(ak_v3<type>& Left, ak_m3<type> Right)
 {
     Left = Left*Right;
     return Left;
+}
+
+ak_m3f AK_OrientAt(ak_v3f Position, ak_v3f Target, ak_v3f Up)
+{
+    ak_v3f Z = AK_Normalize(Position-Target);
+    if(AK_EqualEps(Z, Up))
+        Up = AK_YAxis();
+    
+    ak_v3f X = -AK_Normalize(AK_Cross(Z, Up));
+    ak_v3f Y = AK_Cross(Z, X);
+    
+    ak_m3f Result = AK_M3(X, Y, Z);
+    return Result;
 }
 
 ak_m3f AK_M3f(ak_f64* Data)
@@ -2124,7 +2138,7 @@ ak_m4f AK_LookAt(ak_v3f Position, ak_v3f Target, ak_v3f Up)
 {
     ak_v3f Z = AK_Normalize(Position-Target);
     if(AK_EqualEps(Z, Up))
-        Up = AK_ZAxis();
+        Up = AK_YAxis();
     
     ak_v3f X = -AK_Normalize(AK_Cross(Z, Up));
     ak_v3f Y = AK_Cross(Z, X);

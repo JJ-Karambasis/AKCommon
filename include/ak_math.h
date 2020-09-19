@@ -660,7 +660,7 @@ template <typename type> ak_m3<type>& operator*=(ak_m3<type>& Left, type Right);
 template <typename type> ak_m3<type>& operator*=(ak_m3<type>& Left, ak_m3<type> Right);
 template <typename type> ak_v3<type> operator*(ak_v3<type> Left, ak_m3<type> Right);
 template <typename type> ak_v3<type>& operator*=(ak_v3<type>& Left, ak_m3<type> Right);
-
+ak_m3f AK_OrientAt(ak_v3f Position, ak_v3f Target, ak_v3f Up = AK_ZAxis());
 ak_m3f AK_M3f(ak_f64* Data);
 
 ////////////////////////////////////////////////////
@@ -710,7 +710,7 @@ template <typename type> ak_m4<type> AK_Perspective(type FOV, type AspectRatio, 
 template <typename type> ak_m4<type> AK_Orthographic(type Left, type Right, type Top, type Bottom, type Near, type Far);
 template <typename type> ak_v3<type> AK_TransformPoint(ak_v3<type> Point, ak_m4<type> Transform);
 template <typename type> void AK_TransformPoints(ak_v3<type>* Points, ak_u32 PointCount, ak_m4<type> Transform);
-ak_m4f AK_LookAt(ak_v3f Position, ak_v3f Target, ak_v3f Up = AK_YAxis());
+ak_m4f AK_LookAt(ak_v3f Position, ak_v3f Target, ak_v3f Up = AK_ZAxis());
 ak_m4f AK_M4f(ak_f64* Data);
 
 ////////////////////////////////////////////////////
