@@ -109,24 +109,24 @@ ak_mesh_result AK_GenerateTriangleBox(ak_arena* Arena, ak_v3f Dimensions, ak_v3f
     Result.Vertices = AK_Internal__GetBoxVertices(Arena, CenterP, Dimensions);
     Result.VertexCount = 8;
     
-    Result.IndexCount = 24;
+    Result.IndexCount = 36;
     Result.Indices = Arena->PushArray<ak_u16>(Result.IndexCount);
-    
+    //top
     Result.Indices[0]  = 0; Result.Indices[1]  = 1; Result.Indices[2]  = 2;
     Result.Indices[3]  = 0; Result.Indices[4]  = 2; Result.Indices[5]  = 3;
-    
+    //right
     Result.Indices[6]  = 1; Result.Indices[7]  = 4; Result.Indices[8]  = 7;
     Result.Indices[9]  = 1; Result.Indices[10] = 7; Result.Indices[11] = 2;
-    
+    //Bottom
     Result.Indices[12] = 4; Result.Indices[13] = 5; Result.Indices[14] = 6;
     Result.Indices[15] = 4; Result.Indices[16] = 6; Result.Indices[17] = 7;
-    
+    //Left
     Result.Indices[18] = 5; Result.Indices[19] = 0; Result.Indices[20] = 3;
     Result.Indices[21] = 5; Result.Indices[22] = 3; Result.Indices[23] = 6;
-    
-    Result.Indices[24] = 3; Result.Indices[25] = 2; Result.Indices[26] = 7;
-    Result.Indices[27] = 3; Result.Indices[28] = 7; Result.Indices[29] = 6;
-    
+    //Back
+    Result.Indices[24] = 7; Result.Indices[25] = 6; Result.Indices[26] = 3;
+    Result.Indices[27] = 7; Result.Indices[28] = 3; Result.Indices[29] = 2;
+    //Front
     Result.Indices[30] = 5; Result.Indices[31] = 4; Result.Indices[32] = 1;
     Result.Indices[33] = 5; Result.Indices[34] = 1; Result.Indices[35] = 0;
     
