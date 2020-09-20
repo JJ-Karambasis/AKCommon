@@ -16,7 +16,8 @@ ak_bool ak_pool<type>::IsInitialized()
 template <typename type>
 ak_u64 ak_pool<type>::Allocate()
 {
-    AK_Assert(IsInitialized(), "Pool is not initialized");
+    if(!IsInitialized())
+        *this = AK_CreatePool<type>();    
     
     ak_u32 Index;
     if(FreeHead != AK_INVALID_FREE_HEAD)
