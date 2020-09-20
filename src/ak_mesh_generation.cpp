@@ -367,6 +367,46 @@ ak_mesh_result AK_GenerateTriangleCylinder(ak_arena* Arena, ak_f32 Radius, ak_f3
     return Result;
 }
 
+ak_mesh_result AK_GenerateTriangleTorus(ak_arena* Arena, ak_f32 Radius, ak_f32 InnerRadius, ak_u16 CircleSampleCount, ak_v3f CenterP)
+{
+    ak_mesh_result Result = AK_AllocateMeshResult(Arena, CircleSampleCount*CircleSampleCount, CircleSampleCount*CircleSampleCount*2*3);    
+    ak_f32 CircleRadOffset = AK_Internal__GetCircleRadOffset(CircleSampleCount);
+    ak_u16 CenterVertexOffset = CircleSampleCount*2;
+    
+    ak_vertex_p3* VertexAt = Result.Vertices; 
+    
+    ak_f32 Radians = 0.0f;    
+    for(ak_u32 SampleIndex = 0; SampleIndex < CircleSampleCount; SampleIndex++, Radians += CircleRadOffset)
+    {
+        ak_f32 InnerRadians = 0.0f;
+        ak_v3f InnerCenter = AK_V3(AK_Cos(Radians)*Radius, AK_Sin(Radians)*Radius, 0.0f) + CenterP;
+        for(ak_u32 InnerSample = 0; InnerSample < CircleSampleCount; InnerSample++, InnerRadians += CircleRadOffset)
+        {
+            ak_v3f W = AK_Normalize(InnerCenter - CenterP);
+            *VertexAt++ = {CenterP + InnerCenter + (InnerRadius*AK_Cos(InnerRadians)*InnerCenter) + AK_V3f(0.0f, 0.0f, InnerRadius*AK_Sin(InnerRadians))};
+        }         
+    }
+    
+    ak_u16* IndicesAt = Result.Indices;
+    ak_i32 VertexMax = CircleSampleCount*CircleSampleCount;
+    for(ak_u16 SampleIndex = 0; SampleIndex < VertexMax; SampleIndex++)
+    {
+        ak_u16 SampleIndexPlusOne = (SampleIndex+1) % VertexMax;
+        
+        *IndicesAt++ = SampleIndex;
+        *IndicesAt++ = SampleIndexPlusOne;
+        *IndicesAt++ = (SampleIndex + CircleSampleCount) % VertexMax;
+        if(SampleIndex != 0)
+        {
+            *IndicesAt++ = SampleIndex;
+            *IndicesAt++ = (SampleIndex + CircleSampleCount) % VertexMax;
+            *IndicesAt++ = (SampleIndex + CircleSampleCount - 1) % VertexMax;
+        }                
+    }        
+    
+    return Result;
+}
+
 inline ak_mesh_result
 AK_GenerateTriangleCircle(ak_arena* Arena, ak_f32 Radius, ak_f32 Height, ak_u16 CircleSampleCount, ak_v3f CenterP)
 {   
