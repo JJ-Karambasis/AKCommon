@@ -19,7 +19,7 @@ struct ak_hash_map
     key*    ItemKeys;
     ak_u32* ItemSlots;
     value*  ItemEntries;
-    
+        
     void   Insert(key Key, value Value);    
     value* Find(key Key);
     void   Remove(key Key);

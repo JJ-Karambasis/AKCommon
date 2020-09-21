@@ -115,8 +115,7 @@ void AK_DeletePool(ak_pool<type>* Pool)
 
 template <typename type>
 ak_pool_iter<type> AK_BeginIter(ak_pool<type>* Pool)
-{    
-    AK_Assert(Pool->IsInitialized(), "Pool is not initialized");        
+{            
     ak_pool_iter<type> Result = {};
     Result.Pool = Pool;
     return Result;
