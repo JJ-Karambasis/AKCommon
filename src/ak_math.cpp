@@ -365,6 +365,11 @@ ak_v2f AK_V2f(ak_i32 x, ak_i32 y)
     return {(ak_f32)x, (ak_f32)y};
 }
 
+ak_v2f AK_V2f(ak_v2i V)
+{
+    return AK_V2f(V.x, V.y);
+}
+
 ak_v2f AK_V2f(ak_f64 x, ak_f64 y)
 {
     return {(ak_f32)x, (ak_f32)y};
@@ -716,6 +721,16 @@ ak_v3<type> AK_SphericalToCartesian(ak_v3<type> SphericalCoordinates)
     Result.y = s*AK_Sin(SphericalCoordinates.azimuth);
     Result.z = c;
     return Result;    
+}
+
+template <typename type> 
+ak_v3<type> AK_ToNormalizedDeviceCoordinates(ak_v2<type> XY, ak_v2<type> Resolution)
+{
+    ak_v3<type> Result;
+    Result.x = ((type)2 * XY.x) / Resolution.w - (type)1;
+    Result.y = (type)1 - ((type)2 * XY.y) / Resolution.h;
+    Result.z = (type)1;
+    return Result;
 }
 
 ak_v3f AK_InvalidV3f()

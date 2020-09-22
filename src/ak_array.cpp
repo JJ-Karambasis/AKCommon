@@ -77,6 +77,21 @@ void ak_array<type>::Clear()
 }
 
 template <typename type>
+type* ak_array<type>::Last()
+{
+    if(Size == 0)
+        return NULL;    
+    return Get(Size-1);
+}
+
+template <typename type>
+ak_fixed_array<type> ak_array<type>::ToFixedArray()
+{
+    ak_fixed_array<type> Result = AK_CreateArray<type>(Entries, Size);
+    return Result;
+}
+
+template <typename type>
 ak_array<type> AK_CreateArray(ak_u32 InitialCapacity)
 {
     ak_array<type> Result = {};    
@@ -120,6 +135,30 @@ type* ak_array_iter<type>::Next()
 }
 
 template <typename type>
+ak_fixed_array_iter<type> AK_BeginIter(ak_fixed_array<type>* Array)
+{
+    ak_fixed_array_iter<type> Result = {};
+    Result.Array = Array;
+    return Result;
+}
+
+template <typename type>
+type* ak_fixed_array_iter<type>::First()
+{
+    AK_Assert(Index == 0, "Iterator has already begun");    
+    if(Index < Array->Size) return Array->Get(Index++);        
+    return NULL;    
+}
+
+template <typename type>
+type* ak_fixed_array_iter<type>::Next()
+{
+    AK_Assert(Index != 0, "Iterator should call First() before calling Next()");
+    if(Index < Array->Size) return Array->Get(Index++);        
+    return NULL;
+}
+
+template <typename type>
 ak_fixed_array<type> AK_CreateArray(type* Data, ak_u32 Size)
 {
     ak_fixed_array<type> Result = {Data, Size};
@@ -131,4 +170,11 @@ type& ak_fixed_array<type>::operator[](ak_u32 Index)
 {
     AK_Assert(Index < Size, "Index out of bounds");
     return Data[Index];
+}
+
+template <typename type>
+type* ak_fixed_array<type>::Get(ak_u32 Index)
+{
+    AK_Assert(Index < Size, "Index out of bounds");
+    return &Data[Index];
 }

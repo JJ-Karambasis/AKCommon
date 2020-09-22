@@ -413,6 +413,7 @@ template <typename type> ak_v2<type> AK_Lerp(ak_v2<type> A, type t, ak_v2<type> 
 
 ak_v2f AK_InvalidV2f();
 ak_v2f AK_V2f(ak_i32 x, ak_i32 y);
+ak_v2f AK_V2f(ak_v2i V);
 ak_v2f AK_V2f(ak_f64 x, ak_f64 y);
 ak_v2f AK_V2f(ak_f64* Data);
 ak_bool AK_EqualApprox(ak_v2f A, ak_v2f B, ak_f32 Epsilon);
@@ -475,6 +476,7 @@ template <typename type> ak_v3<type> AK_Lerp(ak_v3<type> A, type t, ak_v3<type> 
 template <typename type> ak_v3<type> AK_Cross(ak_v3<type> Left, ak_v3<type> Right);
 template <typename type> type AK_Determinant(ak_v3<type> U, ak_v3<type> V, ak_v3<type> W);
 template <typename type> ak_v3<type> AK_SphericalToCartesian(ak_v3<type> SphericalCoordinates);
+template <typename type> ak_v3<type> AK_ToNormalizedDeviceCoordinates(ak_v2<type> XY, ak_v2<type> Resolution);
 
 ak_v3f AK_InvalidV3f();
 ak_v3f AK_V3f(ak_i32 x, ak_i32 y, ak_i32 z);
