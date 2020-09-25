@@ -32,6 +32,7 @@ void  AK_DecommitVirtualMemory(void* Address, ak_uaddr Size);
 void  AK_FreeVirtualMemory(void* Address, ak_uaddr Size);
 ak_memory_info AK_GetMemoryInfo();
 void AK_MessageBoxOk(ak_char* Title, ak_char* Message);
+void AK_MessageBoxOk(ak_char* Title, ak_string Message);
 ak_string AK_GetExecutablePathWithName(ak_arena* Arena);
 ak_string AK_GetExecutablePath(ak_arena* Arena);
 ak_bool AK_FileExists(ak_string Path);
@@ -51,6 +52,8 @@ ak_array<ak_string> AK_GetAllFilesInDirectory(ak_char* Directory, ak_arena* Aren
 ak_array<ak_string> AK_GetAllFilesInDirectory(ak_string Directory, ak_arena* Arena);
 ak_string AK_OpenFileDialog(ak_char* Extension, ak_arena* Arena);
 ak_string AK_OpenFileDialog(ak_string Extension, ak_arena* Arena);
+ak_string AK_SaveFileDialog(ak_char* Extension, ak_arena* Arena);
+ak_string AK_SaveFileDialog(ak_string Extension, ak_arena* Arena);
 ak_buffer AK_ReadEntireFile(ak_string Path, ak_arena* Arena);
 ak_buffer AK_ReadEntireFile(ak_char* Path, ak_arena* Arena);
 ak_bool AK_WriteEntireFile(ak_string Path, void* Data, ak_u32 DataSize);

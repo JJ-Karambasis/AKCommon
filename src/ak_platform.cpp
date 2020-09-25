@@ -411,6 +411,55 @@ ak_string AK_OpenFileDialog(ak_char* Extension, ak_arena* Arena)
     return Result;
 }
 
+ak_string AK_SaveFileDialog(ak_char* Extension, ak_arena* Arena)
+{
+    ak_string Result = AK_CreateEmptyString();
+    ak_arena* GlobalArena = AK_GetGlobalArena();
+    ak_temp_arena TempArena = GlobalArena->BeginTemp();
+    
+    IFileSaveDialog* FileDialog = NULL;
+    if(SUCCEEDED(CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL, IID_IFileSaveDialog, (void**)&FileDialog)))
+    {
+        DWORD FileFlags;
+        if(SUCCEEDED(FileDialog->GetOptions(&FileFlags)))
+        {
+            if(SUCCEEDED(FileDialog->SetOptions(FileFlags | FOS_FORCEFILESYSTEM)))
+            {
+                ak_string StringExtension = AK_StringConcat("*.", Extension, GlobalArena); 
+                COMDLG_FILTERSPEC Filter = {L"File", AK_Internal__Win32ConvertToWide(StringExtension.Data, GlobalArena)};
+                if(SUCCEEDED(FileDialog->SetFileTypes(1, &Filter)))
+                {
+                    if(SUCCEEDED(FileDialog->SetFileTypeIndex(0)))
+                    {
+                        if(SUCCEEDED(FileDialog->SetDefaultExtension(AK_Internal__Win32ConvertToWide(Extension, GlobalArena))))
+                        {
+                            if(SUCCEEDED(FileDialog->Show(NULL)))
+                            {
+                                IShellItem* Item;
+                                if(SUCCEEDED(FileDialog->GetResult(&Item)))
+                                {
+                                    PWSTR FilePath = NULL;
+                                    if(SUCCEEDED(Item->GetDisplayName(SIGDN_FILESYSPATH, &FilePath)))
+                                    {
+                                        Result = AK_PushString(AK_Internal__Win32ConvertToStandard(FilePath, GlobalArena), Arena);
+                                        CoTaskMemFree(FilePath);
+                                    }
+                                    Item->Release();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        FileDialog->Release();
+    }
+    
+    GlobalArena->EndTemp(&TempArena);
+    return Result;
+}
+
 global ak_bool AK_Internal__InitFrequency;
 global LARGE_INTEGER AK_Internal__Frequency;
 
@@ -516,4 +565,9 @@ ak_array<ak_string> AK_GetAllFilesInDirectory(ak_char* Directory, ak_arena* Aren
 ak_string AK_OpenFileDialog(ak_string Extension, ak_arena* Arena)
 {
     return AK_OpenFileDialog(Extension.Data, Arena);
+}
+
+void AK_MessageBoxOk(ak_char* Title, ak_string Message)
+{
+    AK_MessageBoxOk(Title, Message.Data);
 }

@@ -422,7 +422,7 @@ ak_bool AK_IsNullChar(ak_char Character)
 
 ak_bool AK_IsWhitespace(ak_char Character)
 {
-    ak_bool Result = AK_IsNewline(Character) || (Character == ' ') || (Character == '\t');
+    ak_bool Result = AK_IsNewline(Character) || (Character == ' ') || (Character == '\t') ||  (Character == '\0');
     return Result;
 }
 
@@ -522,3 +522,5 @@ ak_string AK_ReadToken(ak_char* String)
     while(!AK_IsWhitespace(*At)) { At++; Length++; }
     return AK_CreateString(String, Length);    
 }
+    
+    

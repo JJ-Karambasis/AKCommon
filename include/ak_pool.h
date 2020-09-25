@@ -10,14 +10,15 @@ struct ak_pool
     ak_u32 MaxUsed;
     ak_u64 NextKey;
     ak_u32 FreeHead;
+    ak_u32 Size;
     type*   Entries;
     ak_u64* IDs;
-    
-    
+        
     ak_bool IsInitialized();
     ak_u64 Allocate();
     void Free(ak_u64 ID);
     type* Get(ak_u64 ID);
+    type* GetByIndex(ak_u32 Index);
     void FreeAll();
 };
 

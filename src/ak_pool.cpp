@@ -48,6 +48,7 @@ ak_u64 ak_pool<type>::Allocate()
         FreeHead = *ID & 0xFFFFFFFF;
     
     *ID = (NextKey++ << 32) | Index;
+    Size++;
     return *ID;
 }
 
@@ -61,6 +62,7 @@ void ak_pool<type>::Free(ak_u64 ID)
         AK_Assert(Index < MaxUsed, "Index out of bounds.");
         IDs[Index] = (0 | FreeHead);
         FreeHead = Index;
+        Size--;
     }
 }
 
@@ -75,6 +77,16 @@ type* ak_pool<type>::Get(ak_u64 ID)
     if(IDs[Index] != ID)
         return NULL;
     
+    type* Result = &Entries[Index];
+    return Result;
+}
+
+template <typename type>
+type* ak_pool<type>::GetByIndex(ak_u32 Index)
+{    
+    AK_Assert(Index < MaxUsed, "Index out of bounds.");    
+    if(!AK_Internal__PoolIsAllocatedID(IDs[Index]))
+        return NULL;    
     type* Result = &Entries[Index];
     return Result;
 }
