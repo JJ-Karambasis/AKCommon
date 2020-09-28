@@ -362,7 +362,7 @@ AK_Internal__Win32ConvertToStandard(wchar_t* String, ak_arena* Arena)
     return Result;
 }
 
-ak_string AK_OpenFileDialog(ak_char* Extension, ak_arena* Arena)
+ak_string AK_OpenFileDialog(ak_char* Extension)
 {
     ak_string Result = AK_CreateEmptyString();
     ak_arena* GlobalArena = AK_GetGlobalArena();
@@ -392,7 +392,11 @@ ak_string AK_OpenFileDialog(ak_char* Extension, ak_arena* Arena)
                                     PWSTR FilePath = NULL;
                                     if(SUCCEEDED(Item->GetDisplayName(SIGDN_FILESYSPATH, &FilePath)))
                                     {
-                                        Result = AK_PushString(AK_Internal__Win32ConvertToStandard(FilePath, GlobalArena), Arena);
+                                        char* String = AK_Internal__Win32ConvertToStandard(FilePath, GlobalArena);
+                                        Result.Length = AK_StringLength(String);
+                                        Result.Data = (ak_char*)AK_Allocate((Result.Length+1)*sizeof(ak_char));
+                                        Result.Data[Result.Length] = 0;
+                                        AK_MemoryCopy(Result.Data, String, Result.Length*sizeof(ak_char));                                        
                                         CoTaskMemFree(FilePath);
                                     }       
                                     Item->Release();                                    
@@ -411,7 +415,7 @@ ak_string AK_OpenFileDialog(ak_char* Extension, ak_arena* Arena)
     return Result;
 }
 
-ak_string AK_SaveFileDialog(ak_char* Extension, ak_arena* Arena)
+ak_string AK_SaveFileDialog(ak_char* Extension)
 {
     ak_string Result = AK_CreateEmptyString();
     ak_arena* GlobalArena = AK_GetGlobalArena();
@@ -441,7 +445,11 @@ ak_string AK_SaveFileDialog(ak_char* Extension, ak_arena* Arena)
                                     PWSTR FilePath = NULL;
                                     if(SUCCEEDED(Item->GetDisplayName(SIGDN_FILESYSPATH, &FilePath)))
                                     {
-                                        Result = AK_PushString(AK_Internal__Win32ConvertToStandard(FilePath, GlobalArena), Arena);
+                                        char* String = AK_Internal__Win32ConvertToStandard(FilePath, GlobalArena);
+                                        Result.Length = AK_StringLength(String);
+                                        Result.Data = (ak_char*)AK_Allocate((Result.Length+1)*sizeof(ak_char));
+                                        Result.Data[Result.Length] = 0;
+                                        AK_MemoryCopy(Result.Data, String, Result.Length*sizeof(ak_char));                                                                                
                                         CoTaskMemFree(FilePath);
                                     }
                                     Item->Release();
@@ -562,9 +570,9 @@ ak_array<ak_string> AK_GetAllFilesInDirectory(ak_char* Directory, ak_arena* Aren
     return AK_GetAllFilesInDirectory(AK_CreateString(Directory), Arena);
 }
 
-ak_string AK_OpenFileDialog(ak_string Extension, ak_arena* Arena)
+ak_string AK_OpenFileDialog(ak_string Extension)
 {
-    return AK_OpenFileDialog(Extension.Data, Arena);
+    return AK_OpenFileDialog(Extension.Data);
 }
 
 void AK_MessageBoxOk(ak_char* Title, ak_string Message)

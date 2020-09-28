@@ -104,7 +104,7 @@ ak_bool ak_buffer::IsValid()
 
 ak_u8* ak_stream::Read(ak_uaddr Size)
 {
-    AK_Assert((Current + Size) < End, "Stream read overflow");
+    AK_Assert((Current + Size) <= End, "Stream read overflow");
     ak_u8* Result = Current;
     Current += Size;
     return Result;

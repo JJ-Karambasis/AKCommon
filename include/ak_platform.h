@@ -50,10 +50,10 @@ ak_bool AK_WriteFile(ak_file_handle* File, void* Data, ak_u32 Size, ak_u64 Offse
 ak_u64 AK_GetFilePointer(ak_file_handle* File);
 ak_array<ak_string> AK_GetAllFilesInDirectory(ak_char* Directory, ak_arena* Arena);
 ak_array<ak_string> AK_GetAllFilesInDirectory(ak_string Directory, ak_arena* Arena);
-ak_string AK_OpenFileDialog(ak_char* Extension, ak_arena* Arena);
-ak_string AK_OpenFileDialog(ak_string Extension, ak_arena* Arena);
-ak_string AK_SaveFileDialog(ak_char* Extension, ak_arena* Arena);
-ak_string AK_SaveFileDialog(ak_string Extension, ak_arena* Arena);
+ak_string AK_OpenFileDialog(ak_char* Extension);
+ak_string AK_OpenFileDialog(ak_string Extension);
+ak_string AK_SaveFileDialog(ak_char* Extension);
+ak_string AK_SaveFileDialog(ak_string Extension);
 ak_buffer AK_ReadEntireFile(ak_string Path, ak_arena* Arena);
 ak_buffer AK_ReadEntireFile(ak_char* Path, ak_arena* Arena);
 ak_bool AK_WriteEntireFile(ak_string Path, void* Data, ak_u32 DataSize);
