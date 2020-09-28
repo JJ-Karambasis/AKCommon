@@ -94,8 +94,18 @@ void AK_HashMap__Internal_ExpandItems(ak_hash_map<key, value>* Map)
 }
 
 template <typename key, typename value>
+ak_bool ak_hash_map<key, value>::IsInitialized()
+{
+    ak_bool Result = SlotCapacity > 0 && Slots && ItemKeys;
+    return Result;
+}
+
+template <typename key, typename value>
 void ak_hash_map<key, value>::Insert(key Key, value Value)
 {
+    if(!IsInitialized())
+        *this = AK_CreateHashMap<key, value>();
+    
     AK_Assert(AK_HashMap__Internal_FindSlot(this, Key) < 0, "Cannot insert duplicate keys into hash map");
     
     if(Size >= (SlotCapacity - SlotCapacity/3))
@@ -142,7 +152,10 @@ void ak_hash_map<key, value>::Insert(key Key, value Value)
 
 template <typename key, typename value>
 void ak_hash_map<key, value>::Remove(key Key)
-{
+{   
+    if(!IsInitialized())
+        *this = AK_CreateHashMap<type>();
+    
     ak_i32 Slot = AK_HashMap__Internal_FindSlot(this, Key);
     ASSERT(Slot >= 0);
     
@@ -170,7 +183,10 @@ void ak_hash_map<key, value>::Remove(key Key)
 
 template <typename key, typename value>
 value* ak_hash_map<key, value>::Find(key Key)
-{    
+{   
+    if(!IsInitialized())
+        *this = AK_CreateHashMap<key, value>();
+    
     ak_i32 Slot = AK_HashMap__Internal_FindSlot(this, Key);
     if(Slot < 0) return NULL;
     
@@ -181,6 +197,9 @@ value* ak_hash_map<key, value>::Find(key Key)
 template <typename key, typename value>
 void ak_hash_map<key, value>::Reset()
 {
+    if(!IsInitialized())
+        *this = AK_CreateHashMap<key, value>();
+    
     Size = 0;
     AK_MemoryClear(Slots, SlotCapacity*sizeof(ak_hash_map_slot));
 }
@@ -204,13 +223,12 @@ ak_hash_map<key, value> AK_CreateHashMap(ak_u32 InitialCapacity)
 }
 
 template <typename key, typename value>
-ak_hash_map<key, value> AK_DeleteHashMap(ak_hash_map<key, value>* HashMap)
+void AK_DeleteHashMap(ak_hash_map<key, value>* HashMap)
 {
-    if(HashMap->Slots) FreeMemory(HashMap->Slots);
-    if(HashMap->ItemKeys) FreeMemory(HashMap->ItemKeys);
+    if(HashMap->Slots) AK_Free(HashMap->Slots);
+    if(HashMap->ItemKeys) AK_Free(HashMap->ItemKeys);
     
-    HashMap->Slots = HashMap->ItemKeys = HashMap->ItemSlots = HashMap->ItemEntries = NULL;
-    HashMap->Size = HashMap->SlotCapacity = HashMap->ItemCapacity = 0;
+    *HashMap = {};    
 }
 
 ak_u32 AK_HashFunction(ak_u64 Key)

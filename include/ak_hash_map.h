@@ -1,6 +1,10 @@
 #ifndef AK_HASH_MAP_H
 #define AK_HASH_MAP_H
 
+#ifndef AK_DEFAULT_HASH_MAP_SIZE 
+#define AK_DEFAULT_HASH_MAP_SIZE 8191
+#endif
+
 struct ak_hash_map_slot
 {
     ak_u32 KeyHash;
@@ -19,7 +23,8 @@ struct ak_hash_map
     key*    ItemKeys;
     ak_u32* ItemSlots;
     value*  ItemEntries;
-        
+    
+    ak_bool IsInitialized();
     void   Insert(key Key, value Value);    
     value* Find(key Key);
     void   Remove(key Key);
@@ -27,10 +32,10 @@ struct ak_hash_map
 };
 
 template <typename key, typename value>
-ak_hash_map<key, value> AK_CreateHashMap(ak_u32 InitialCapacity=32);
+ak_hash_map<key, value> AK_CreateHashMap(ak_u32 InitialCapacity=AK_DEFAULT_HASH_MAP_SIZE);
 
 template <typename key, typename value>
-ak_hash_map<key, value> AK_DeleteHashMap(ak_hash_map<key, value>* HashMap);
+void AK_DeleteHashMap(ak_hash_map<key, value>* HashMap);
 
 ////////////////////////////////////////////////////
 //NOTE(EVERYONE): Common hash functions

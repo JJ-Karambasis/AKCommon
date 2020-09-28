@@ -208,7 +208,7 @@ ak_mesh_result AK_GenerateTriangleSphere(ak_arena* Arena, ak_f32 Radius, ak_u32 
     AK_MemoryCopy(MeshIn.Vertices, Vertices, sizeof(Vertices));
     AK_MemoryCopy(MeshIn.Indices,  Indices, sizeof(Indices));
     
-    ak_hash_map<ak_pair<ak_u32>, ak_u16> DivisionsMap = AK_CreateHashMap<ak_pair<ak_u32>, ak_u16>(8191);
+    ak_hash_map<ak_pair<ak_u32>, ak_u16> DivisionsMap = {};
     
     for(ak_u32 SubdivisionIndex = 0; SubdivisionIndex < Subdivisions; SubdivisionIndex++)
     {           
