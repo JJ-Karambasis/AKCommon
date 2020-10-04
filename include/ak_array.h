@@ -20,7 +20,8 @@ struct ak_array
     type* Entries;
     
     type& operator[](ak_u32 Index);    
-    type* Get(ak_u32 Index);    
+    type* Get(ak_u32 Index);
+    type* Pop();    
     type* operator+(ak_u32 Index);    
     void Add(type Value);
     void Reserve(ak_u32 NewCapacity);

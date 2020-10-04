@@ -28,6 +28,19 @@ type* ak_array<type>::Get(ak_u32 Index)
 }
 
 template <typename type>
+type* ak_array<type>::Pop()
+{
+    if(Size == 0)
+    {
+        return NULL;
+    }
+    type* Result = Last();
+    Size--;
+    return Result;
+}
+
+
+template <typename type>
 type* ak_array<type>::operator+(ak_u32 Index)
 {        
     return Get(Index);
