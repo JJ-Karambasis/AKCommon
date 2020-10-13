@@ -22,5 +22,6 @@ ak_mesh_result AK_GenerateTriangleCylinder(ak_arena* Arena, ak_f32 Radius, ak_f3
 ak_mesh_result AK_GenerateTriangleCircle(ak_arena* Arena, ak_f32 Radius, ak_f32 Height, ak_u16 CircleSampleCount, ak_v3f CenterP = AK_V3<ak_f32>());
 ak_mesh_result AK_GenerateTriangleCone(ak_arena* Arena, ak_f32 Radius, ak_f32 Height, ak_u16 CircleSampleCount, ak_v3f CenterP=AK_V3<ak_f32>());
 ak_mesh_result AK_GenerateTriangleTorus(ak_arena* Arena, ak_f32 Radius, ak_f32 InnerRadius, ak_u16 CircleSampleCount, ak_v3f CenterP = AK_V3<ak_f32>());
+ak_mesh_result AK_GenerateTriangleQuad(ak_arena* Arena, ak_v3f CenterP=AK_V3<ak_f32>(), ak_v2f Dimensions=AK_V2(1.0f, 1.0f));
 
 #endif

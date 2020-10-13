@@ -481,3 +481,23 @@ ak_mesh_result AK_GenerateTriangleCone(ak_arena* Arena, ak_f32 Radius, ak_f32 He
     
     return Result;
 }
+
+ak_mesh_result AK_GenerateTriangleQuad(ak_arena* Arena, ak_v3f CenterP, ak_v2f Dimensions)
+{
+    ak_mesh_result Result = AK_AllocateMeshResult(Arena, 4, 6);
+    ak_v2f HalfDimensions = Dimensions*0.5f;
+    
+    Result.Vertices[0].P = AK_V3(CenterP.xy - HalfDimensions, CenterP.z);
+    Result.Vertices[1].P = AK_V3(CenterP.x + HalfDimensions.x, CenterP.y - HalfDimensions.y, CenterP.z);
+    Result.Vertices[2].P = AK_V3(CenterP.xy + HalfDimensions, CenterP.z);
+    Result.Vertices[3].P = AK_V3(CenterP.x - HalfDimensions.x, CenterP.y + HalfDimensions.y, CenterP.z);
+    
+    Result.Indices[0] = 0;
+    Result.Indices[1] = 1;
+    Result.Indices[2] = 2;
+    Result.Indices[3] = 2;
+    Result.Indices[4] = 3;
+    Result.Indices[5] = 0;
+    
+    return Result;
+}
