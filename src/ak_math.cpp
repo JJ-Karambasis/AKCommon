@@ -1628,6 +1628,16 @@ ak_m3<type> AK_InvTransformM3(ak_m3<type> M)
 }
 
 template <typename type> 
+ak_m3<type> AK_NormalizeM3(ak_m3<type> M)
+{
+    ak_m3<type> Result;
+    Result.XAxis = AK_Normalize(M.XAxis);
+    Result.YAxis = AK_Normalize(M.YAxis);
+    Result.ZAxis = AK_Normalize(M.ZAxis);
+    return Result;
+}
+
+template <typename type> 
 ak_m3<type> operator+(type Left, ak_m3<type> Right)
 {
     ak_m3<type> Result;

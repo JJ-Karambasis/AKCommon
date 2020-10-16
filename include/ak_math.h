@@ -645,6 +645,7 @@ template <typename type> ak_m3<type> AK_TransformM3(ak_quat<type> Orient, ak_v3<
 template <typename type> ak_m3<type> AK_InvTransformM3(ak_m3<type> Orient, ak_v3<type> Scale);
 template <typename type> ak_m3<type> AK_InvTransformM3(ak_quat<type> Orient, ak_v3<type> Scale);
 template <typename type> ak_m3<type> AK_InvTransformM3(ak_m3<type> M);
+template <typename type> ak_m3<type> AK_NormalizeM3(ak_m3<type> M);
 template <typename type> ak_m3<type> operator+(type Left, ak_m3<type> Right);
 template <typename type> ak_m3<type> operator+(ak_m3<type> Left, type Right);
 template <typename type> ak_m3<type> operator+(ak_m3<type> Left, ak_m3<type> Right);
