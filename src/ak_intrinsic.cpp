@@ -275,6 +275,12 @@ ak_f64 AK_Sqrt(ak_f64 Value)
     return Result;
 }
 
+ak_f32 AK_Pow(ak_f32 Value, ak_f32 Exp)
+{
+    ak_f32 Result = powf(Value, Exp);
+    return Result;
+}
+
 ak_i32 AK_AtomicAdd32(ak_i32 volatile* Value, ak_i32 Addend)
 {
     ak_i32 Result;

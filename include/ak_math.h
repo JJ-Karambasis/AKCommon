@@ -568,6 +568,10 @@ ak_color4f AK_Yellow4(ak_f32 a = 1.0f);
 ak_color4f AK_Black4(ak_f32 a = 1.0f);
 ak_color4f AK_Cyan4(ak_f32 a = 1.0f);
 ak_color4f AK_Magenta4(ak_f32 a = 1.0f);
+ak_color4f AK_Orange4(ak_f32 a = 1.0f);
+
+ak_u32 AK_RGBA_U32(ak_color4f Color);
+ak_color4f AK_RGBA(ak_u32 Color);
 
 ////////////////////////////////////////////////////
 //NOTE(EVERYONE): Quaternion operations

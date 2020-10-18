@@ -26,6 +26,27 @@ struct ak_file_handle
     ak_file_attributes Attributes;
 };
 
+LRESULT CALLBACK 
+AK_Internal__PlatformWindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM LParam)
+{
+    LRESULT Result = 0;
+    
+    switch(Message)
+    {        
+        case WM_CLOSE:
+        {
+            PostQuitMessage(0);
+        } break;
+        
+        default:
+        {
+            Result = DefWindowProc(Window, Message, WParam, LParam);
+        } break;                
+    }
+    
+    return Result;
+}
+
 void* AK_Allocate(ak_uaddr Size)
 {
     void* Result = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, Size);
@@ -495,6 +516,61 @@ void AK_ConsoleLog(ak_char* Format, ...)
     va_end(Args);
     
     OutputDebugStringA(String);    
+}
+
+#define GLOBAL_INTERNAL__WINDOW_CLASS_NAME "Global_WindowClass"
+global WNDCLASSEX Global_Internal__WindowClass;
+
+ak_window* AK_CreateWindow(ak_u16 Width, ak_u16 Height, ak_char* Title)
+{
+    if(Global_Internal__WindowClass.cbSize == 0)
+    {                
+        Global_Internal__WindowClass.cbSize = sizeof(WNDCLASSEX);
+        Global_Internal__WindowClass.style = CS_VREDRAW|CS_HREDRAW|CS_OWNDC;
+        Global_Internal__WindowClass.lpfnWndProc = AK_Internal__PlatformWindowProc;
+        Global_Internal__WindowClass.hInstance = GetModuleHandle(0);
+        Global_Internal__WindowClass.lpszClassName = GLOBAL_INTERNAL__WINDOW_CLASS_NAME;    
+        if(!RegisterClassEx(&Global_Internal__WindowClass))    
+        {            
+            AK_Internal__PlatformSetErrorMessage("WIN32: Could not register the window class. Cannot create window");            
+            return NULL;
+        }                
+    }
+    
+    DWORD ExStyle = 0;
+    DWORD Style = WS_OVERLAPPEDWINDOW|WS_VISIBLE;
+    
+    RECT WindowRect = {0, 0, (LONG)Width, (LONG)Height};
+    AdjustWindowRectEx(&WindowRect, Style, FALSE, ExStyle);    
+    
+    HWND Window = CreateWindowEx(ExStyle, GLOBAL_INTERNAL__WINDOW_CLASS_NAME, Title, Style, 
+                                 CW_USEDEFAULT, CW_USEDEFAULT, 
+                                 WindowRect.right-WindowRect.left,
+                                 WindowRect.bottom-WindowRect.top,
+                                 0, 0, GetModuleHandle(0), NULL);
+    if(!Window)            
+        return NULL;        
+    
+    return (ak_window*)Window;
+}
+
+void AK_GetWindowResolution(ak_window* PlatformWindow, ak_u16* OutWidth, ak_u16* OutHeight)
+{
+    HWND Window = (HWND)PlatformWindow;
+    
+    RECT Rect;
+    if(GetClientRect(Window, &Rect))    
+    {
+        if(OutWidth) *OutWidth = (ak_u16)(Rect.right-Rect.left);
+        if(OutHeight) *OutHeight = (ak_u16)(Rect.bottom-Rect.top);
+    }    
+}
+
+HWND AK_GetPlatformWindow(ak_window* Window)
+{
+    if(Window)
+        return (HWND)Window;
+    return NULL;
 }
 
 #endif

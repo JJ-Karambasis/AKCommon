@@ -23,6 +23,8 @@ struct ak_memory_info
     ak_uaddr PageSize;
 };
 
+struct ak_window;
+
 ak_string AK_PlatformGetErrorMessage();
 void* AK_Allocate(ak_uaddr Size);
 void  AK_Free(void* Memory);
@@ -61,5 +63,13 @@ ak_bool AK_WriteEntireFile(ak_char* Path, void* Data, ak_u32 DataSize);
 ak_high_res_clock AK_WallClock();
 ak_f64 AK_GetElapsedTime(ak_high_res_clock End, ak_high_res_clock Start);
 void AK_ConsoleLog(ak_char* Format, ...);
+
+ak_window* AK_CreateWindow(ak_u16 Width, ak_u16 Height, ak_char* Title);
+void AK_GetWindowResolution(ak_window* PlatformWindow, ak_u16* OutWidth, ak_u16* OutHeight);
+
+
+#ifdef AK_WINDOWS
+HWND AK_GetPlatformWindow(ak_window* Window);
+#endif
 
 #endif

@@ -2,6 +2,7 @@
 #define AK_INTRINSIC_H
 
 #ifdef AK_MSVC_COMPILER
+#include <intrin.h>
 #include <immintrin.h>
 #include <xmmintrin.h>
 #include <smmintrin.h>
@@ -37,6 +38,7 @@ ak_f32 AK_Tan(ak_f32 Rads);
 ak_f32 AK_ATan2(ak_f32 A, ak_f32 B);
 ak_f32 AK_ASin(ak_f32 Rads);
 ak_f32 AK_Sqrt(ak_f32 Value);
+ak_f32 AK_Pow(ak_f32 Value, ak_f32 Exp);
 ak_i32 AK_AtomicAdd32(ak_i32 volatile* Value, ak_i32 Addend);
 ak_i64 AK_AtomicAdd64(ak_i64 volatile* Value, ak_i64 Addend);
 

@@ -41,7 +41,7 @@ inline ak_f32 AK_Internal__GetCircleRadOffset(ak_u16 SampleCount)
 }
 
 inline ak_u16 
-AK_Internal__SubdivideEdge(ak_u16 Index0, ak_u16 Index1, ak_v3f P0, ak_v3f P1, ak_mesh_result* MeshOut, ak_hash_map<ak_pair<ak_u32>, ak_u16>* DivisionsMap)
+AK_Internal__SubdivideEdge(ak_u16 Index0, ak_u16 Index1, ak_v3f P0, ak_v3f P1, ak_mesh_result<ak_vertex_p3>* MeshOut, ak_hash_map<ak_pair<ak_u32>, ak_u16>* DivisionsMap)
 {
     ak_pair<ak_u32> Edge = {Index0, Index1};
     
@@ -56,12 +56,13 @@ AK_Internal__SubdivideEdge(ak_u16 Index0, ak_u16 Index1, ak_v3f P0, ak_v3f P1, a
     return Result;
 }
 
-ak_mesh_result AK_AllocateMeshResult(ak_arena* Arena, ak_u32 VertexCount, ak_u32 IndexCount)
+template <typename type>
+ak_mesh_result<type> AK_AllocateMeshResult(ak_arena* Arena, ak_u32 VertexCount, ak_u32 IndexCount)
 {
-    ak_mesh_result Result = {};
+    ak_mesh_result<type> Result = {};
     Result.VertexCount = VertexCount;
     Result.IndexCount = IndexCount;    
-    Result.Vertices = Arena->PushArray<ak_vertex_p3>(Result.VertexCount);
+    Result.Vertices = Arena->PushArray<type>(Result.VertexCount);
     Result.Indices = Arena->PushArray<ak_u16>(Result.IndexCount);    
     return Result;
 }
@@ -71,14 +72,14 @@ void AK_OffsetIndices(ak_u16* Indices, ak_u32 IndexCount, ak_u16 IndexOffset)
     for(ak_u32 Index = 0; Index < IndexCount; Index++) Indices[Index] += IndexOffset;
 }
 
-void AK_OffsetIndices(ak_mesh_result* Mesh, ak_u16 IndexOffset)
+void AK_OffsetIndices(ak_mesh_result<ak_vertex_p3>* Mesh, ak_u16 IndexOffset)
 {
     AK_OffsetIndices(Mesh->Indices, Mesh->IndexCount, IndexOffset);
 }
 
-ak_mesh_result AK_GenerateLineBox(ak_arena* Arena, ak_v3f Dimensions, ak_v3f CenterP)
+ak_mesh_result<ak_vertex_p3> AK_GenerateLineBox(ak_arena* Arena, ak_v3f Dimensions, ak_v3f CenterP)
 {
-    ak_mesh_result Result;    
+    ak_mesh_result<ak_vertex_p3> Result;    
     Result.Vertices = AK_Internal__GetBoxVertices(Arena, CenterP, Dimensions);
     Result.VertexCount = 8;
     
@@ -103,9 +104,9 @@ ak_mesh_result AK_GenerateLineBox(ak_arena* Arena, ak_v3f Dimensions, ak_v3f Cen
     return Result;
 }
 
-ak_mesh_result AK_GenerateTriangleBox(ak_arena* Arena, ak_v3f Dimensions, ak_v3f CenterP)
+ak_mesh_result<ak_vertex_p3> AK_GenerateTriangleBox(ak_arena* Arena, ak_v3f Dimensions, ak_v3f CenterP)
 {
-    ak_mesh_result Result;
+    ak_mesh_result<ak_vertex_p3> Result;
     Result.Vertices = AK_Internal__GetBoxVertices(Arena, CenterP, Dimensions);
     Result.VertexCount = 8;
     
@@ -133,9 +134,9 @@ ak_mesh_result AK_GenerateTriangleBox(ak_arena* Arena, ak_v3f Dimensions, ak_v3f
     return Result;
 }
 
-ak_mesh_result AK_GenerateLineSphere(ak_arena* Arena, ak_f32 Radius, ak_u16 CircleSampleCount, ak_v3f CenterP)
+ak_mesh_result<ak_vertex_p3> AK_GenerateLineSphere(ak_arena* Arena, ak_f32 Radius, ak_u16 CircleSampleCount, ak_v3f CenterP)
 {
-    ak_mesh_result Result = AK_AllocateMeshResult(Arena, CircleSampleCount*3, CircleSampleCount*3*2);
+    ak_mesh_result<ak_vertex_p3> Result = AK_AllocateMeshResult<ak_vertex_p3>(Arena, CircleSampleCount*3, CircleSampleCount*3*2);
     ak_f32 CircleRadOffset = AK_Internal__GetCircleRadOffset(CircleSampleCount);
     ak_vertex_p3* VertexAt = Result.Vertices;
     
@@ -158,7 +159,7 @@ ak_mesh_result AK_GenerateLineSphere(ak_arena* Arena, ak_f32 Radius, ak_u16 Circ
     return Result;
 }
 
-ak_mesh_result AK_GenerateTriangleSphere(ak_arena* Arena, ak_f32 Radius, ak_u32 Subdivisions, ak_v3f CenterP)
+ak_mesh_result<ak_vertex_p3> AK_GenerateTriangleSphere(ak_arena* Arena, ak_f32 Radius, ak_u32 Subdivisions, ak_v3f CenterP)
 {
     ak_f32 t = (1.0f + AK_Sqrt(5.0f)) * 0.5f;
     ak_vertex_p3 Vertices[] = 
@@ -204,7 +205,7 @@ ak_mesh_result AK_GenerateTriangleSphere(ak_arena* Arena, ak_f32 Radius, ak_u32 
     ak_arena* GlobalArena = AK_GetGlobalArena();
     ak_temp_arena TempArena = GlobalArena->BeginTemp();
     
-    ak_mesh_result MeshIn = AK_AllocateMeshResult(GlobalArena, AK_Count(Vertices), AK_Count(Indices));
+    ak_mesh_result<ak_vertex_p3> MeshIn = AK_AllocateMeshResult<ak_vertex_p3>(GlobalArena, AK_Count(Vertices), AK_Count(Indices));
     AK_MemoryCopy(MeshIn.Vertices, Vertices, sizeof(Vertices));
     AK_MemoryCopy(MeshIn.Indices,  Indices, sizeof(Indices));
     
@@ -217,7 +218,7 @@ ak_mesh_result AK_GenerateTriangleSphere(ak_arena* Arena, ak_f32 Radius, ak_u32 
         ak_u32 NewVertexCount = MeshIn.VertexCount+(TriangleCount*3);
         ak_u32 NewIndexCount = (TriangleCount*3)*4;
         
-        ak_mesh_result MeshOut = AK_AllocateMeshResult(GlobalArena, NewVertexCount, NewIndexCount);
+        ak_mesh_result<ak_vertex_p3> MeshOut = AK_AllocateMeshResult<ak_vertex_p3>(GlobalArena, NewVertexCount, NewIndexCount);
         MeshOut.VertexCount = MeshIn.VertexCount;
         MeshOut.IndexCount = 0;
         
@@ -262,7 +263,7 @@ ak_mesh_result AK_GenerateTriangleSphere(ak_arena* Arena, ak_f32 Radius, ak_u32 
         MeshIn = MeshOut;
     }
     
-    ak_mesh_result Result = AK_AllocateMeshResult(Arena, MeshIn.VertexCount, MeshIn.IndexCount);    
+    ak_mesh_result<ak_vertex_p3> Result = AK_AllocateMeshResult<ak_vertex_p3>(Arena, MeshIn.VertexCount, MeshIn.IndexCount);    
     AK_MemoryCopy(Result.Indices, MeshIn.Indices, sizeof(ak_u16)*MeshIn.IndexCount);
     for(ak_u32 VertexIndex = 0; VertexIndex < MeshIn.VertexCount; VertexIndex++)     
         Result.Vertices[VertexIndex].P = (MeshIn.Vertices[VertexIndex].P*Radius) + CenterP;                
@@ -272,13 +273,13 @@ ak_mesh_result AK_GenerateTriangleSphere(ak_arena* Arena, ak_f32 Radius, ak_u32 
     return Result;
 }
 
-ak_mesh_result AK_GenerateLineHemisphere(ak_arena* Arena, ak_f32 Radius, ak_u16 CircleSampleCount, ak_v3f CenterP)
+ak_mesh_result<ak_vertex_p3> AK_GenerateLineHemisphere(ak_arena* Arena, ak_f32 Radius, ak_u16 CircleSampleCount, ak_v3f CenterP)
 {
     ak_u16 HalfCircleSampleCountPlusOne = (CircleSampleCount/2)+1;
     ak_f32 CircleRadOffset = AK_Internal__GetCircleRadOffset(CircleSampleCount);
     
     ak_u32 VertexCount = CircleSampleCount+(HalfCircleSampleCountPlusOne*2);
-    ak_mesh_result Result = AK_AllocateMeshResult(Arena, VertexCount, VertexCount*2);
+    ak_mesh_result<ak_vertex_p3> Result = AK_AllocateMeshResult<ak_vertex_p3>(Arena, VertexCount, VertexCount*2);
     
     ak_vertex_p3* VertexAt = Result.Vertices;
     
@@ -302,10 +303,10 @@ ak_mesh_result AK_GenerateLineHemisphere(ak_arena* Arena, ak_f32 Radius, ak_u16 
     return Result;
 }
 
-ak_mesh_result AK_GenerateTriangleCylinder(ak_arena* Arena, ak_f32 Radius, ak_f32 Height, ak_u16 CircleSampleCount, ak_v3f CenterP)
+ak_mesh_result<ak_vertex_p3> AK_GenerateTriangleCylinder(ak_arena* Arena, ak_f32 Radius, ak_f32 Height, ak_u16 CircleSampleCount, ak_v3f CenterP)
 {
-    ak_mesh_result Result = AK_AllocateMeshResult(Arena, CircleSampleCount*2 + 2, 
-                                                  CircleSampleCount*3*2 + CircleSampleCount*6);    
+    ak_mesh_result<ak_vertex_p3> Result = AK_AllocateMeshResult<ak_vertex_p3>(Arena, CircleSampleCount*2 + 2, 
+                                                                              CircleSampleCount*3*2 + CircleSampleCount*6);    
     ak_f32 CircleRadOffset = AK_Internal__GetCircleRadOffset(CircleSampleCount);
     ak_u16 CenterVertexOffset = CircleSampleCount*2;
     
@@ -367,9 +368,9 @@ ak_mesh_result AK_GenerateTriangleCylinder(ak_arena* Arena, ak_f32 Radius, ak_f3
     return Result;
 }
 
-ak_mesh_result AK_GenerateTriangleTorus(ak_arena* Arena, ak_f32 Radius, ak_f32 InnerRadius, ak_u16 CircleSampleCount, ak_v3f CenterP)
+ak_mesh_result<ak_vertex_p3> AK_GenerateTriangleTorus(ak_arena* Arena, ak_f32 Radius, ak_f32 InnerRadius, ak_u16 CircleSampleCount, ak_v3f CenterP)
 {
-    ak_mesh_result Result = AK_AllocateMeshResult(Arena, CircleSampleCount*CircleSampleCount, CircleSampleCount*CircleSampleCount*2*3);    
+    ak_mesh_result<ak_vertex_p3> Result = AK_AllocateMeshResult<ak_vertex_p3>(Arena, CircleSampleCount*CircleSampleCount, CircleSampleCount*CircleSampleCount*2*3);    
     ak_f32 CircleRadOffset = AK_Internal__GetCircleRadOffset(CircleSampleCount);
     ak_u16 CenterVertexOffset = CircleSampleCount*2;
     
@@ -407,10 +408,10 @@ ak_mesh_result AK_GenerateTriangleTorus(ak_arena* Arena, ak_f32 Radius, ak_f32 I
     return Result;
 }
 
-inline ak_mesh_result
+inline ak_mesh_result<ak_vertex_p3>
 AK_GenerateTriangleCircle(ak_arena* Arena, ak_f32 Radius, ak_f32 Height, ak_u16 CircleSampleCount, ak_v3f CenterP)
 {   
-    ak_mesh_result Result = AK_AllocateMeshResult(Arena, CircleSampleCount*2, CircleSampleCount*3*2);    
+    ak_mesh_result<ak_vertex_p3> Result = AK_AllocateMeshResult<ak_vertex_p3>(Arena, CircleSampleCount*2, CircleSampleCount*3*2);    
     ak_f32 CircleRadOffset = AK_Internal__GetCircleRadOffset(CircleSampleCount);
     ak_u16 CenterVertexOffset = CircleSampleCount*2;
     
@@ -443,9 +444,9 @@ AK_GenerateTriangleCircle(ak_arena* Arena, ak_f32 Radius, ak_f32 Height, ak_u16 
     return Result;
 }
 
-ak_mesh_result AK_GenerateTriangleCone(ak_arena* Arena, ak_f32 Radius, ak_f32 Height, ak_u16 CircleSampleCount, ak_v3f CenterP)
+ak_mesh_result<ak_vertex_p3> AK_GenerateTriangleCone(ak_arena* Arena, ak_f32 Radius, ak_f32 Height, ak_u16 CircleSampleCount, ak_v3f CenterP)
 {
-    ak_mesh_result Result = AK_AllocateMeshResult(Arena, CircleSampleCount+2, CircleSampleCount*3*2);    
+    ak_mesh_result<ak_vertex_p3> Result = AK_AllocateMeshResult<ak_vertex_p3>(Arena, CircleSampleCount+2, CircleSampleCount*3*2);    
     ak_f32 CircleRadOffset = AK_Internal__GetCircleRadOffset(CircleSampleCount);
     
     ak_vertex_p3* VertexAt = Result.Vertices;
@@ -482,9 +483,9 @@ ak_mesh_result AK_GenerateTriangleCone(ak_arena* Arena, ak_f32 Radius, ak_f32 He
     return Result;
 }
 
-ak_mesh_result AK_GenerateTriangleQuad(ak_arena* Arena, ak_v3f CenterP, ak_v2f Dimensions)
+ak_mesh_result<ak_vertex_p3> AK_GenerateTriangleQuad(ak_arena* Arena, ak_v3f CenterP, ak_v2f Dimensions)
 {
-    ak_mesh_result Result = AK_AllocateMeshResult(Arena, 4, 6);
+    ak_mesh_result<ak_vertex_p3> Result = AK_AllocateMeshResult<ak_vertex_p3>(Arena, 4, 6);
     ak_v2f HalfDimensions = Dimensions*0.5f;
     
     Result.Vertices[0].P = AK_V3(CenterP.xy - HalfDimensions, CenterP.z);
@@ -498,6 +499,64 @@ ak_mesh_result AK_GenerateTriangleQuad(ak_arena* Arena, ak_v3f CenterP, ak_v2f D
     Result.Indices[3] = 2;
     Result.Indices[4] = 3;
     Result.Indices[5] = 0;
+    
+    return Result;
+}
+
+ak_mesh_result<ak_vertex_p3_n3> AK_GenerateTriangleBoxN(ak_arena* Arena, ak_v3f Dimensions, ak_v3f CenterP)
+{
+    ak_mesh_result<ak_vertex_p3_n3> Result = AK_AllocateMeshResult<ak_vertex_p3_n3>(Arena, 24, 36);
+    
+    ak_v3f HalfDim = Dimensions*0.5f;
+    
+    Result.Vertices[0]  = {AK_V3(-HalfDim.x, -HalfDim.y, Dimensions.z) + CenterP, AK_ZAxis()};
+    Result.Vertices[1]  = {AK_V3( HalfDim.x, -HalfDim.y, Dimensions.z) + CenterP, AK_ZAxis()};
+    Result.Vertices[2]  = {AK_V3( HalfDim.x,  HalfDim.y, Dimensions.z) + CenterP, AK_ZAxis()};
+    Result.Vertices[3]  = {AK_V3(-HalfDim.x,  HalfDim.y, Dimensions.z) + CenterP, AK_ZAxis()};
+    
+    Result.Vertices[4]  = {AK_V3( HalfDim.x, -HalfDim.y, Dimensions.z) + CenterP, AK_XAxis()};
+    Result.Vertices[5]  = {AK_V3( HalfDim.x, -HalfDim.y, 0.0f) + CenterP, AK_XAxis()};
+    Result.Vertices[6]  = {AK_V3( HalfDim.x,  HalfDim.y, 0.0f) + CenterP, AK_XAxis()};
+    Result.Vertices[7]  = {AK_V3( HalfDim.x,  HalfDim.y, Dimensions.z) + CenterP, AK_XAxis()};
+    
+    Result.Vertices[8]  = {AK_V3( HalfDim.x, -HalfDim.y, 0.0f) + CenterP, -AK_ZAxis()};
+    Result.Vertices[9]  = {AK_V3(-HalfDim.x, -HalfDim.y, 0.0f) + CenterP, -AK_ZAxis()};
+    Result.Vertices[10] = {AK_V3(-HalfDim.x,  HalfDim.y, 0.0f) + CenterP, -AK_ZAxis()};
+    Result.Vertices[11] = {AK_V3( HalfDim.x,  HalfDim.y, 0.0f) + CenterP, -AK_ZAxis()};
+    
+    Result.Vertices[12] = {AK_V3(-HalfDim.x, -HalfDim.y, 0.0f) + CenterP, -AK_XAxis()};
+    Result.Vertices[13] = {AK_V3(-HalfDim.x, -HalfDim.y, Dimensions.z) + CenterP, -AK_XAxis()};
+    Result.Vertices[14] = {AK_V3(-HalfDim.x,  HalfDim.y, Dimensions.z) + CenterP, -AK_XAxis()};
+    Result.Vertices[15] = {AK_V3(-HalfDim.x,  HalfDim.y, 0.0f) + CenterP, -AK_XAxis()};
+    
+    Result.Vertices[16] = {AK_V3(-HalfDim.x, -HalfDim.y, 0.0f) + CenterP, -AK_YAxis()};
+    Result.Vertices[17] = {AK_V3( HalfDim.x, -HalfDim.y, 0.0f) + CenterP, -AK_YAxis()};
+    Result.Vertices[18] = {AK_V3( HalfDim.x, -HalfDim.y, Dimensions.z) + CenterP, -AK_YAxis()};
+    Result.Vertices[19] = {AK_V3(-HalfDim.x, -HalfDim.y, Dimensions.z) + CenterP, -AK_YAxis()};
+    
+    Result.Vertices[20] = {AK_V3(-HalfDim.x,  HalfDim.y, Dimensions.z) + CenterP, AK_YAxis()};
+    Result.Vertices[21] = {AK_V3( HalfDim.x,  HalfDim.y, Dimensions.z) + CenterP, AK_YAxis()};
+    Result.Vertices[22] = {AK_V3( HalfDim.x,  HalfDim.y, 0.0f) + CenterP, AK_YAxis()};
+    Result.Vertices[23] = {AK_V3(-HalfDim.x,  HalfDim.y, 0.0f) + CenterP, AK_YAxis()};
+    
+    Result.Indices[0]  = 0;  Result.Indices[1]  = 1;  Result.Indices[2]  = 2;
+    Result.Indices[3]  = 2;  Result.Indices[4]  = 3;  Result.Indices[5]  = 0;    
+        
+    Result.Indices[6]  = 4;  Result.Indices[7]  = 5;  Result.Indices[8]  = 6;
+    Result.Indices[9]  = 6;  Result.Indices[10] = 7;  Result.Indices[11] = 4;
+        
+    Result.Indices[12] = 8;  Result.Indices[13] = 9;  Result.Indices[14] = 10;
+    Result.Indices[15] = 10; Result.Indices[16] = 11; Result.Indices[17] = 8;
+        
+    Result.Indices[18] = 12; Result.Indices[19] = 13; Result.Indices[20] = 14;
+    Result.Indices[21] = 14; Result.Indices[22] = 15; Result.Indices[23] = 12;
+    
+    
+    Result.Indices[24] = 16; Result.Indices[25] = 17; Result.Indices[26] = 18;
+    Result.Indices[27] = 18; Result.Indices[28] = 19; Result.Indices[29] = 16;    
+    
+    Result.Indices[30] = 20; Result.Indices[31] = 21; Result.Indices[32] = 22;
+    Result.Indices[33] = 22; Result.Indices[34] = 23; Result.Indices[35] = 20;
     
     return Result;
 }

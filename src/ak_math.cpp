@@ -1140,6 +1140,21 @@ ak_color4f AK_Magenta4(ak_f32 a)
     return {1.0f, 0.0f, 1.0f, a};
 }
 
+ak_color4f AK_Orange4(ak_f32 a)
+{
+    return {1.0f, 0.0f, 1.0f, a};
+}
+
+ak_u32 AK_BGRA_U32(ak_color4f Color)
+{
+    ak_u8 B = (ak_u8)AK_Floor(Color.b >= 1.0f ? 255 : Color.b * 256.0f);
+    ak_u8 G = (ak_u8)AK_Floor(Color.g >= 1.0f ? 255 : Color.g * 256.0f);
+    ak_u8 R = (ak_u8)AK_Floor(Color.r >= 1.0f ? 255 : Color.r * 256.0f);
+    ak_u8 A = (ak_u8)AK_Floor(Color.a >= 1.0f ? 255 : Color.a * 256.0f);
+    
+    return B | (G << 8) | (R << 16) | (A << 24);
+}
+
 template <typename type> 
 ak_quat<type> AK_Quat(type x, type y, type z, type w)
 {
