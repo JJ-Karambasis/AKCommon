@@ -692,6 +692,12 @@ template <typename type> ak_m4<type> AK_TransformM4(ak_v3<type> Translation, ak_
 template <typename type> ak_m4<type> AK_TransformM4(ak_v3<type> Translation, ak_m3<type>  Orientation,  ak_v3<type> Scale);
 template <typename type> ak_m4<type> AK_TransformM4(ak_v3<type> Translation, ak_quat<type> Orientation, ak_v3<type> Scale);
 template <typename type> ak_m4<type> AK_TransformM4(ak_sqt<type> Transform);
+template <typename type> ak_m4<type> AK_ScaleM4(ak_v3<type> Scale);
+template <typename type> ak_m4<type> AK_InvScale(ak_v3<type> Scale);
+template <typename type> ak_m4<type> AK_XRotM4(type Radians);
+template <typename type> ak_m4<type> AK_YRotM4(type Radians);
+template <typename type> ak_m4<type> AK_ZRotM4(type Radians);
+template <typename type> ak_m4<type> AK_XYZRotM4(ak_v3<type> Radians);
 template <typename type> ak_m4<type> AK_InvTransformM4(ak_v3<type> Translation, ak_v3<type> XAxis, ak_v3<type> YAxis, ak_v3<type> ZAxis);
 template <typename type> ak_m4<type> AK_InvTransformM4(ak_v3<type> Translation, ak_m3<type>  Orientation);
 template <typename type> ak_m4<type> AK_InvTransformM4(ak_v3<type> Translation, ak_quat<type> Orientation);

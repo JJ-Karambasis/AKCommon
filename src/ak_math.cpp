@@ -1979,6 +1979,75 @@ ak_m4<type> AK_TransformM4(ak_sqt<type> Transform)
 }
 
 template <typename type> 
+ak_m4<type> AK_ScaleM4(ak_v3<type> Scale)
+{
+    return 
+    {
+        Scale.x, (type)0, (type)0, (type)0, 
+        (type)0, Scale.y, (type)0, (type)0, 
+        (type)0, (type)0, Scale.z, (type)0, 
+        (type)0, (type)0, (type)0, (type)1
+    };
+}
+
+template <typename type> ak_m4<type> AK_InvScale(ak_v3<type> Scale)
+{
+    Scale = (type)1/Scale;    
+    return AK_ScaleM4(Scale);    
+};
+
+template <typename type> 
+ak_m4<type> AK_XRotM4(type Radians)
+{
+    type c = AK_Cos(Radians);
+    type s = AK_Sin(Radians);
+    
+    return 
+    {
+        (type)1, (type)0, (type)0, (type)0, 
+        (type)0,       c,       s, (type)0, 
+        (type)0,      -s,       c, (type)0, 
+        (type)0, (type)0, (type)0, (type)1
+    };
+}
+
+template <typename type> 
+ak_m4<type> AK_YRotM4(type Radians)
+{
+    type c = AK_Cos(Radians);
+    type s = AK_Sin(Radians);
+    
+    return 
+    {
+        c,       (type)0,       -s, (type)0, 
+        (type)0, (type)1,  (type)0, (type)0, 
+        s,       (type)0,        c, (type)0, 
+        (type)0, (type)0,  (type)0, (type)1                                    
+    };        
+}
+
+template <typename type> 
+ak_m4<type> AK_ZRotM4(type Radians)
+{
+    type c = AK_Cos(Radians);
+    type s = AK_Sin(Radians);
+    
+    return
+    {
+        c,             s, (type)0, (type)0, 
+        -s,            c, (type)0, (type)0, 
+        (type)0, (type)0, (type)1, (type)0, 
+        (type)0, (type)0, (type)0, (type)1
+    };
+}
+
+template <typename type> 
+ak_m4<type> AK_XYZRotM4(ak_v3<type> Radians)
+{
+    return AK_ZRotM4(Radians.z) * (AK_YRotM4(Radians.y) * AK_XRotM4(Radians.x));
+}
+
+template <typename type> 
 ak_m4<type> AK_InvTransformM4(ak_v3<type> Translation, ak_v3<type> XAxis, ak_v3<type> YAxis, ak_v3<type> ZAxis)
 {
     type tx = -AK_Dot(Translation, XAxis);
