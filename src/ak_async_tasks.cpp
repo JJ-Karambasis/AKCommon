@@ -6,7 +6,7 @@ struct win32_async_task_queue : ak_async_task_queue
     HANDLE Semaphore;
 };
 
-ak_bool AK_Internal__PerformTask(win32_async_task_queue* TaskQueue)
+ak_bool AK_Internal__PerformTask(win32_async_task_queue* TaskQueue, ak_arena* ThreadArena)
 {
     ak_i32 NextEntryToRead = TaskQueue->NextEntryToRead;
     ak_i32 NewNextEntryToRead = (NextEntryToRead+1) % AK_ASYNC_TASK_COUNT;
@@ -15,7 +15,7 @@ ak_bool AK_Internal__PerformTask(win32_async_task_queue* TaskQueue)
         ak_i32 Index = InterlockedCompareExchange((LONG volatile*)&TaskQueue->NextEntryToRead, NewNextEntryToRead, NextEntryToRead);
         if(Index == NextEntryToRead)
         {
-            TaskQueue->AsyncTasks[Index].Callback(TaskQueue->AsyncTasks[Index].UserData);            
+            TaskQueue->AsyncTasks[Index].Callback(ThreadArena, TaskQueue->AsyncTasks[Index].UserData);            
             InterlockedIncrement((LONG volatile*)&TaskQueue->CompletionCount);
         }
     }
@@ -37,10 +37,10 @@ void ak_async_task_queue::AddTask(ak_async_task_callback* Callback, void* UserDa
     ReleaseSemaphore(((win32_async_task_queue*)this)->Semaphore, 1, 0);
 }
 
-void ak_async_task_queue::CompleteAllTasks()
+void ak_async_task_queue::CompleteAllTasks(ak_arena* ThreadArena)
 {
     while(CompletionGoal != CompletionCount)    
-        AK_Internal__PerformTask((win32_async_task_queue*)this);    
+        AK_Internal__PerformTask((win32_async_task_queue*)this, ThreadArena);    
     
     CompletionGoal  = 0;
     CompletionCount = 0;
@@ -48,13 +48,16 @@ void ak_async_task_queue::CompleteAllTasks()
 
 DWORD WINAPI AK_Internal__PlatformThreadProc(LPVOID lpParameter)
 {
-    win32_async_task_queue* TaskQueue = (win32_async_task_queue*)lpParameter;
+    win32_async_task_queue* TaskQueue = (win32_async_task_queue*)lpParameter;    
     
+    ak_arena* ThreadArena = AK_CreateArena(AK_Megabyte(1));
     
     for(;;)
     {
-        if(!AK_Internal__PerformTask(TaskQueue))
+        ak_temp_arena TempArena = ThreadArena->BeginTemp();
+        if(!AK_Internal__PerformTask(TaskQueue, ThreadArena))
             WaitForSingleObjectEx(TaskQueue->Semaphore, INFINITE, FALSE);
+        ThreadArena->EndTemp(&TempArena);
     }
 }
 

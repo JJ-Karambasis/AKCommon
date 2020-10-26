@@ -255,7 +255,7 @@ struct ak_m4
         };
     };
     
-    type& operator[](ak_u32 Index);
+    type& operator[](ak_u32 Index);    
 };
 typedef ak_m4<ak_f32> ak_m4f;
 

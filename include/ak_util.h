@@ -21,5 +21,7 @@ void AK_SetRandomSeed64(ak_u64 Seed);
 void AK_SetRandomSeed32(ak_u32 Seed);
 ak_u64 AK_Random64();
 ak_u32 AK_Random32();
+ak_f32 AK_RandomF32();
+ak_iaddr AK_AlignTo(ak_uaddr V, ak_uaddr Alignment);
 
 #endif

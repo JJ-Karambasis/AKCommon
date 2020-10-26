@@ -1,13 +1,6 @@
 global ak_memory_info _AK_Internal__MemoryInfo;
 global ak_memory_info* AK_Internal__MemoryInfo;
 
-ak_iaddr AK_Internal__AlignTo(ak_uaddr V, ak_uaddr Alignment)
-{
-    Alignment = Alignment ? Alignment : 1;
-    ak_uaddr Mod = V & (Alignment-1);
-    return Mod ? V + (Alignment-Mod) : V;
-}
-
 ak_memory_block* AK_Internal__GetArenaBlock(ak_arena* Arena, ak_uaddr Size, ak_i32 Alignment)
 {
     ak_memory_block* Block = Arena->CurrentBlock;
@@ -18,7 +11,7 @@ ak_memory_block* AK_Internal__GetArenaBlock(ak_arena* Arena, ak_uaddr Size, ak_i
     if(Alignment != 0)
     {
         AK_Assert((Alignment & (Alignment-1)) == 0, "Alignment is not a power of two");
-        CurrentUsed = (ak_u8*)AK_Internal__AlignTo((ak_uaddr)CurrentUsed, Alignment);
+        CurrentUsed = (ak_u8*)AK_AlignTo((ak_uaddr)CurrentUsed, Alignment);
     }    
     
     if(CurrentUsed+Size > Block->End)
@@ -152,7 +145,7 @@ void* ak_arena::Push(ak_uaddr Size, ak_arena_clear_flags ClearFlags, ak_i32 Alig
     
     CurrentBlock = Block;
     if(Alignment != 0)
-        Block->Current = (ak_u8*)AK_Internal__AlignTo((ak_uaddr)Block->Current, Alignment);
+        Block->Current = (ak_u8*)AK_AlignTo((ak_uaddr)Block->Current, Alignment);
     
     void* Result = Block->Current;
     Block->Current += Size;

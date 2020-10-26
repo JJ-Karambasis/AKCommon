@@ -302,3 +302,9 @@ ak_i64 AK_AtomicAdd64(ak_i64 volatile* Value, ak_i64 Addend)
 #endif
     return Result;
 }
+
+ak_f32 AK_Frac(ak_f32 Value)
+{
+    ak_f32 IntPart;
+    return modff(Value, &IntPart);
+}

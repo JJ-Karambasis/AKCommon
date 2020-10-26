@@ -41,5 +41,6 @@ ak_f32 AK_Sqrt(ak_f32 Value);
 ak_f32 AK_Pow(ak_f32 Value, ak_f32 Exp);
 ak_i32 AK_AtomicAdd32(ak_i32 volatile* Value, ak_i32 Addend);
 ak_i64 AK_AtomicAdd64(ak_i64 volatile* Value, ak_i64 Addend);
+ak_f32 AK_Frac(ak_f32 Value);
 
 #endif

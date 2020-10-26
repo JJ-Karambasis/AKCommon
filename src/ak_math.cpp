@@ -34,7 +34,7 @@ ak_u32 ak_v3<type>::LargestComp()
 template <typename type>
 type& ak_v4<type>::operator[](ak_u32 Index)
 {
-    ASSERT(Index < 4);
+    AK_Assert(Index < 4, "Index out of bounds");
     return Data[Index];
 }
 
@@ -1153,6 +1153,16 @@ ak_u32 AK_BGRA_U32(ak_color4f Color)
     ak_u8 A = (ak_u8)AK_Floor(Color.a >= 1.0f ? 255 : Color.a * 256.0f);
     
     return B | (G << 8) | (R << 16) | (A << 24);
+}
+
+ak_u32 AK_RGBA_U32(ak_color4f Color)
+{
+    ak_u8 B = (ak_u8)AK_Floor(Color.b >= 1.0f ? 255 : Color.b * 256.0f);
+    ak_u8 G = (ak_u8)AK_Floor(Color.g >= 1.0f ? 255 : Color.g * 256.0f);
+    ak_u8 R = (ak_u8)AK_Floor(Color.r >= 1.0f ? 255 : Color.r * 256.0f);
+    ak_u8 A = (ak_u8)AK_Floor(Color.a >= 1.0f ? 255 : Color.a * 256.0f);
+    
+    return R | (G << 8) | (B << 16) | (A << 24);
 }
 
 template <typename type> 

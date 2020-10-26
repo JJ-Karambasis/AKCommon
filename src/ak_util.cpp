@@ -32,6 +32,11 @@ ak_f32 AK_SafeRatio(ak_i32 Numerator, ak_i32 Denominator)
     return Result;
 }
 
+ak_f32 AK_SafeRatio(ak_v2i Fraction)
+{
+    return AK_SafeRatio(Fraction.w, Fraction.h);
+}
+
 ak_f32 AK_SafeInverse(ak_f32 A)
 {
     AK_Assert(!AK_EqualZeroEps(A), "Cannot take the inverse of a value that is zero (or extremely close too).");    
@@ -91,4 +96,16 @@ ak_u32 AK_Random32()
     Result ^= Result << 5;
     AK_Internal__Seed32 = Result;
     return Result;
+}
+
+ak_f32 AK_RandomF32()
+{
+    return ((ak_f32)AK_Random32()) * (1.0f/4294967296.f);
+}
+
+ak_iaddr AK_AlignTo(ak_uaddr V, ak_uaddr Alignment)
+{
+    Alignment = Alignment ? Alignment : 1;
+    ak_uaddr Mod = V & (Alignment-1);
+    return Mod ? V + (Alignment-Mod) : V;
 }
