@@ -18,17 +18,26 @@ ak_f32 AK_RoundPrecision(ak_f32 Value, ak_u32 Precision)
     ak_f32 Result = AK__Internal_RoundPrecision(Value, X);
     return Result;
 }
+ak_bool AK_EqualApprox(ak_f32 A, ak_f32 Eps)
+{
+    ak_bool Result = AK_Abs(A) < Eps;
+    return Result;
+}
+
+ak_bool AK_EqualApprox(ak_f64 A, ak_f64 Eps)
+{
+    ak_bool Result = AK_Abs(A) < Eps;
+    return Result;
+}
 
 ak_bool AK_EqualZeroEps(ak_f32 V)
 {
-    ak_bool Result = AK_Abs(V) < AK_EPSILON32;
-    return Result;
+    return AK_EqualApprox(V, AK_EPSILON32);    
 }
 
 ak_bool AK_EqualZeroEps(ak_f64 V)
 {
-    ak_bool Result = AK_Abs(V) < AK_EPSILON64;
-    return Result;
+    return AK_EqualApprox(V, AK_EPSILON64);    
 }
 
 ak_bool AK_EqualEps(ak_f32 A, ak_f32 B)
@@ -65,4 +74,9 @@ ak_bool AK_EqualEps(ak_f64 A, ak_f64 B)
     {
         return ab < AK_EPSILON64*aAbs;
     }
+}
+
+ak_bool AK_IsNan(ak_f32 V)
+{
+    return isnan(V);
 }

@@ -300,6 +300,15 @@ struct ak_rect3
 typedef ak_rect3<ak_f32> ak_rect3f;
 
 template <typename type>
+struct ak_plane
+{
+    type Equation[4];
+    ak_v3<type> Origin;
+    ak_v3<type> Normal;
+};
+typedef ak_plane<ak_f32> ak_planef;
+
+template <typename type>
 struct ak_frustum
 {
     ak_v3f Normals[6];
@@ -750,6 +759,12 @@ template <typename type> ak_v3<type> AK_InverseTransform(ak_v3<type> Point, ak_s
 //////////////////////////////////////////////////
 template <typename type> ak_rect3<type> AK_Rect(type MinX, type MinY, type MinZ, type MaxX, type MaxY, type MaxZ);
 template <typename type> ak_rect3<type> AK_Rect(ak_v3<type> Min, ak_v3<type> Max);
+
+//////////////////////////////////////////////////
+//NOTE(EVERYONE): Plane operations
+//////////////////////////////////////////////////
+template <typename type> ak_plane<type> AK_Plane(ak_v3<type> Origin, ak_v3<type> Normal);
+template <typename type> type AK_SignDistance(ak_plane<type> Plane, ak_v3<type> Point);
 
 /////////////////////////////////////////////////
 //NOTE(EVERYONE): Quadratic equation

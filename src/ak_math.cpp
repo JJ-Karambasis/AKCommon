@@ -7,7 +7,7 @@ type AK_Lerp(type A, type t, type B)
 template <typename type>
 type& ak_v2<type>::operator[](ak_u32 Index)
 {
-    ASSERT(Index < 2);
+    AK_Assert(Index < 2, "Index out of bounds");
     return Data[Index];
 }
 
@@ -2388,6 +2388,25 @@ ak_v3<type> AK_Transform(ak_v3<type> Point, ak_sqt<type> Transform)
 template <typename type> ak_v3<type> AK_InverseTransform(ak_v3<type> Point, ak_v3<type> Translation, ak_quat<type> Orientation, ak_v3<type> Scale);
 template <typename type> ak_v3<type> AK_InverseTransform(ak_v3<type> Point, ak_sqt<type> Transform);
 #endif
+
+template <typename type> 
+ak_plane<type> AK_Plane(ak_v3<type> Origin, ak_v3<type> Normal)
+{
+    ak_plane<type> Result = {};
+    Result.Normal = Normal;
+    Result.Origin = Origin;
+    Result.Equation[0] = Normal.x;
+    Result.Equation[1] = Normal.y;
+    Result.Equation[2] = Normal.z;
+    Result.Equation[3] = -(Normal.x*Origin.x + Normal.y*Origin.y + Normal.z*Origin.z);
+    return Result;
+}
+
+template <typename type> 
+type AK_SignDistance(ak_plane<type> Plane, ak_v3<type> Point)
+{
+    return AK_Dot(Point, Plane.Normal) + Plane.Equation[3];
+}
 
 ak_quadratic_equation_result AK_SolveQuadraticEquation(ak_f32 a, ak_f32 b, ak_f32 c)
 {

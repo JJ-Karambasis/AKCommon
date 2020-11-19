@@ -18,9 +18,12 @@
 #define AK_MAX64 1.7976931348623158e+30
 
 ak_f32  AK_RoundPrecision(ak_f32 Value, ak_u32 X);
+ak_bool AK_EqualApprox(ak_f32 A, ak_f32 Eps);
+ak_bool AK_EqualApprox(ak_f64 A, ak_f64 Eps);
 ak_bool AK_EqualZeroEps(ak_f32 V);
 ak_bool AK_EqualZeroEps(ak_f64 V);
 ak_bool AK_EqualEps(ak_f32 A, ak_f32 B);
 ak_bool AK_EqualEps(ak_f64 A, ak_f64 B);
+ak_bool AK_IsNan(ak_f32 V);
 
 #endif
