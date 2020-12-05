@@ -29,8 +29,7 @@ void AK__Internal_LogWarning(ak_logger* Logger, ak_char* Format, ...)
 }
 
 void AK__Internal_LogError(ak_logger* Logger, ak_char* Filename, ak_u32 LineNumber, ak_char* Function, ak_char* Format, ...)
-{
-    ak_char* HeaderFormat = "ERROR - Message: %s\n File: %s Function: %s Line: %d";    
+{    
     ak_arena* Arena = AK_GetGlobalArena();
     ak_temp_arena TempArena = Arena->BeginTemp();
     

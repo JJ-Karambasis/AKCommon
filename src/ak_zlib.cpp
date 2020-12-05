@@ -401,9 +401,9 @@ ak_bool AK_ZLibDecompress(void* DecompressedData, void* CompressedData, ak_u32 C
     ak_u8 CMF = ((CINFO << 4) & 0xF0) | (CM & 0x0F);
     ak_u8 FLAG = (ak_u8)Stream.GetBits(8);
     
-    ak_u8 FCHECK = (FLAG & 0x1F);
+    //ak_u8 FCHECK = (FLAG & 0x1F);
     ak_u8 FDICT  = (FLAG & 0x20);
-    ak_u8 FLEVEL = (FLAG & 0xC0);
+    //ak_u8 FLEVEL = (FLAG & 0xC0);
     
     if((CMF*256 + FLAG) % 31 != 0) return AK_Internal__ZLibError("ZLib header is corrupted");    
     if(FDICT) return AK_Internal__ZLibError("ZLib preset dictionary is not supported");

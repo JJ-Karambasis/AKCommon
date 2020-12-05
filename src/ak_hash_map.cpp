@@ -79,8 +79,8 @@ void AK_HashMap__Internal_ExpandItems(ak_hash_map<key, value>* Map)
     void* MapData = AK_Allocate(Map->ItemCapacity * (sizeof(key) + sizeof(value) + sizeof(ak_u32)));        
     
     key* NewItemKeys = (key*)MapData;
-    ak_u32* NewItemSlots = (ak_u32*)(Map->ItemKeys + Map->ItemCapacity);
-    value* NewItemEntries = (value*)(Map->ItemSlots + Map->ItemCapacity);        
+    ak_u32* NewItemSlots = (ak_u32*)(NewItemKeys + Map->ItemCapacity);
+    value* NewItemEntries = (value*)(NewItemSlots + Map->ItemCapacity);        
     
     AK_MemoryCopy(NewItemKeys, Map->ItemKeys, Map->Size*sizeof(key));
     AK_MemoryCopy(NewItemSlots, Map->ItemSlots, Map->Size*sizeof(ak_u32));

@@ -371,8 +371,7 @@ ak_mesh_result<ak_vertex_p3> AK_GenerateTriangleCylinder(ak_arena* Arena, ak_f32
 ak_mesh_result<ak_vertex_p3> AK_GenerateTriangleTorus(ak_arena* Arena, ak_f32 Radius, ak_f32 InnerRadius, ak_u16 CircleSampleCount, ak_v3f CenterP)
 {
     ak_mesh_result<ak_vertex_p3> Result = AK_AllocateMeshResult<ak_vertex_p3>(Arena, CircleSampleCount*CircleSampleCount, CircleSampleCount*CircleSampleCount*2*3);    
-    ak_f32 CircleRadOffset = AK_Internal__GetCircleRadOffset(CircleSampleCount);
-    ak_u16 CenterVertexOffset = CircleSampleCount*2;
+    ak_f32 CircleRadOffset = AK_Internal__GetCircleRadOffset(CircleSampleCount);    
     
     ak_vertex_p3* VertexAt = Result.Vertices; 
     
@@ -412,8 +411,7 @@ inline ak_mesh_result<ak_vertex_p3>
 AK_GenerateTriangleCircle(ak_arena* Arena, ak_f32 Radius, ak_f32 Height, ak_u16 CircleSampleCount, ak_v3f CenterP)
 {   
     ak_mesh_result<ak_vertex_p3> Result = AK_AllocateMeshResult<ak_vertex_p3>(Arena, CircleSampleCount*2, CircleSampleCount*3*2);    
-    ak_f32 CircleRadOffset = AK_Internal__GetCircleRadOffset(CircleSampleCount);
-    ak_u16 CenterVertexOffset = CircleSampleCount*2;
+    ak_f32 CircleRadOffset = AK_Internal__GetCircleRadOffset(CircleSampleCount);    
     
     ak_vertex_p3* VertexAt = Result.Vertices; 
     
