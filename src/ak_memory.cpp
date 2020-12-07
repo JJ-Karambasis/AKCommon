@@ -294,7 +294,8 @@ void AK_DeleteArena(ak_arena* Arena)
 global ak_arena* AK_Internal__Global_Arena;
 ak_arena* AK_GetGlobalArena()
 {
-    AK_Assert(AK_Internal__Global_Arena, "Global arena has not be set. Please call AK_SetGlobalArena() first before AK_GetGlobalArena()");
+    if(!AK_Internal__Global_Arena)
+        AK_Internal__Global_Arena = AK_CreateArena(AK_Megabyte(1));
     return AK_Internal__Global_Arena;
 }
 
