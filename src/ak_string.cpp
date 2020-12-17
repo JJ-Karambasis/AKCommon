@@ -31,6 +31,15 @@ ak_string AK_AllocateString(ak_u32 StringLength, ak_arena* Arena)
     return Result;
 }
 
+ak_string AK_AllocateString(ak_u32 StringLength)
+{
+    ak_string Result = {};
+    Result.Data = (ak_char*)AK_Allocate(StringLength+1);
+    Result.Length = StringLength;
+    Result.Data[StringLength] = 0;
+    return Result;
+}
+
 ak_string AK_PushString(ak_char* Data, ak_u32 StringLength, ak_arena* Arena)
 {
     ak_string Result = AK_AllocateString(StringLength, Arena);
@@ -50,9 +59,38 @@ ak_string AK_PushString(const ak_char* Data, ak_arena* Arena)
     return Result;
 }
 
+ak_string AK_PushString(ak_char* Data, ak_u32 StringLength)
+{
+    ak_string Result = AK_AllocateString(StringLength);
+    AK_MemoryCopy(Result.Data, Data, StringLength);
+    return Result;
+}
+
+ak_string AK_PushString(ak_char* Data)
+{
+    return AK_PushString(Data, AK_StringLength(Data));
+}
+
+ak_string AK_PushString(ak_string String)
+{
+    return AK_PushString(String.Data, String.Length);
+}
+
+void AK_FreeString(ak_string String)
+{
+    if(String.Length && String.Data)
+        AK_Free(String.Data);
+}
+
 ak_bool AK_StringIsNullOrEmpty(ak_string String)
 {
     ak_bool Result = !String.Data || !String.Length;
+    return Result;
+}
+
+ak_bool AK_StringIsNullOrEmpty(ak_char* String)
+{
+    ak_bool Result = !String || !AK_StringLength(String);
     return Result;
 }
 
@@ -116,6 +154,11 @@ ak_bool AK_StringEquals(ak_string StringA, ak_char* StringB)
 ak_bool AK_StringEquals(const ak_char* StringA, ak_string StringB)
 {
     return AK_StringEquals((ak_char*)StringA, StringB.Data, StringB.Length);
+}
+
+ak_bool AK_StringEquals(ak_string StringA, ak_string StringB)
+{
+    return AK_StringEquals(StringA.Data, StringA.Length, StringB.Data, StringB.Length);
 }
 
 ak_bool AK_StringEndsWith(ak_char* String, ak_u32 StringLength, ak_char* MatchString, ak_u32 MatchStringLength)
@@ -522,5 +565,4 @@ ak_string AK_ReadToken(ak_char* String)
     while(!AK_IsWhitespace(*At)) { At++; Length++; }
     return AK_CreateString(String, Length);    
 }
-    
-    
+

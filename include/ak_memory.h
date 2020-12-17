@@ -80,6 +80,7 @@ void AK_MemoryClear(void* Memory, ak_uaddr Size);
 template <typename type> type* AK_MemorySet(type* Memory, type Data, ak_uaddr Count);
 template <typename type> type* AK_CopyArray(type* Dst, type* Src, ak_u32 Count);
 template <typename type> type* AK_CopyArray(type* Dst, const type* Src, ak_u32 Count);
+template <typename type> void AK_ClearArray(type* Dst, ak_u32 Count);
 ak_arena* AK_CreateArena(ak_uaddr InitialBlockSIze = AK_Megabyte(1));
 void AK_DeleteArena(ak_arena* Arena);
 ak_arena* AK_GetGlobalArena();

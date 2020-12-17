@@ -90,6 +90,13 @@ type* AK_CopyArray(type* Dst, const type* Src, ak_u32 Count)
     return AK_CopyArray(Dst, (type*)Src, Count);
 }
 
+template <typename type> 
+void AK_ClearArray(type* Dst, ak_u32 Count)
+{
+    for(ak_u32 Index = 0; Index < Count; Index++)
+        Dst[Index] = {};
+}
+
 ak_bool ak_buffer::IsValid()
 {
     return Data && Size;

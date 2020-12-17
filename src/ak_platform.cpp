@@ -103,6 +103,11 @@ ak_memory_info AK_GetMemoryInfo()
     return MemoryInfo;
 }
 
+ak_bool AK_CreateDirectory(ak_char* Path)
+{
+    return CreateDirectory(Path, NULL);
+}
+
 ak_file_handle* AK_OpenFile(ak_char* Path, ak_file_attributes FileAttributes)
 {    
     DWORD DesiredAttributes = 0;
@@ -125,7 +130,7 @@ ak_file_handle* AK_OpenFile(ak_char* Path, ak_file_attributes FileAttributes)
         AK_Internal__PlatformSetErrorMessage("WIN32: Failed to open file %s", Path);
         return 0;
     }
-        
+    
     ak_file_handle* File = (ak_file_handle*)AK_Allocate(sizeof(ak_file_handle));
     File->Handle = Handle;
     File->Attributes = FileAttributes;    
@@ -160,7 +165,7 @@ ak_u64 AK_GetFileSize(ak_file_handle* File)
         AK_Internal__PlatformSetErrorMessage("WIN32: Cannot get file size. Invalid file attributes. It is set to write instead of read.");
         return (ak_u64)-1;
     }
-        
+    
     LARGE_INTEGER Result;
     if(!GetFileSizeEx(File->Handle, &Result))
     {
@@ -280,11 +285,24 @@ ak_bool AK_FileExists(ak_char* Path)
     return Result;
 }
 
+ak_bool AK_DirectoryExists(ak_char* Path)
+{
+    DWORD Attrib = GetFileAttributes(Path);
+    ak_bool Result = (Attrib != INVALID_FILE_ATTRIBUTES) && (Attrib & FILE_ATTRIBUTE_DIRECTORY);
+    return Result;
+}
+
 ak_bool AK_FileRemove(ak_char* Path)
 {
     ak_bool Result = DeleteFile(Path);
     if(!Result)
         AK_Internal__PlatformSetErrorMessage("WIN32: Could not delete file %s. Error code %d", Path, GetLastError());
+    return Result;
+}
+
+ak_bool AK_DirectoryRemove(ak_char* Path)
+{
+    ak_bool Result = RemoveDirectory(Path);
     return Result;
 }
 
@@ -388,7 +406,7 @@ ak_string AK_OpenFileDialog(ak_char* Extension)
     ak_string Result = AK_CreateEmptyString();
     ak_arena* GlobalArena = AK_GetGlobalArena();
     ak_temp_arena TempArena = GlobalArena->BeginTemp();
-        
+    
     IFileOpenDialog* FileDialog = NULL;
     if(SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog, (void**)&FileDialog)))
     {
@@ -626,6 +644,11 @@ ak_bool AK_FileExists(ak_string Path)
     return AK_FileExists(Path.Data);
 }
 
+ak_bool AK_DirectoryExists(ak_string Path)
+{
+    return AK_DirectoryExists(Path.Data);
+}
+
 ak_bool AK_FileRemove(ak_string Path)
 {
     return AK_FileRemove(Path.Data);
@@ -634,6 +657,11 @@ ak_bool AK_FileRemove(ak_string Path)
 ak_bool AK_FileRename(ak_string OldName, ak_string NewName)
 {        
     return AK_FileRename(OldName.Data, NewName.Data);
+}
+
+ak_bool AK_FileRename(ak_string OldName, const ak_char* NewName)
+{
+    return AK_FileRename(OldName.Data, (ak_char*)NewName);
 }
 
 ak_string AK_GetExecutablePath(ak_arena* Arena)
@@ -654,4 +682,15 @@ ak_string AK_OpenFileDialog(ak_string Extension)
 void AK_MessageBoxOk(ak_char* Title, ak_string Message)
 {
     AK_MessageBoxOk(Title, Message.Data);
+}
+
+ak_bool AK_CreateDirectory(ak_string Path)
+{
+    return AK_CreateDirectory(Path.Data);
+}
+
+ak_bool AK_DirectoryRemove(ak_string Path)
+{
+    ak_bool Result = AK_DirectoryRemove(Path.Data);
+    return Result;
 }
