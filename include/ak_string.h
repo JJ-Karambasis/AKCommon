@@ -12,11 +12,13 @@ struct ak_string
 ak_string AK_CreateEmptyString();
 ak_string AK_CreateString(ak_char* Data, ak_u32 StringLength);
 ak_string AK_CreateString(ak_char* Data);
+ak_string AK_CreateString(ak_buffer Buffer);
 ak_string AK_AllocateString(ak_u32 StringLength);
 ak_string AK_AllocateString(ak_u32 StringLength, ak_arena* Arena);
 ak_string AK_PushString(ak_char* Data, ak_u32 StringLength, ak_arena* Arena);
 ak_string AK_PushString(ak_char* Data, ak_arena* Arena);
 ak_string AK_PushString(const ak_char* Data, ak_arena* Arena); 
+ak_string AK_PushString(ak_string Data, ak_arena* Arena);
 ak_string AK_PushString(ak_char* Data);
 ak_string AK_PushString(ak_string String);
 void AK_FreeString(ak_string String);

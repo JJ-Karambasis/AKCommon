@@ -22,6 +22,12 @@ ak_string AK_CreateString(ak_char* Data)
     return Result;
 }
 
+ak_string AK_CreateString(ak_buffer Buffer)
+{
+    ak_string Result = AK_CreateString((ak_char*)Buffer.Data, AK_SafeU32(Buffer.Size));
+    return Result;
+}
+
 ak_string AK_AllocateString(ak_u32 StringLength, ak_arena* Arena)
 {
     ak_string Result;
@@ -56,6 +62,12 @@ ak_string AK_PushString(ak_char* Data, ak_arena* Arena)
 ak_string AK_PushString(const ak_char* Data, ak_arena* Arena)
 {
     ak_string Result = AK_PushString((ak_char*)Data, Arena);
+    return Result;
+}
+
+ak_string AK_PushString(ak_string Data, ak_arena* Arena)
+{
+    ak_string Result = AK_PushString(Data.Data, Data.Length, Arena);
     return Result;
 }
 

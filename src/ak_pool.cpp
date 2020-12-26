@@ -51,7 +51,7 @@ void ak_pool<type>::Free(ak_u64 ID)
 {
     if(ID)
     {
-        AK_Assert(AK_Internal__PoolIsAllocatedID(ID), "Cannot free an already freed entry from the pool.");
+        AK_Assert(AK_PoolIsAllocatedID(ID), "Cannot free an already freed entry from the pool.");
         ak_u32 Index = AK_PoolIndex(ID);
         AK_Assert(Index < MaxUsed, "Index out of bounds.");
         IDs[Index] = (0 | FreeHead);
