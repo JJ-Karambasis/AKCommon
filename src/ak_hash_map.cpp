@@ -227,7 +227,6 @@ void AK_DeleteHashMap(ak_hash_map<key, value>* HashMap)
 {
     if(HashMap->Slots) AK_Free(HashMap->Slots);
     if(HashMap->ItemKeys) AK_Free(HashMap->ItemKeys);
-    
     *HashMap = {};    
 }
 

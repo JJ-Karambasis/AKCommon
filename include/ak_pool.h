@@ -2,6 +2,7 @@
 #define AK_POOL_H
 
 #define AK_PoolIndex(ID) ((ak_u32)(ID & 0xFFFFFFFF))
+#define AK_PoolIsAllocatedID(ID) ((ID & 0xFFFFFFFF00000000) != 0)
 
 template <typename type>
 struct ak_pool
@@ -13,7 +14,7 @@ struct ak_pool
     ak_u32 Size;
     type*   Entries;
     ak_u64* IDs;
-        
+    
     ak_bool IsInitialized();
     ak_u64 Allocate();
     void Free(ak_u64 ID);

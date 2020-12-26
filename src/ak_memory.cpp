@@ -102,35 +102,6 @@ ak_bool ak_buffer::IsValid()
     return Data && Size;
 }
 
-ak_u8* ak_stream::Read(ak_uaddr Size)
-{
-    AK_Assert((Current + Size) <= End, "Stream read overflow");
-    ak_u8* Result = Current;
-    Current += Size;
-    return Result;
-}
-
-template <typename type>
-type* ak_stream::Read()
-{
-    return (type*)Read(sizeof(type));
-}
-
-template <typename type>
-type* ak_stream::ReadArray(ak_u32 Count)
-{
-    return (type*)Read(sizeof(type)*Count);
-}
-
-ak_stream AK_CreateStream(ak_u8* Stream, ak_uaddr Size)
-{
-    ak_stream Result = {};
-    Result.Start = Stream;
-    Result.Current = Stream;
-    Result.End = Stream + Size;
-    return Result;
-}
-
 void ak_arena::Clear()
 {
     AK_Assert(TempCheck(), "Cannot clear arena. Still have temporary arenas being used.");
@@ -155,7 +126,7 @@ void* ak_arena::Push(ak_uaddr Size, ak_arena_clear_flags ClearFlags, ak_i32 Alig
         Block->Current = (ak_u8*)AK_AlignTo((ak_uaddr)Block->Current, Alignment);
     
     void* Result = Block->Current;
-    Block->Current += Size;
+    Block->Current += Size; 
     
     if(ClearFlags == AK_ARENA_CLEAR_FLAGS_CLEAR)
         AK_MemoryClear(Result, Size);

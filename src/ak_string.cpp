@@ -121,6 +121,11 @@ ak_bool AK_StringEquals(ak_char* StringA, ak_u32 StringALength, ak_char* StringB
     return true;
 }
 
+ak_bool AK_StringEquals(ak_char* StringA, ak_u32 StringALength, const ak_char* StringB, ak_u32 StringBLength)
+{
+    return AK_StringEquals(StringA, StringALength, (ak_char*)StringB, StringBLength);
+}
+
 ak_bool AK_StringEquals(ak_char* StringA, ak_char* StringB)
 {
     return AK_StringEquals(StringA, AK_StringLength(StringA), StringB, AK_StringLength(StringB));
@@ -366,6 +371,11 @@ ak_string AK_StringConcat(ak_string String, ak_char Character, ak_arena* Arena)
 ak_string AK_StringConcat(ak_char* String, ak_char Character, ak_arena* Arena)
 {
     return AK_StringConcat(String, AK_StringLength(String), &Character, 1, Arena);
+}
+
+ak_string AK_StringConcat(ak_string String, const ak_char* StringB, ak_arena* Arena)
+{
+    return AK_StringConcat(String.Data, String.Length, (ak_char*)StringB, AK_StringLength(StringB), Arena);
 }
 
 ak_string AK_FormatString(ak_arena* Arena, const ak_char* Format, va_list List)

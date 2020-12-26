@@ -28,6 +28,13 @@ type* ak_array<type>::Get(ak_u32 Index)
 }
 
 template <typename type>
+void ak_array<type>::Set(ak_u32 Index, type Type)
+{
+    AK_Assert(Index < Size, "Index out of bounds");
+    Entries[Index] = Type;
+}
+
+template <typename type>
 type* ak_array<type>::Pop()
 {
     if(Size == 0)

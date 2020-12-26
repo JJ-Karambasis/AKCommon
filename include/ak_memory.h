@@ -9,17 +9,6 @@ struct ak_buffer
     ak_bool IsValid();
 };
 
-struct ak_stream
-{
-    ak_u8* Start;
-    ak_u8* Current;
-    ak_u8* End;
-    
-    ak_u8* Read(ak_uaddr Size);
-    template <typename type> type* Read();            
-    template <typename type> type* ReadArray(ak_u32 Count);
-};
-
 enum ak_arena_clear_flags
 {
     AK_ARENA_CLEAR_FLAGS_CLEAR,
@@ -85,6 +74,5 @@ ak_arena* AK_CreateArena(ak_uaddr InitialBlockSIze = AK_Megabyte(1));
 void AK_DeleteArena(ak_arena* Arena);
 ak_arena* AK_GetGlobalArena();
 void AK_SetGlobalArena(ak_arena* Arena);
-ak_stream AK_CreateStream(ak_u8* Stream, ak_uaddr Size);
 
 #endif

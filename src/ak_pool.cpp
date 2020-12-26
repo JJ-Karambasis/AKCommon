@@ -1,12 +1,6 @@
 #undef AK_INVALID_FREE_HEAD
 #define AK_INVALID_FREE_HEAD ((ak_u32)-1)
 
-inline ak_bool AK_Internal__PoolIsAllocatedID(ak_u64 ID)
-{
-    ak_bool Result = (ID & 0xFFFFFFFF00000000) != 0;
-    return Result;
-}    
-
 template <typename type>
 ak_bool ak_pool<type>::IsInitialized()
 {
@@ -69,7 +63,7 @@ void ak_pool<type>::Free(ak_u64 ID)
 template <typename type>
 type* ak_pool<type>::Get(ak_u64 ID)
 {
-    if(!AK_Internal__PoolIsAllocatedID(ID))
+    if(!AK_PoolIsAllocatedID(ID))
         return NULL;
     
     ak_u32 Index = AK_PoolIndex(ID);
@@ -85,7 +79,7 @@ template <typename type>
 type* ak_pool<type>::GetByIndex(ak_u32 Index)
 {    
     AK_Assert(Index < MaxUsed, "Index out of bounds.");    
-    if(!AK_Internal__PoolIsAllocatedID(IDs[Index]))
+    if(!AK_PoolIsAllocatedID(IDs[Index]))
         return NULL;    
     type* Result = &Entries[Index];
     return Result;
@@ -139,7 +133,7 @@ type* ak_pool_iter<type>::First()
     AK_Assert(CurrentID == 0, "Iterator has already begun");    
     for(ak_u32 Index = 0; Index < Pool->MaxUsed; Index++)
     {
-        if(AK_Internal__PoolIsAllocatedID(Pool->IDs[Index]))
+        if(AK_PoolIsAllocatedID(Pool->IDs[Index]))
         {
             CurrentID = Pool->IDs[Index];
             return &Pool->Entries[Index];
@@ -155,7 +149,7 @@ type* ak_pool_iter<type>::Next()
     AK_Assert(CurrentID != 0, "Iterator should call First() before calling Next()");        
     for(ak_u32 Index = AK_PoolIndex(CurrentID)+1; Index < Pool->MaxUsed; Index++)
     {
-        if(AK_Internal__PoolIsAllocatedID(Pool->IDs[Index]))
+        if(AK_PoolIsAllocatedID(Pool->IDs[Index]))
         {
             CurrentID = Pool->IDs[Index];
             return &Pool->Entries[Index];

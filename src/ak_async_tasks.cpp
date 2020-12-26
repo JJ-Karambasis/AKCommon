@@ -15,8 +15,10 @@ ak_bool AK_Internal__PerformTask(win32_async_task_queue* TaskQueue, ak_arena* Th
         ak_i32 Index = InterlockedCompareExchange((LONG volatile*)&TaskQueue->NextEntryToRead, NewNextEntryToRead, NextEntryToRead);
         if(Index == NextEntryToRead)
         {
-            TaskQueue->AsyncTasks[Index].Callback(ThreadArena, TaskQueue->AsyncTasks[Index].UserData);            
+            TaskQueue->AsyncTasks[Index].State = AK_ASYNC_TASK_STATE_PROCESSING;
+            TaskQueue->AsyncTasks[Index].Callback(ThreadArena, TaskQueue->AsyncTasks[Index].UserData);     
             InterlockedIncrement((LONG volatile*)&TaskQueue->CompletionCount);
+            TaskQueue->AsyncTasks[Index].State = AK_ASYNC_TASK_STATE_NONE;
         }
     }
     else return false;
@@ -24,17 +26,19 @@ ak_bool AK_Internal__PerformTask(win32_async_task_queue* TaskQueue, ak_arena* Th
     return true;
 }
 
-void ak_async_task_queue::AddTask(ak_async_task_callback* Callback, void* UserData)
+ak_async_task* ak_async_task_queue::AddTask(ak_async_task_callback* Callback, void* UserData)
 {
     ak_i32 NewNextEntryToWrite = (NextEntryToWrite+1) % AK_ASYNC_TASK_COUNT;
     AK_Assert(NewNextEntryToWrite != NextEntryToRead, "Append to much work for work queue. Please increase MAX_WORK_QUEUE_ENTRIES");            
     ak_async_task* Task = AsyncTasks + NextEntryToWrite;
     Task->Callback = Callback;
     Task->UserData = UserData;
+    Task->State = AK_ASYNC_TASK_STATE_STARTED;
     CompletionGoal++;    
     _WriteBarrier();
     NextEntryToWrite = NewNextEntryToWrite;
     ReleaseSemaphore(((win32_async_task_queue*)this)->Semaphore, 1, 0);
+    return Task;
 }
 
 void ak_async_task_queue::CompleteAllTasks(ak_arena* ThreadArena)
@@ -76,4 +80,9 @@ void AK_DeleteAsyncTaskQueue(ak_async_task_queue* TaskQueue)
 {
     if(TaskQueue)
         AK_Free(TaskQueue);
+}
+
+void ak_async_task::Wait()
+{
+    while(State != AK_ASYNC_TASK_STATE_NONE) _mm_pause();
 }

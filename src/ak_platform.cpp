@@ -278,6 +278,12 @@ void AK_MessageBoxOk(ak_char* Title, ak_char* Message)
     MessageBox(NULL, Message, Title, MB_OK);
 }
 
+ak_bool AK_MessageBoxYesNo(ak_char* Title, ak_char* Message)
+{
+    int Code = MessageBox(NULL, Message, Title, MB_YESNO);
+    return Code == IDYES;
+}
+
 ak_bool AK_FileExists(ak_char* Path)
 {
     DWORD Attrib = GetFileAttributes(Path);
@@ -684,6 +690,11 @@ void AK_MessageBoxOk(ak_char* Title, ak_string Message)
     AK_MessageBoxOk(Title, Message.Data);
 }
 
+ak_bool AK_MessageBoxYesNo(ak_char* Title, ak_string Message)
+{
+    return AK_MessageBoxYesNo(Title, Message.Data);
+}
+
 ak_bool AK_CreateDirectory(ak_string Path)
 {
     return AK_CreateDirectory(Path.Data);
@@ -693,4 +704,9 @@ ak_bool AK_DirectoryRemove(ak_string Path)
 {
     ak_bool Result = AK_DirectoryRemove(Path.Data);
     return Result;
+}
+
+ak_bool AK_WriteFile(ak_file_handle* File, const void* Data, ak_u32 Size, ak_u64 Offset)
+{
+    return AK_WriteFile(File, (void*)Data, Size, Offset);
 }

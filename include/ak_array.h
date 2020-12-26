@@ -21,6 +21,7 @@ struct ak_array
     
     type& operator[](ak_u32 Index);    
     type* Get(ak_u32 Index);
+    void  Set(ak_u32 Index, type Type); 
     type* Pop();    
     type* operator+(ak_u32 Index);    
     void Add(type Value);

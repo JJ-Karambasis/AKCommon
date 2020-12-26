@@ -1,17 +1,21 @@
-void AK_Internal__StringBuilderWrite(ak_string_builder* StringBuilder, ak_char* Format, va_list Args)
+void AK_Internal__ArenaBuilderWrite(ak_arena* Arena, ak_char* Format, va_list Args)
 {
-    if(!StringBuilder->Arena)
-        StringBuilder->Arena = AK_CreateArena();
-    
     ak_arena* GlobalArena = AK_GetGlobalArena();
     ak_temp_arena TempArena = GlobalArena->BeginTemp();
     
     ak_string WriteString = AK_FormatString(GlobalArena, Format, Args);        
-    ak_char* DstString = StringBuilder->Arena->PushArray<ak_char>(WriteString.Length);
+    ak_char* DstString = Arena->PushArray<ak_char>(WriteString.Length);
     
     AK_MemoryCopy(DstString, WriteString.Data, WriteString.Length);
     
     GlobalArena->EndTemp(&TempArena);
+}
+
+void AK_Internal__StringBuilderWrite(ak_string_builder* StringBuilder, ak_char* Format, va_list Args)
+{
+    if(!StringBuilder->Arena)
+        StringBuilder->Arena = AK_CreateArena();
+    AK_Internal__ArenaBuilderWrite(StringBuilder->Arena, Format, Args);
 }
 
 void ak_string_builder::Write(ak_char* Format, ...)
@@ -80,4 +84,3 @@ void ak_string_builder::ReleaseMemory()
         AK_DeleteArena(Arena);
     Arena = NULL;
 }
-    

@@ -25,6 +25,7 @@ ak_bool AK_StringIsNullOrEmpty(ak_char* String);
 ak_u32 AK_StringLength(ak_char* String);
 ak_u32 AK_StringLength(const ak_char* String);
 ak_bool AK_StringEquals(ak_char* StringA, ak_u32 StringALength, ak_char* StringB, ak_u32 StringBLength);
+ak_bool AK_StringEquals(ak_char* StringA, ak_u32 StringALength, const ak_char* StringB, ak_u32 StringBLength);
 ak_bool AK_StringEquals(ak_char* StringA, ak_char* StringB);
 ak_bool AK_StringEquals(const ak_char* StringA, const ak_char* StringB);
 ak_bool AK_StringEquals(const ak_char* StringA, ak_char* StringB);
@@ -61,6 +62,7 @@ ak_string AK_StringConcat(ak_string StringA, ak_string StringB, ak_arena* Arena)
 ak_string AK_StringConcat(ak_char* StringA, ak_string StringB, ak_arena* Arena);
 ak_string AK_StringConcat(ak_string String, ak_char Character, ak_arena* Arena);
 ak_string AK_StringConcat(ak_char* String, ak_char Character, ak_arena* Arena);
+ak_string AK_StringConcat(ak_string String, const ak_char* StringB, ak_arena* Arena);
 ak_string AK_GetToken(ak_string String);
 ak_string AK_FormatString(ak_arena* Arena, const ak_char* Format, va_list List);
 ak_string AK_FormatString(ak_arena* Arena, const ak_char* Format, ...);
