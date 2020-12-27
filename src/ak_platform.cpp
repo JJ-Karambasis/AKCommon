@@ -19,6 +19,7 @@ ak_string AK_PlatformGetErrorMessage()
 
 #pragma comment(lib, "user32.lib")
 #pragma comment(lib, "Ole32.lib")
+#pragma comment(lib, "Shell32.lib")
 
 struct ak_file_handle
 {
@@ -311,6 +312,24 @@ ak_bool AK_DirectoryRemove(ak_char* Path)
     ak_bool Result = RemoveDirectory(Path);
     return Result;
 }
+
+
+ak_bool AK_DirectoryRemoveRecursively(ak_char* Path)
+{
+    SHFILEOPSTRUCT FileOp = 
+    {
+        NULL, 
+        FO_DELETE, 
+        Path, 
+        "", 
+        FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT, 
+        false, 
+        0, 
+        ""
+    };
+    return SHFileOperation(&FileOp) == 0;
+}
+
 
 ak_bool AK_FileRename(ak_char* OldName, ak_char* NewName)
 {
@@ -709,4 +728,10 @@ ak_bool AK_DirectoryRemove(ak_string Path)
 ak_bool AK_WriteFile(ak_file_handle* File, const void* Data, ak_u32 Size, ak_u64 Offset)
 {
     return AK_WriteFile(File, (void*)Data, Size, Offset);
+}
+
+
+ak_bool AK_DirectoryRemoveRecursively(ak_string Path)
+{
+    return AK_DirectoryRemoveRecursively(Path.Data);
 }

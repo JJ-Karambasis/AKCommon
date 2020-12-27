@@ -47,6 +47,8 @@ ak_bool AK_FileRemove(ak_string Path);
 ak_bool AK_FileRemove(ak_char* Path);
 ak_bool AK_DirectoryRemove(ak_string Path);
 ak_bool AK_DirectoryRemove(ak_char* Path);
+ak_bool AK_DirectoryRemoveRecursively(ak_string Path);
+ak_bool AK_DirectoryRemoveRecursively(ak_char* Path);
 ak_bool AK_FileRename(ak_string OldName, ak_string NewName);
 ak_bool AK_FileRename(ak_string OldName, const ak_char* NewName);
 ak_bool AK_FileRename(ak_char* OldName, ak_char* NewName);
