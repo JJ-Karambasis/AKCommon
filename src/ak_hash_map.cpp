@@ -154,15 +154,15 @@ template <typename key, typename value>
 void ak_hash_map<key, value>::Remove(key Key)
 {   
     if(!IsInitialized())
-        *this = AK_CreateHashMap<type>();
+        *this = AK_CreateHashMap<key, value>();
     
     ak_i32 Slot = AK_HashMap__Internal_FindSlot(this, Key);
-    ASSERT(Slot >= 0);
+    AK_Assert(Slot >= 0, "Cannot find entry with key in hash map");
     
     ak_u32 SlotMask = SlotCapacity-1;
     ak_u32 Hash = Slots[Slot].KeyHash;
     ak_u32 BaseSlot = Hash & SlotMask;
-    ASSERT(Hash);
+    AK_Assert(Hash, "Hash is invalid");
     Slots[BaseSlot].BaseCount--;
     Slots[Slot].KeyHash = 0;
     
@@ -276,6 +276,22 @@ ak_u32 AK_HashFunction(char* Value)
     return AK_HashFunction(Result);
 }
 
+ak_u32 AK_HashFunction(ak_string Value)
+{
+    ak_u64 Result = 0;
+    ak_u64 Rand1 = 31414;
+    ak_u64 Rand2 = 27183;
+    
+    for(ak_u32 Index = 0; Index < Value.Length; Index++)
+    {
+        Result *= Rand1;
+        Result += Value[Index];
+        Rand1 *= Rand2;
+    }
+    
+    return AK_HashFunction(Result);
+}
+
 ak_u32 AK_HashFunction(ak_pair<ak_u32> Pair)
 {
     return AK_HashFunction(AK_BijectiveMap(Pair.A, Pair.B));
@@ -302,6 +318,11 @@ ak_bool AK_HashCompare(ak_f32 A, ak_f32 B)
 }
 
 ak_bool AK_HashCompare(char* A, char* B)
+{
+    return AK_StringEquals(A, B);
+}
+
+ak_bool AK_HashCompare(ak_string A, ak_string B)
 {
     return AK_StringEquals(A, B);
 }

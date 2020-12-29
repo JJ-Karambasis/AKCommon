@@ -38,9 +38,8 @@ template <typename type>
 type* ak_array<type>::Pop()
 {
     if(Size == 0)
-    {
         return NULL;
-    }
+    
     type* Result = Last();
     Size--;
     return Result;

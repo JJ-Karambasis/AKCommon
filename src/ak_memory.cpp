@@ -257,15 +257,18 @@ ak_arena* AK_CreateArena(ak_uaddr InitialBlockSize)
 
 void AK_DeleteArena(ak_arena* Arena)
 {
-    ak_memory_block* Block = Arena->FirstBlock->Next;
-    while(Block)
+    if(Arena)
     {
-        ak_memory_block* BlockToDelete = Block;
-        Block = Block->Next;
-        AK_Free(BlockToDelete);
-    }    
-    
-    AK_Free(Arena);
+        ak_memory_block* Block = Arena->FirstBlock->Next;
+        while(Block)
+        {
+            ak_memory_block* BlockToDelete = Block;
+            Block = Block->Next;
+            AK_Free(BlockToDelete);
+        }    
+        
+        AK_Free(Arena);
+    }
     Arena = NULL;       
 }
 
