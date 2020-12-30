@@ -1514,6 +1514,19 @@ ak_v3<type> AK_Rotate(ak_v3<type> V, ak_quat<type> Quat)
     return Result;
 }
 
+template <typename type> 
+ak_quat<type> AK_Inverse(ak_quat<type> Quat)
+{
+    type Denom = 1.0f/AK_SqrMagnitude(Quat);
+    return AK_Conjugate(Quat)*Denom;
+}
+
+template <typename type> 
+ak_quat<type> AK_QuatDiff(ak_quat<type> Q1, ak_quat<type> Q2)
+{
+    return AK_Inverse(Q1)*Q2;
+}
+
 ak_quatf AK_Lerp(ak_quatf A, ak_f32 t, ak_quatf B)
 {
     ak_quatf Result = AK_Quat(AK_Normalize(AK_Lerp(A.q, t, B.q)));
@@ -2369,6 +2382,14 @@ ak_sqt<type>& operator*=(ak_sqt<type>& A, ak_sqt<type> B)
 {
     A = A*B;
     return A;
+}
+
+template <typename type> 
+ak_bool operator==(ak_sqt<type> A, ak_sqt<type> B)
+{
+    return ((A.Translation == B.Translation) &&
+            (A.Orientation == B.Orientation) &&
+            (A.Scale == B.Scale));
 }
 
 template <typename type> 

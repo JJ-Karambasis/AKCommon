@@ -258,7 +258,7 @@ ak_u32 AK_HashFunction(ak_f32 Value)
     return AK_HashFunction(U.Int);
 }
 
-ak_u32 AK_HashFunction(char* Value)
+ak_u32 AK_HashFunction(ak_char* Value)
 {
     ak_u64 Result = 0;
     ak_u64 Rand1 = 31414;
@@ -269,11 +269,15 @@ ak_u32 AK_HashFunction(char* Value)
     {
         Result *= Rand1;
         Result += *At;
-        Rand1 *= Rand2;
-        At++;
+        Rand1 *= Rand2;At++;
     }
     
     return AK_HashFunction(Result);
+}
+
+ak_u32 AK_HashFunction(const ak_char* Value)
+{
+    return AK_HashFunction((ak_char*)Value);
 }
 
 ak_u32 AK_HashFunction(ak_string Value)

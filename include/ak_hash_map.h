@@ -43,7 +43,8 @@ void AK_DeleteHashMap(ak_hash_map<key, value>* HashMap);
 ak_u32 AK_HashFunction(ak_u64 Key);
 ak_u32 AK_HashFunction(ak_u32 Key);
 ak_u32 AK_HashFunction(ak_f32 Value);
-ak_u32 AK_HashFunction(char* Value);
+ak_u32 AK_HashFunction(ak_char* Value);
+ak_u32 AK_HashFunction(const ak_char* Value);
 ak_u32 AK_HashFunction(ak_pair<ak_u32> Pair);
 ak_u32 AK_HashFunction(ak_pair<ak_i32> Pair);
 

@@ -634,6 +634,8 @@ template <typename type> type          AK_Magnitude(ak_quat<type> Quat);
 template <typename type> ak_quat<type> AK_Normalize(ak_quat<type> Quat);
 template <typename type> ak_quat<type> AK_RotQuat(ak_v3<type> Axis, type Angle);
 template <typename type> ak_v3<type>   AK_Rotate(ak_v3<type> V, ak_quat<type> Quat);
+template <typename type> ak_quat<type> AK_Inverse(ak_quat<type> Quat);
+template <typename type> ak_quat<type> AK_QuatDiff(ak_quat<type> Q1, ak_quat<type> Q2);
 
 ak_quatf AK_Lerp(ak_quatf A, ak_f32 t, ak_quatf B);
 ak_quatf AK_SLerp(ak_quatf A, ak_f32 t, ak_quatf B);
@@ -749,6 +751,7 @@ template <typename type> ak_sqt<type> AK_SQT(ak_v3<type> Translation, ak_m3<type
 template <typename type> ak_sqt<type> AK_SQT(ak_m4<type> M);
 template <typename type> ak_sqt<type> operator*(ak_sqt<type> A, ak_sqt<type> B);
 template <typename type> ak_sqt<type>& operator*=(ak_sqt<type>& A, ak_sqt<type> B);
+template <typename type> ak_bool operator==(ak_sqt<type> A, ak_sqt<type> B);
 template <typename type> ak_v3<type> AK_Transform(ak_v3<type> Point, ak_v3<type> Translation, ak_quat<type> Orientation, ak_v3<type> Scale);
 template <typename type> ak_v3<type> AK_Transform(ak_v3<type> Point, ak_sqt<type> Transform);
 template <typename type> ak_v3<type> AK_InverseTransform(ak_v3<type> Point, ak_v3<type> Translation, ak_quat<type> Orientation, ak_v3<type> Scale);
