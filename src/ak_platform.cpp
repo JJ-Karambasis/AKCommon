@@ -338,6 +338,12 @@ ak_bool AK_FileRename(ak_char* OldName, ak_char* NewName)
     return Result;
 }
 
+ak_bool AK_FileCopy(ak_char* OldFile, ak_char* NewFile)
+{
+    ak_bool Result = CopyFile(OldFile, NewFile, FALSE);
+    return Result;
+}
+
 ak_string AK_GetExecutablePathWithName(ak_arena* Arena)
 {
     ak_arena* GlobalArena = AK_GetGlobalArena();
@@ -730,8 +736,12 @@ ak_bool AK_WriteFile(ak_file_handle* File, const void* Data, ak_u32 Size, ak_u64
     return AK_WriteFile(File, (void*)Data, Size, Offset);
 }
 
-
 ak_bool AK_DirectoryRemoveRecursively(ak_string Path)
 {
     return AK_DirectoryRemoveRecursively(Path.Data);
+}
+
+ak_bool AK_FileCopy(ak_string OldFile, ak_string NewFile)
+{
+    return AK_FileCopy(OldFile.Data, NewFile.Data);
 }
