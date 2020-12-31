@@ -1461,6 +1461,47 @@ ak_m3<type>   AK_QuatToMatrix(ak_quat<type> Quat)
     return Result;
 }
 
+template <typename type>
+ak_v3<type> AK_QuatToXAxis(ak_quat<type> Quat)
+{
+    type qwqy = Quat.w*Quat.y;
+    type qxqz = Quat.x*Quat.z;
+    type qxqy = Quat.x*Quat.y;
+    type qwqz = Quat.w*Quat.z;
+    type qyqy = AK_Square(Quat.y);
+    type qzqz = AK_Square(Quat.z);
+    
+    ak_v3<type> Result = {1 - 2*(qyqy+qzqz), 2*(qxqy+qwqz), 2*(qxqz-qwqy)};
+    return Result;
+}
+
+template <typename type>
+ak_v3<type> AK_QuatToYAxis(ak_quat<type> Quat)
+{
+    type qwqx = Quat.w*Quat.x;
+    type qyqz = Quat.y*Quat.z;
+    type qxqy = Quat.x*Quat.y;
+    type qwqz = Quat.w*Quat.z;
+    type qxqx = AK_Square(Quat.x);
+    type qzqz = AK_Square(Quat.z);
+    
+    ak_v3<type> Result = {2*(qxqy-qwqz),     1 - 2*(qxqx+qzqz), 2*(qyqz+qwqx)};
+    return Result;
+}
+
+template <typename type>
+ak_v3<type> AK_QuatToZAxis(ak_quat<type> Quat)
+{
+    type qxqz = Quat.x*Quat.z;
+    type qwqy = Quat.w*Quat.y;
+    type qyqz = Quat.y*Quat.z;
+    type qwqx = Quat.w*Quat.x;
+    type qxqx = AK_Square(Quat.x);
+    type qyqy = AK_Square(Quat.y);
+    
+    ak_v3<type> Result = {2*(qxqz+qwqy), 2*(qyqz-qwqx), 1 - 2*(qxqx+qyqy)};
+    return Result;
+}
 
 template <typename type> 
 ak_quat<type> AK_IdentityQuat()

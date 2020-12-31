@@ -16,7 +16,6 @@
 #ifdef AK_WINDOWS
 #define AK_OS_PATH_DELIMITER  '\\'
 #include <Windows.h>
-#include <shobjidl_core.h>
 #define AK_DEBUG_BREAK __debugbreak();
 #endif //AK_WINDOWS
 

@@ -432,112 +432,6 @@ AK_Internal__Win32ConvertToStandard(wchar_t* String, ak_arena* Arena)
     return Result;
 }
 
-ak_string AK_OpenFileDialog(ak_char* Extension)
-{
-    ak_string Result = AK_CreateEmptyString();
-    ak_arena* GlobalArena = AK_GetGlobalArena();
-    ak_temp_arena TempArena = GlobalArena->BeginTemp();
-    
-    IFileOpenDialog* FileDialog = NULL;
-    if(SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, IID_IFileOpenDialog, (void**)&FileDialog)))
-    {
-        DWORD FileFlags;
-        if(SUCCEEDED(FileDialog->GetOptions(&FileFlags)))
-        {
-            if(SUCCEEDED(FileDialog->SetOptions(FileFlags | FOS_FORCEFILESYSTEM)))
-            {
-                ak_string StringExtension = AK_StringConcat("*.", Extension, GlobalArena); 
-                COMDLG_FILTERSPEC Filter = {L"File", AK_Internal__Win32ConvertToWide(StringExtension.Data, GlobalArena)};
-                if(SUCCEEDED(FileDialog->SetFileTypes(1, &Filter)))
-                {
-                    if(SUCCEEDED(FileDialog->SetFileTypeIndex(0)))
-                    {
-                        if(SUCCEEDED(FileDialog->SetDefaultExtension(AK_Internal__Win32ConvertToWide(Extension, GlobalArena))))
-                        {
-                            if(SUCCEEDED(FileDialog->Show(NULL)))
-                            {
-                                IShellItem* Item;
-                                if(SUCCEEDED(FileDialog->GetResult(&Item)))
-                                {
-                                    PWSTR FilePath = NULL;
-                                    if(SUCCEEDED(Item->GetDisplayName(SIGDN_FILESYSPATH, &FilePath)))
-                                    {
-                                        char* String = AK_Internal__Win32ConvertToStandard(FilePath, GlobalArena);
-                                        Result.Length = AK_StringLength(String);
-                                        Result.Data = (ak_char*)AK_Allocate((Result.Length+1)*sizeof(ak_char));
-                                        Result.Data[Result.Length] = 0;
-                                        AK_MemoryCopy(Result.Data, String, Result.Length*sizeof(ak_char));                                        
-                                        CoTaskMemFree(FilePath);
-                                    }       
-                                    Item->Release();                                    
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        FileDialog->Release();      
-    }    
-    
-    GlobalArena->EndTemp(&TempArena);    
-    return Result;
-}
-
-ak_string AK_SaveFileDialog(ak_char* Extension)
-{
-    ak_string Result = AK_CreateEmptyString();
-    ak_arena* GlobalArena = AK_GetGlobalArena();
-    ak_temp_arena TempArena = GlobalArena->BeginTemp();
-    
-    IFileSaveDialog* FileDialog = NULL;
-    if(SUCCEEDED(CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL, IID_IFileSaveDialog, (void**)&FileDialog)))
-    {
-        DWORD FileFlags;
-        if(SUCCEEDED(FileDialog->GetOptions(&FileFlags)))
-        {
-            if(SUCCEEDED(FileDialog->SetOptions(FileFlags | FOS_FORCEFILESYSTEM)))
-            {
-                ak_string StringExtension = AK_StringConcat("*.", Extension, GlobalArena); 
-                COMDLG_FILTERSPEC Filter = {L"File", AK_Internal__Win32ConvertToWide(StringExtension.Data, GlobalArena)};
-                if(SUCCEEDED(FileDialog->SetFileTypes(1, &Filter)))
-                {
-                    if(SUCCEEDED(FileDialog->SetFileTypeIndex(0)))
-                    {
-                        if(SUCCEEDED(FileDialog->SetDefaultExtension(AK_Internal__Win32ConvertToWide(Extension, GlobalArena))))
-                        {
-                            if(SUCCEEDED(FileDialog->Show(NULL)))
-                            {
-                                IShellItem* Item;
-                                if(SUCCEEDED(FileDialog->GetResult(&Item)))
-                                {
-                                    PWSTR FilePath = NULL;
-                                    if(SUCCEEDED(Item->GetDisplayName(SIGDN_FILESYSPATH, &FilePath)))
-                                    {
-                                        char* String = AK_Internal__Win32ConvertToStandard(FilePath, GlobalArena);
-                                        Result.Length = AK_StringLength(String);
-                                        Result.Data = (ak_char*)AK_Allocate((Result.Length+1)*sizeof(ak_char));
-                                        Result.Data[Result.Length] = 0;
-                                        AK_MemoryCopy(Result.Data, String, Result.Length*sizeof(ak_char));                                                                                
-                                        CoTaskMemFree(FilePath);
-                                    }
-                                    Item->Release();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-        FileDialog->Release();
-    }
-    
-    GlobalArena->EndTemp(&TempArena);
-    return Result;
-}
-
 global ak_bool AK_Internal__InitFrequency;
 global LARGE_INTEGER AK_Internal__Frequency;
 
@@ -703,11 +597,6 @@ ak_string AK_GetExecutablePath(ak_arena* Arena)
 ak_array<ak_string> AK_GetAllFilesInDirectory(ak_char* Directory, ak_arena* Arena)
 {
     return AK_GetAllFilesInDirectory(AK_CreateString(Directory), Arena);
-}
-
-ak_string AK_OpenFileDialog(ak_string Extension)
-{
-    return AK_OpenFileDialog(Extension.Data);
 }
 
 void AK_MessageBoxOk(ak_char* Title, ak_string Message)
