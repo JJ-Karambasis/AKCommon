@@ -1881,7 +1881,7 @@ ak_m3f AK_OrientAt(ak_v3f Position, ak_v3f Target, ak_v3f Up)
     if(AK_EqualEps(Z, Up))
         Up = AK_YAxis();
     
-    ak_v3f X = -AK_Normalize(AK_Cross(Z, Up));
+    ak_v3f X = AK_Normalize(AK_Cross(Up, Z));
     ak_v3f Y = AK_Cross(Z, X);
     
     ak_m3f Result = AK_M3(X, Y, Z);
@@ -2138,7 +2138,7 @@ ak_m4<type> AK_InvTransformM4(ak_v3<type> Translation, ak_m3<type>  Orientation)
 template <typename type> 
 ak_m4<type> AK_InvTransformM4(ak_v3<type> Translation, ak_quat<type> Orientation)
 {
-    reutrn AK_InvTransformM4(Translation, AK_QuatToMatrix(Orientation));
+    return AK_InvTransformM4(Translation, AK_QuatToMatrix(Orientation));
 }
 
 template <typename type> 
@@ -2309,7 +2309,7 @@ void AK_TransformPoints(ak_v3<type>* Points, ak_u32 PointCount, ak_m4<type> Tran
 
 ak_m4f AK_LookAt(ak_v3f Position, ak_v3f Target, ak_v3f Up)
 {
-    ak_v3f Z = AK_Normalize(Position-Target);
+    ak_v3f Z = AK_Normalize(Target-Position);
     if(AK_EqualEps(Z, Up))
         Up = AK_YAxis();
     

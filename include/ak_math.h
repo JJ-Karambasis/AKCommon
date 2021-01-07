@@ -283,6 +283,14 @@ struct ak_sqt
 typedef ak_sqt<ak_f32> ak_sqtf;
 
 template <typename type>
+struct ak_rigid_transform
+{
+    ak_v3<type> Position;
+    ak_m3<type> Orientation;
+};
+typedef ak_rigid_transform<ak_f32> ak_rigid_transformf;
+
+template <typename type>
 struct ak_rect3
 {
     union
