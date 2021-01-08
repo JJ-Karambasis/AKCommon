@@ -724,6 +724,16 @@ ak_v3<type> AK_SphericalToCartesian(ak_v3<type> SphericalCoordinates)
 }
 
 template <typename type> 
+ak_v3<type> AK_CartesianToSpherical(ak_v3<type> Cartesian)
+{
+    ak_v3<type> Result;
+    Result.radius = AK_Magnitude(Cartesian);
+    Result.azimuth = AK_ATan2(Cartesian.y, Cartesian.x);
+    Result.inclination = AK_ACos(Cartesian.z/Result.radius);
+    return Result;
+}
+
+template <typename type> 
 ak_v3<type> AK_ToNormalizedDeviceCoordinates(ak_v2<type> XY, ak_v2<type> Resolution)
 {
     ak_v3<type> Result;
@@ -2287,7 +2297,7 @@ ak_m4<type> AK_Orthographic(type Left, type Right, type Top, type Bottom, type N
     {
         (type)2/(Right-Left),        (type)0,                    (type)0,               (type)0,
         (type)0,                     (type)2/(Top-Bottom),       (type)0,               (type)0, 
-        (type)0,                     (type)0,                    (type)2/(Far-Near),    (type)0, 
+        (type)0,                     (type)0,                   (type)2/(Far-Near),    (type)0, 
         -(Right+Left)/(Right-Left), -(Top+Bottom)/(Top-Bottom), -(Far+Near)/(Far-Near), (type)1
     };
     

@@ -493,6 +493,7 @@ template <typename type> ak_v3<type> AK_Lerp(ak_v3<type> A, type t, ak_v3<type> 
 template <typename type> ak_v3<type> AK_Cross(ak_v3<type> Left, ak_v3<type> Right);
 template <typename type> type AK_Determinant(ak_v3<type> U, ak_v3<type> V, ak_v3<type> W);
 template <typename type> ak_v3<type> AK_SphericalToCartesian(ak_v3<type> SphericalCoordinates);
+template <typename type> ak_v3<type> AK_CartesianToSpherical(ak_v3<type> Cartesian);
 template <typename type> ak_v3<type> AK_ToNormalizedDeviceCoordinates(ak_v2<type> XY, ak_v2<type> Resolution);
 
 ak_v3f AK_InvalidV3f();

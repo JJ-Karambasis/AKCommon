@@ -35,6 +35,7 @@ ak_u32 AK_EndianSwap32(ak_u32 Value);
 ak_f32 AK_Sin(ak_f32 Rads);
 ak_f32 AK_Cos(ak_f32 Rads);
 ak_f32 AK_Tan(ak_f32 Rads);
+ak_f32 AK_ACos(ak_f32 Rads);
 ak_f32 AK_ATan2(ak_f32 A, ak_f32 B);
 ak_f32 AK_ASin(ak_f32 Rads);
 ak_f32 AK_Sqrt(ak_f32 Value);

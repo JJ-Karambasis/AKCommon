@@ -241,6 +241,12 @@ ak_f64 AK_Tan(ak_f64 Rads)
     return Result;
 }
 
+ak_f32 AK_ACos(ak_f32 Rads)
+{
+    ak_f32 Result = atanf(Rads);
+    return Result;
+}
+
 ak_f32 AK_ATan2(ak_f32 A, ak_f32 B)
 {
     ak_f32 Result = atan2f(A, B);
