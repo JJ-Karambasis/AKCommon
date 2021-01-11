@@ -12,6 +12,7 @@ struct ak_string
 ak_string AK_CreateEmptyString();
 ak_string AK_CreateString(ak_char* Data, ak_u32 StringLength);
 ak_string AK_CreateString(ak_char* Data);
+ak_string AK_CreateString(const ak_char* Data);
 ak_string AK_CreateString(ak_buffer Buffer);
 ak_string AK_AllocateString(ak_u32 StringLength);
 ak_string AK_AllocateString(ak_u32 StringLength, ak_arena* Arena);
@@ -48,6 +49,8 @@ ak_bool AK_StringBeginsWith(ak_char* String, const ak_char* MatchString);
 ak_bool AK_StringBeginsWith(const ak_char* String, const ak_char* MatchString);
 ak_bool AK_StringBeginsWith(ak_char* String, ak_u32 StringLength, ak_char Character);
 ak_bool AK_StringBeginsWith(ak_string String, ak_char Character);
+ak_string AK_StringFind(ak_string String, ak_string Pattern);
+ak_string AK_StringFind(ak_string String, const ak_char* Pattern);
 ak_string AK_FindLastChar(ak_string String, ak_char Character);
 ak_char*  AK_FindLastChar(ak_char* String, ak_char Character);
 ak_string AK_GetFilename(ak_string FilePath);

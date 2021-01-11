@@ -1557,6 +1557,19 @@ ak_quat<type> AK_RotQuat(ak_v3<type> Axis, type Angle)
 }
 
 template <typename type>
+void AK_QuatToAxisAngle(ak_v3<type>* Axis, type* Angle, ak_quat<type> Orientation)
+{
+    if(Orientation.w > 1) Orientation = AK_Normalize(Orientation);
+    
+    *Angle = 2*AK_ACos(Orientation.w);
+    ak_f32 s = AK_Sqrt(1-AK_Square(Orientation.w));
+    if(s < 0.001f)
+        *Axis = Orientation.v;
+    else
+        *Axis = Orientation.v/s;
+}
+
+template <typename type>
 ak_v3<type> AK_Rotate(ak_v3<type> V, ak_quat<type> Quat)
 {
     ak_v3<type> Result = ((2 * AK_Dot(Quat.v, V) * Quat.v)   + 

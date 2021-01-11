@@ -22,6 +22,12 @@ ak_string AK_CreateString(ak_char* Data)
     return Result;
 }
 
+ak_string AK_CreateString(const ak_char* Data)
+{
+    ak_string Result = AK_CreateString((ak_char*)Data);
+    return Result;
+}
+
 ak_string AK_CreateString(ak_buffer Buffer)
 {
     ak_string Result = AK_CreateString((ak_char*)Buffer.Data, AK_SafeU32(Buffer.Size));
@@ -266,6 +272,49 @@ ak_bool AK_StringBeginsWith(ak_char* String, ak_u32 StringLength, ak_char Charac
 ak_bool AK_StringBeginsWith(ak_string String, ak_char Character)
 {
     return AK_StringBeginsWith(String.Data, String.Length, Character);
+}
+
+ak_string AK_StringFind(ak_string String, ak_string Pattern)
+{
+    if(Pattern.Length > String.Length)
+        return AK_CreateEmptyString();
+    
+    for(ak_u32 CharIndex = 0; CharIndex < String.Length; CharIndex++)
+    {
+        if(String[CharIndex] == Pattern[0])
+        {
+            ak_u32 Remainder = Pattern.Length-1;
+            if((CharIndex+Remainder) < String.Length)
+            {
+                ak_u32 StartIndex = CharIndex;
+                ak_bool Valid = true;
+                for(ak_u32 PatternIndex = 0; PatternIndex < Pattern.Length; PatternIndex++)
+                {
+                    if(String[CharIndex] != Pattern[PatternIndex])
+                    {
+                        Valid = false;
+                        break;
+                    }
+                    CharIndex++;
+                }
+                if(Valid)
+                {
+                    return AK_OffsetString(String, StartIndex);
+                }
+            }
+            else
+            {
+                return AK_CreateEmptyString();
+            }
+        }
+    }
+    
+    return AK_CreateEmptyString();
+}
+
+ak_string AK_StringFind(ak_string String, const ak_char* Pattern)
+{
+    return AK_StringFind(String, AK_CreateString(Pattern));
 }
 
 ak_string AK_FindLastChar(ak_string String, ak_char Character)

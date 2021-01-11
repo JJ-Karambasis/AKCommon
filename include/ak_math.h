@@ -645,6 +645,7 @@ template <typename type> type          AK_SqrMagnitude(ak_quat<type> Quat);
 template <typename type> type          AK_Magnitude(ak_quat<type> Quat);
 template <typename type> ak_quat<type> AK_Normalize(ak_quat<type> Quat);
 template <typename type> ak_quat<type> AK_RotQuat(ak_v3<type> Axis, type Angle);
+template <typename type> void AK_QuatToAxisAngle(ak_v3<type>* Axis, type* Angle, ak_quat<type> Orientation);
 template <typename type> ak_v3<type>   AK_Rotate(ak_v3<type> V, ak_quat<type> Quat);
 template <typename type> ak_quat<type> AK_Inverse(ak_quat<type> Quat);
 template <typename type> ak_quat<type> AK_QuatDiff(ak_quat<type> Q1, ak_quat<type> Q2);
