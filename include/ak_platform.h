@@ -25,7 +25,6 @@ struct ak_memory_info
 
 struct ak_window;
 
-ak_string AK_PlatformGetErrorMessage();
 void* AK_Allocate(ak_uaddr Size);
 void  AK_Free(void* Memory);
 void* AK_AllocateVirtualMemory(ak_uaddr Size);

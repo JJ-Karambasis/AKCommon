@@ -184,6 +184,12 @@ ak_fixed_array<type> AK_CreateArray(type* Data, ak_u32 Size)
     return Result;
 }
 
+template <typename type> 
+ak_fixed_array<type> AK_CreateArray(ak_arena* Arena, ak_u32 Size)
+{
+    return AK_CreateArray(Arena->PushArray<type>(Size), Size);
+}
+
 template <typename type>
 type& ak_fixed_array<type>::operator[](ak_u32 Index)
 {

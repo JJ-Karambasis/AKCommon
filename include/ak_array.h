@@ -53,6 +53,7 @@ struct ak_fixed_array_iter
 
 template <typename type> ak_array<type> AK_CreateArray(ak_u32 InitialCapacity=32);
 template <typename type> ak_fixed_array<type> AK_CreateArray(type* Data, ak_u32 Size);
+template <typename type> ak_fixed_array<type> AK_CreateArray(ak_arena* Arena, ak_u32 Size);
 template <typename type> void AK_DeleteArray(ak_array<type>* Array);
 template <typename type> ak_array_iter<type> AK_BeginIter(ak_array<type>* Array);
 template <typename type> ak_fixed_array_iter<type> AK_BeginIter(ak_fixed_array<type>* Array);

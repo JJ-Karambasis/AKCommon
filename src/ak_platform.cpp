@@ -1,20 +1,3 @@
-global ak_string AK_Internal__PlatformErrorMessage;
-
-void AK_Internal__PlatformSetErrorMessage(ak_char* Format, ...)
-{    
-    ak_arena* Arena = AK_GetGlobalArena();    
-    
-    va_list List;
-    va_start(List, Format);
-    AK_Internal__PlatformErrorMessage = AK_FormatString(Arena, Format, List);
-    va_end(List);            
-}
-
-ak_string AK_PlatformGetErrorMessage()
-{
-    return AK_Internal__PlatformErrorMessage;
-}
-
 #ifdef AK_WINDOWS
 
 #pragma comment(lib, "user32.lib")
@@ -51,8 +34,6 @@ AK_Internal__PlatformWindowProc(HWND Window, UINT Message, WPARAM WParam, LPARAM
 void* AK_Allocate(ak_uaddr Size)
 {
     void* Result = HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, Size);
-    if(!Result)
-        AK_Internal__PlatformSetErrorMessage("WIN32: Failed to allocate heap memory");
     return Result;
 }
 
@@ -65,16 +46,12 @@ void  AK_Free(void* Memory)
 void* AK_AllocateVirtualMemory(ak_uaddr Size)
 {
     void* Result = VirtualAlloc(NULL, Size, MEM_RESERVE, PAGE_NOACCESS);
-    if(!Result)
-        AK_Internal__PlatformSetErrorMessage("WIN32: Failed to reserve virtual memory");
     return Result;
 }
 
 void* AK_CommitVirtualMemory(void* Address, ak_uaddr Size)
 {
     void* Result = VirtualAlloc(Address, Size, MEM_COMMIT, PAGE_READWRITE);
-    if(!Result)
-        AK_Internal__PlatformSetErrorMessage("WIN32: Failed to commit virtual memory");
     return Result;
 }
 
@@ -127,10 +104,7 @@ ak_file_handle* AK_OpenFile(ak_char* Path, ak_file_attributes FileAttributes)
     
     HANDLE Handle = CreateFile(Path, DesiredAttributes, 0, NULL, CreationDisposition, FILE_ATTRIBUTE_NORMAL, NULL);
     if(Handle == INVALID_HANDLE_VALUE)
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Failed to open file %s", Path);
         return 0;
-    }
     
     ak_file_handle* File = (ak_file_handle*)AK_Allocate(sizeof(ak_file_handle));
     File->Handle = Handle;
@@ -156,23 +130,14 @@ void AK_CloseFile(ak_file_handle* File)
 ak_u64 AK_GetFileSize(ak_file_handle* File)
 {    
     if(!File)
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Cannot get file size. Invalid file handle.");
         return (ak_u64)-1;
-    }
     
     if(File->Attributes != AK_FILE_ATTRIBUTES_READ)
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Cannot get file size. Invalid file attributes. It is set to write instead of read.");
         return (ak_u64)-1;
-    }
     
     LARGE_INTEGER Result;
     if(!GetFileSizeEx(File->Handle, &Result))
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Cannot get file size. Error code %d", GetLastError());
         return (ak_u64)-1;
-    }
     
     return Result.QuadPart;        
 }
@@ -180,18 +145,12 @@ ak_u64 AK_GetFileSize(ak_file_handle* File)
 ak_u64 AK_GetFilePointer(ak_file_handle* File)
 {    
     if(!File)
-    {    
-        AK_Internal__PlatformSetErrorMessage("WIN32: Cannot get file pointer. Invalid file handle.");
         return (ak_u64)-1;
-    }
     
     LONG High = 0;
     DWORD Low = SetFilePointer(File->Handle, 0, &High, FILE_CURRENT);
     if(Low == INVALID_SET_FILE_POINTER)
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Cannot get file pointer. Error code %d", GetLastError());
         return (ak_u64)-1;
-    }
     
     return ((ak_u64)High << 32) | Low;
 }
@@ -199,16 +158,10 @@ ak_u64 AK_GetFilePointer(ak_file_handle* File)
 ak_bool AK_ReadFile(ak_file_handle* File, void* Data, ak_u32 ReadSize, ak_u64 Offset)
 {    
     if(!File)
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Cannot read file. Invalid file handle.");
         return false;
-    }
     
     if(File->Attributes != AK_FILE_ATTRIBUTES_READ)
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Cannot read file. File has invalid attributes. It is set to write when it should be set to read.");
         return false;
-    }
     
     OVERLAPPED* OffsetPointer = NULL;
     OVERLAPPED Offsets = {};
@@ -221,16 +174,10 @@ ak_bool AK_ReadFile(ak_file_handle* File, void* Data, ak_u32 ReadSize, ak_u64 Of
     
     DWORD BytesRead;
     if(!ReadFile(File->Handle, Data, ReadSize, &BytesRead, OffsetPointer))
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Cannot read file. Error code %d", GetLastError());
         return false;
-    }
     
     if(BytesRead != ReadSize)
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Did not fully read file. Read/Requested %d/%d", BytesRead, ReadSize);
         return false;
-    }
     
     return true;
 }
@@ -238,16 +185,10 @@ ak_bool AK_ReadFile(ak_file_handle* File, void* Data, ak_u32 ReadSize, ak_u64 Of
 ak_bool AK_WriteFile(ak_file_handle* File, void* Data, ak_u32 WriteSize, ak_u64 Offset)
 {    
     if(!File)
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Cannot write file. Invalid file handle.");
         return false;
-    }
     
     if(File->Attributes != AK_FILE_ATTRIBUTES_WRITE)
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Cannot write file. File has invalid attributes. It is set to read when it should be set to write.");
         return false;
-    }
     
     OVERLAPPED* OffsetPointer = NULL;
     OVERLAPPED Offsets = {};
@@ -260,16 +201,10 @@ ak_bool AK_WriteFile(ak_file_handle* File, void* Data, ak_u32 WriteSize, ak_u64 
     
     DWORD BytesWritten;
     if(!WriteFile(File->Handle, Data, WriteSize, &BytesWritten, OffsetPointer))
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Cannot write file. Error code %d", GetLastError());
         return false;
-    }
     
     if(BytesWritten != WriteSize)
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Did not fully write file. Written/Requested %d/%d", BytesWritten, WriteSize);
         return false;
-    }
     
     return true;
 }
@@ -302,8 +237,6 @@ ak_bool AK_DirectoryExists(ak_char* Path)
 ak_bool AK_FileRemove(ak_char* Path)
 {
     ak_bool Result = DeleteFile(Path);
-    if(!Result)
-        AK_Internal__PlatformSetErrorMessage("WIN32: Could not delete file %s. Error code %d", Path, GetLastError());
     return Result;
 }
 
@@ -334,7 +267,6 @@ ak_bool AK_DirectoryRemoveRecursively(ak_char* Path)
 ak_bool AK_FileRename(ak_char* OldName, ak_char* NewName)
 {
     ak_bool Result = MoveFile(OldName, NewName);
-    if(!Result) AK_Internal__PlatformSetErrorMessage("WIN32: Could not rename file from %s to %s. Error code %d", OldName, NewName, GetLastError());
     return Result;
 }
 
@@ -373,10 +305,6 @@ ak_string AK_GetExecutablePathWithName(ak_arena* Arena)
     {
         Result = AK_PushString(String, Size, Arena);
     }
-    else
-    {
-        AK_Internal__PlatformSetErrorMessage("WIN32: Could not get the executable path. File path is too long");
-    }    
     
     GlobalArena->EndTemp(&TempArena);
     return Result;
@@ -474,10 +402,7 @@ ak_window* AK_CreateWindow(ak_u16 Width, ak_u16 Height, ak_char* Title)
         Global_Internal__WindowClass.hInstance = GetModuleHandle(0);
         Global_Internal__WindowClass.lpszClassName = GLOBAL_INTERNAL__WINDOW_CLASS_NAME;    
         if(!RegisterClassEx(&Global_Internal__WindowClass))    
-        {            
-            AK_Internal__PlatformSetErrorMessage("WIN32: Could not register the window class. Cannot create window");            
             return NULL;
-        }                
     }
     
     DWORD ExStyle = 0;
