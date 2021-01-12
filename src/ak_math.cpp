@@ -2054,6 +2054,12 @@ ak_m4<type> AK_TransformM4(ak_v3<type> Translation, ak_m3<type> Orientation, ak_
 }
 
 template <typename type> 
+ak_m4<type> AK_TransformM4(ak_v3<type> Translation, ak_m3<type>  Orientation,  ak_f32 Scale)
+{
+    return AK_TransformM4(Translation, Orientation.XAxis*Scale, Orientation.YAxis*Scale, Orientation.ZAxis*Scale);
+}
+
+template <typename type> 
 ak_m4<type> AK_TransformM4(ak_v3<type> Translation, ak_quat<type> Orientation, ak_v3<type> Scale)
 {
     return AK_TransformM4(Translation, AK_QuatToMatrix(Orientation), Scale);
